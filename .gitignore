@@ -1,0 +1,9 @@
+/logs
+/target
+/project/target
+/project/project
+/.idea
+/target
+/oso-query-api/target
+/oso-query-impl/target
+/oso-query-impl/logs
