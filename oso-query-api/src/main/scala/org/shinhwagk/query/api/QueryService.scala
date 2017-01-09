@@ -2,14 +2,14 @@ package org.shinhwagk.query.api
 
 import java.sql.{DriverManager, ResultSet}
 
-import com.lightbend.lagom.scaladsl.api.Service.restCall
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
+import play.api.libs.json.{Json, _}
 
+import scala.collection.immutable.Map
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import scala.concurrent.Future
 
 /**
   * The lagom-hello service interface.
@@ -19,21 +19,33 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 trait QueryService extends Service {
 
-  def query(id: Int): ServiceCall[QueryOracleMessage, String]
+  def query(id: Int, mode: String): ServiceCall[QueryOracleMessage, String]
 
   override final def descriptor = {
     import Service._
     named("oso-query").withCalls(
-      restCall(Method.POST, "/api/query/oracle/:id/map", query _)
+      restCall(Method.POST, "/api/query/oracle/:id/:mode", query _)
     ).withAutoAcl(true)
   }
 }
 
+object QueryMode extends Enumeration {
+  type QueryMode = Value
+  val ARRAY = Value("ARRAY")
+  val MAP = Value("MAP")
+}
 
 case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: List[Any]) {
   Class.forName("oracle.jdbc.driver.OracleDriver");
 
-  def query[T](f: (ResultSet) => List[T]) = Future {
+  def mode(mode: String): Future[String] = {
+    QueryMode.withName(mode.toUpperCase) match {
+      case QueryMode.ARRAY => query[List[String]](queryToAarry)
+      case QueryMode.MAP => query[Map[String, String]](queryToMap)
+    }
+  }
+
+  def query[T](f: (ResultSet) => JsValue) = Future {
     val conn = DriverManager.getConnection(jdbcUrl, username, password)
     val stmt = conn.prepareStatement(sqlText)
     (1 to parameters.length).foreach(num => stmt.setObject(num, parameters(num - 1)))
@@ -44,10 +56,11 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
     stmt.close()
     rs.close()
     conn.close()
-    rows
+
+    rows.toString()
   }
 
-  def queryToMap(rs: ResultSet): List[Map[String, String]] = {
+  def queryToMap(rs: ResultSet): JsValue = {
     val meta = rs.getMetaData
     val rows = new ArrayBuffer[Map[String, String]]()
     import scala.collection.mutable.Map
@@ -58,25 +71,25 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
       }
       rows += row.toMap
     }
-    rows.toList
+    println(rows.toList)
+    Json.toJson(rows.toList)
   }
 
 
-  def queryToAarry(rs: ResultSet): List[List[String]] = {
+  def queryToAarry(rs: ResultSet): JsValue = {
     val meta = rs.getMetaData
     val rows: ArrayBuffer[List[String]] = new ArrayBuffer[List[String]]()
     rows += (1 to meta.getColumnCount).toList.map(meta.getColumnName)
     while (rs.next()) {
       rows += (1 to meta.getColumnCount).toList.map(i => (if (rs.getString(i) == null) "" else rs.getString(i)))
     }
-    rows.toList
+    Json.toJson(rows.toList)
   }
 
 }
 
 object QueryOracleMessage {
 
-  import play.api.libs.json._
 
   implicit object AnyJsonFormat extends Format[Any] {
     override def writes(o: Any): JsValue = o match {
