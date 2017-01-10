@@ -1,7 +1,9 @@
 package org.shinhwagk.query.api
 
+import java.io.{BufferedReader, InputStreamReader}
 import java.sql.{DriverManager, ResultSet}
 
+import com.jcraft.jsch.{ChannelExec, JSch}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
 import play.api.libs.json.{Json, _}
@@ -19,29 +21,84 @@ import scala.concurrent.Future
   */
 trait QueryService extends Service {
 
-  def query(id: Int, mode: String): ServiceCall[QueryOracleMessage, String]
+  def queryForOracle(mode: String): ServiceCall[QueryOracleMessage, String]
+
+  def queryForOSScript: ServiceCall[QueryOSMessage, String]
 
   override final def descriptor = {
     import Service._
     named("oso-query").withCalls(
-      restCall(Method.POST, "/api/query/oracle/:id/:mode", query _)
+      restCall(Method.POST, "/api/query/oracle/:mode", queryForOracle _),
+      restCall(Method.POST, "/api/query/os", queryForOSScript _)
     ).withAutoAcl(true)
   }
 }
 
-object QueryMode extends Enumeration {
+object QueryModeEnum extends Enumeration {
   type QueryMode = Value
   val ARRAY = Value("ARRAY")
   val MAP = Value("MAP")
 }
 
+case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: Option[Int]) {
+  def exec = Future {
+    ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl)(0)
+  }
+
+  def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int = 22): ArrayBuffer[String] = {
+
+    val jsch = new JSch();
+    jsch.addIdentity(keyPath);
+    val session = jsch.getSession(user, host, port);
+    session.setConfig("StrictHostKeyChecking", "no");
+    session.connect();
+
+    val channelExec: ChannelExec = session.openChannel("exec").asInstanceOf[ChannelExec]
+    val in = channelExec.getInputStream();
+    channelExec.setCommand(s"curl ${scriptUrl} | sh");
+
+    channelExec.connect();
+
+    val reader = new BufferedReader(new InputStreamReader(in));
+
+    val rs = new ArrayBuffer[String]()
+
+    var line: Option[String] = Option(reader.readLine())
+
+    while (line.isDefined) {
+      rs += line.get
+      line = Option(reader.readLine())
+    }
+
+
+    val exitStatus: Int = channelExec.getExitStatus();
+
+    channelExec.disconnect();
+    session.disconnect();
+
+    if (exitStatus < 0) {
+      // System.out.println("Done, but exit status not set!");
+    } else if (exitStatus > 0) {
+      // System.out.println("Done, but with error!");
+    } else {
+      // System.out.println("Done!");
+    }
+    rs
+  }
+}
+
+object QueryOSMessage {
+  implicit val format: Format[QueryOSMessage] = Json.format[QueryOSMessage]
+}
+
+
 case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: List[Any]) {
   Class.forName("oracle.jdbc.driver.OracleDriver");
 
   def mode(mode: String): Future[String] = {
-    QueryMode.withName(mode.toUpperCase) match {
-      case QueryMode.ARRAY => query[List[String]](queryToAarry)
-      case QueryMode.MAP => query[Map[String, String]](queryToMap)
+    QueryModeEnum.withName(mode.toUpperCase) match {
+      case QueryModeEnum.ARRAY => query[List[String]](queryToAarry)
+      case QueryModeEnum.MAP => query[Map[String, String]](queryToMap)
     }
   }
 
@@ -89,7 +146,6 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
 }
 
 object QueryOracleMessage {
-
 
   implicit object AnyJsonFormat extends Format[Any] {
     override def writes(o: Any): JsValue = o match {
