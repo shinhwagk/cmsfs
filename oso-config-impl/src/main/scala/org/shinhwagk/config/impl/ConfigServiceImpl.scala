@@ -15,23 +15,23 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
 
   val db = Database.forConfig("oso-config")
 
-  override def getNode(id: Int): ServiceCall[NotUsed, Host] = ServiceCall { _ =>
+  override def getHost(id: Int): ServiceCall[NotUsed, Host] = ServiceCall { _ =>
     db.run(Tables.hosts.filter(_.id === id).result.head)
   }
 
-  override def getNodes: ServiceCall[NotUsed, List[Host]] = ServiceCall { _ =>
+  override def getHosts: ServiceCall[NotUsed, List[Host]] = ServiceCall { _ =>
     db.run(Tables.hosts.result).map(_.toList)
   }
 
-  override def deleteNode(id: Int): ServiceCall[NotUsed, NotUsed] = ServiceCall { _ =>
+  override def deleteHost(id: Int): ServiceCall[NotUsed, NotUsed] = ServiceCall { _ =>
     db.run(Tables.hosts.filter(_.id === id).delete).map(_ => NotUsed)
   }
 
-  override def addNode: ServiceCall[Host, NotUsed] = ServiceCall { p =>
+  override def addHost: ServiceCall[Host, NotUsed] = ServiceCall { p =>
     db.run(Tables.hosts += p).map(_ => NotUsed)
   }
 
-  override def putNode(id: Int): ServiceCall[Host, NotUsed] = ServiceCall { p =>
+  override def putHost(id: Int): ServiceCall[Host, NotUsed] = ServiceCall { p =>
     db.run(Tables.hosts.filter(_.id === id).update(p.copy(id = Some(id)))).map(_ => NotUsed)
   }
 }

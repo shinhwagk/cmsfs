@@ -4,6 +4,7 @@ import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
+import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
 import play.api.libs.json._
 
 /**
@@ -11,23 +12,23 @@ import play.api.libs.json._
   */
 trait ConfigService extends Service {
 
-  def getNode(id: Int): ServiceCall[NotUsed, Host]
+  def getHost(id: Int): ServiceCall[NotUsed, Host]
 
-  def getNodes: ServiceCall[NotUsed, List[Host]]
+  def getHosts: ServiceCall[NotUsed, List[Host]]
 
-  def deleteNode(id: Int): ServiceCall[NotUsed, NotUsed]
+  def deleteHost(id: Int): ServiceCall[NotUsed, NotUsed]
 
-  def addNode: ServiceCall[Host, NotUsed]
+  def addHost: ServiceCall[Host, NotUsed]
 
-  def putNode(id: Int): ServiceCall[Host, NotUsed]
+  def putHost(id: Int): ServiceCall[Host, NotUsed]
 
   override final def descriptor = {
     named("oso-config").withCalls(
-      restCall(Method.GET, "/v1/node/:id", getNode _),
-      restCall(Method.GET, "/v1/nodes", getNodes),
-      restCall(Method.PUT, "/v1/node/:id", putNode _),
-      restCall(Method.DELETE, "/v1/node/:id", deleteNode _),
-      restCall(Method.POST, "/v1/node", addNode)
+      restCall(Method.GET, "/v1/node/:id", getHost _),
+      restCall(Method.GET, "/v1/nodes", getHosts),
+      restCall(Method.PUT, "/v1/node/:id", putHost _),
+      restCall(Method.DELETE, "/v1/node/:id", deleteHost _),
+      restCall(Method.POST, "/v1/node", addHost)
     )
   }
 }
@@ -36,6 +37,35 @@ case class Host(id: Option[Int], label: String, hostname: String, ip: String, po
 
 object Host extends ((Option[Int], String, String, String, Int, List[String], Boolean) => Host) {
   implicit val format: Format[Host] = Json.format[Host]
+}
+
+object MonitorCategoryEnum extends Enumeration {
+  type MonitorCategoryEnum = Value
+  val OS = Value("OS")
+  val ORACLE = Value("ORACLE")
+}
+
+case class Monitor(id: Option[Int])
+
+//                   , category: MonitorCategoryEnum, label: String, args: List[String], tags: List[String], status: Boolean
+
+
+object Monitor extends ((Option[Int]) => Monitor) {
+  //  , MonitorCategoryEnum, String, List[String], List[String], Boolean
+
+  //  implicit object MonitorEnumJsonFormat extends Format[MonitorCategoryEnum] {
+  //    override def reads(json: JsValue): JsResult[MonitorCategoryEnum] = json match {
+  //      case JsString("ORACLE") => json.validate[MonitorCategoryEnum]
+  //      case JsString("OS") => json.validate[MonitorCategoryEnum]
+  //      case _ => throw new Exception("MonitorEnum match error")
+  //    }
+  //    override def writes(o: MonitorCategoryEnum): JsValue = o match {
+  //      case MonitorCategoryEnum.ORACLE => JsString("ORACLE")
+  //      case MonitorCategoryEnum.OS => JsString("OS")
+  //    }
+  //  }
+
+  implicit val format: Format[Monitor] = Json.format[Monitor]
 }
 
 //case class RDatabase(id: Int, hid: Int, jdbcUrl: String, user: String, password: String, status: Boolean, tag: List[String])

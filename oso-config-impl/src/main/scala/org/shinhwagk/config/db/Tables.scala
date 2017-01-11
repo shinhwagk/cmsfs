@@ -8,6 +8,28 @@ import slick.driver.MySQLDriver.api._
   * Created by zhangxu on 2017/1/10.
   */
 object Tables {
+  case class Monitorx(id: Int)
+
+  class Monitors(tag: Tag) extends Table[Monitorx](tag, "monitor") {
+    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+
+    //    def category = column[MonitorCategoryEnum]("CATEGORY")
+    //
+    //    def label = column[String]("LABEL")
+    //
+    //    def args = column[List[String]]("ARGS")
+    //
+    //    def tags = column[List[String]]("TAGS")
+    //
+    //    def status = column[Boolean]("STATUS")
+
+    def * = (id) <> (Monitorx.tupled, Monitorx.unapply)
+
+    //      , label, category, args, tags, status
+
+  }
+
+  val monitors = TableQuery[Monitors]
 
   implicit val tagsMapper = MappedColumnType.base[List[String], String](
     Json.toJson(_).toString(),
@@ -15,7 +37,7 @@ object Tables {
   )
 
   class Hosts(tag: Tag) extends Table[Host](tag, "host") {
-    def id = column[Option[Int]]("ID", O.PrimaryKey)
+    def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
 
     def label = column[String]("LABEL")
 
@@ -33,4 +55,17 @@ object Tables {
   }
 
   val hosts = TableQuery[Hosts]
+
+  //  implicit val categoryMapper = MappedColumnType.base[MonitorCategoryEnum, String](
+  //    _ match {
+  //      case MonitorCategoryEnum.ORACLE => "ORACLE"
+  //      case MonitorCategoryEnum.OS => "OS"
+  //    },
+  //    _ match {
+  //      case "ORACLE" => MonitorCategoryEnum.ORACLE
+  //      case "OS " => MonitorCategoryEnum.OS
+  //    }
+  //  )
+
+
 }
