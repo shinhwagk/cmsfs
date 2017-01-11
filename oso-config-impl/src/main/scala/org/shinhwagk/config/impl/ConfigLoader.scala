@@ -27,6 +27,7 @@ abstract class ConfigApplication(context: LagomApplicationContext)
     bindService[ConfigService].to(wire[ConfigServiceImpl])
   )
 
+  lazy val configService = serviceClient.implement[ConfigService]
   // Register the lagom-hello persistent entity
   //persistentEntityRegistry.register(wire[LagomhelloEntity])
 }

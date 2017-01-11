@@ -7,29 +7,29 @@ val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
 lazy val `oso` = (project in file("."))
-  .aggregate(`oso-config-api`, `oso-config-impl`)
+  .aggregate(`oso-query-api`, `oso-query-impl`, `oso-config-api`, `oso-config-impl`)
 
-//lazy val `oso-query-api` = (project in file("oso-query-api"))
-//  .settings(
-//    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
-//    libraryDependencies ++= Seq(
-//      "com.wingtech" % "ojdbc" % "7",
-//      "com.jcraft" % "jsch" % "0.1.54",
-//      lagomScaladslApi
-//    )
-//  )
-//
-//lazy val `oso-query-impl` = (project in file("oso-query-impl"))
-//  .enablePlugins(LagomScala)
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      lagomScaladslTestKit,
-//      macwire,
-//      scalaTest
-//    )
-//  )
-//  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(`oso-query-api`)
+lazy val `oso-query-api` = (project in file("oso-query-api"))
+  .settings(
+    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
+    libraryDependencies ++= Seq(
+      "com.wingtech" % "ojdbc" % "7",
+      "com.jcraft" % "jsch" % "0.1.54",
+      lagomScaladslApi
+    )
+  )
+
+lazy val `oso-query-impl` = (project in file("oso-query-impl"))
+  .enablePlugins(LagomScala)
+  .settings(
+    libraryDependencies ++= Seq(
+      lagomScaladslTestKit,
+      macwire,
+      scalaTest
+    )
+  )
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`oso-query-api`)
 
 //lazy val `os-monitor-api` = (project in file("oso-monitor-api"))
 //  .settings(
