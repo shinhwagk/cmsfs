@@ -91,7 +91,6 @@ object QueryOSMessage {
   implicit val format: Format[QueryOSMessage] = Json.format[QueryOSMessage]
 }
 
-
 case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: List[Any]) {
   Class.forName("oracle.jdbc.driver.OracleDriver");
 

@@ -45,25 +45,22 @@ object MonitorCategoryEnum extends Enumeration {
   val ORACLE = Value("ORACLE")
 }
 
-case class Monitor(id: Option[Int])
+case class Monitor(id: Option[Int], category: MonitorCategoryEnum, label: String, args: List[String], tags: List[String], state: Boolean)
 
-//                   , category: MonitorCategoryEnum, label: String, args: List[String], tags: List[String], status: Boolean
+object Monitor extends ((Option[Int], MonitorCategoryEnum, String, List[String], List[String], Boolean) => Monitor) {
 
+  implicit object MonitorEnumJsonFormat extends Format[MonitorCategoryEnum] {
+    override def reads(json: JsValue): JsResult[MonitorCategoryEnum] = json match {
+      case JsString(s) if s == MonitorCategoryEnum.ORACLE.toString => json.validate[MonitorCategoryEnum]
+      case JsString(s) if s == MonitorCategoryEnum.OS.toString => json.validate[MonitorCategoryEnum]
+      case _ => throw new Exception("MonitorEnum match error")
+    }
 
-object Monitor extends ((Option[Int]) => Monitor) {
-  //  , MonitorCategoryEnum, String, List[String], List[String], Boolean
-
-  //  implicit object MonitorEnumJsonFormat extends Format[MonitorCategoryEnum] {
-  //    override def reads(json: JsValue): JsResult[MonitorCategoryEnum] = json match {
-  //      case JsString("ORACLE") => json.validate[MonitorCategoryEnum]
-  //      case JsString("OS") => json.validate[MonitorCategoryEnum]
-  //      case _ => throw new Exception("MonitorEnum match error")
-  //    }
-  //    override def writes(o: MonitorCategoryEnum): JsValue = o match {
-  //      case MonitorCategoryEnum.ORACLE => JsString("ORACLE")
-  //      case MonitorCategoryEnum.OS => JsString("OS")
-  //    }
-  //  }
+    override def writes(o: MonitorCategoryEnum): JsValue = o match {
+      case MonitorCategoryEnum.ORACLE => JsString("ORACLE")
+      case MonitorCategoryEnum.OS => JsString("OS")
+    }
+  }
 
   implicit val format: Format[Monitor] = Json.format[Monitor]
 }

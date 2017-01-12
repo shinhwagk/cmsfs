@@ -1,6 +1,7 @@
 package org.shinhwagk.config.db
 
-import org.shinhwagk.config.api.Host
+import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
+import org.shinhwagk.config.api.{Host, Monitor, MonitorCategoryEnum}
 import play.api.libs.json.Json
 import slick.driver.MySQLDriver.api._
 
@@ -8,33 +9,41 @@ import slick.driver.MySQLDriver.api._
   * Created by zhangxu on 2017/1/10.
   */
 object Tables {
-  case class Monitorx(id: Int)
 
-  class Monitors(tag: Tag) extends Table[Monitorx](tag, "monitor") {
-    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+  private type StringList = List[String]
 
-    //    def category = column[MonitorCategoryEnum]("CATEGORY")
-    //
-    //    def label = column[String]("LABEL")
-    //
-    //    def args = column[List[String]]("ARGS")
-    //
-    //    def tags = column[List[String]]("TAGS")
-    //
-    //    def status = column[Boolean]("STATUS")
+  private implicit val categoryMapper = MappedColumnType.base[MonitorCategoryEnum, String](
+    _ match {
+      case MonitorCategoryEnum.ORACLE => "ORACLE"
+      case MonitorCategoryEnum.OS => "OS"
+    },
+    _ match {
+      case "ORACLE" => MonitorCategoryEnum.ORACLE
+      case "OS " => MonitorCategoryEnum.OS
+    }
+  )
 
-    def * = (id) <> (Monitorx.tupled, Monitorx.unapply)
+  private implicit val tagsMapper = MappedColumnType.base[StringList, String](
+    Json.toJson(_).toString(),
+    Json.parse(_).as[StringList]
+  )
 
-    //      , label, category, args, tags, status
+  class Monitors(tag: Tag) extends Table[Monitor](tag, "monitors") {
+    def id = column[Option[Int]]("SUP_ID", O.PrimaryKey, O.AutoInc)
 
+    def category = column[MonitorCategoryEnum]("category")
+
+    def label = column[String]("label")
+
+    def args = column[StringList]("args")
+
+    def tags = column[StringList]("tags")
+
+    def state = column[Boolean]("state")
+
+    def * = (id, category, label, args, tags, state) <> (Monitor.tupled, Monitor.unapply)
   }
 
-  val monitors = TableQuery[Monitors]
-
-  implicit val tagsMapper = MappedColumnType.base[List[String], String](
-    Json.toJson(_).toString(),
-    Json.parse(_).as[List[String]]
-  )
 
   class Hosts(tag: Tag) extends Table[Host](tag, "host") {
     def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
@@ -47,7 +56,7 @@ object Tables {
 
     def port = column[Int]("PORT")
 
-    def tags = column[List[String]]("TAGS")
+    def tags = column[StringList]("TAGS")
 
     def status = column[Boolean]("STATUS")
 
@@ -55,17 +64,5 @@ object Tables {
   }
 
   val hosts = TableQuery[Hosts]
-
-  //  implicit val categoryMapper = MappedColumnType.base[MonitorCategoryEnum, String](
-  //    _ match {
-  //      case MonitorCategoryEnum.ORACLE => "ORACLE"
-  //      case MonitorCategoryEnum.OS => "OS"
-  //    },
-  //    _ match {
-  //      case "ORACLE" => MonitorCategoryEnum.ORACLE
-  //      case "OS " => MonitorCategoryEnum.OS
-  //    }
-  //  )
-
-
+  val monitors = TableQuery[Monitors]
 }
