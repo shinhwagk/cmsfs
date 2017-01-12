@@ -10,11 +10,57 @@ import org.shinhwagk.config.api.ConfigService
   * Created by zhangxu on 2017/1/12.
   */
 
-object Category extends Enumeration {
-  type MonitorItemEnum = Value
-  val ORACLE = Value("ORACLE")
-  val LINUX = Value("LINUX")
+sealed trait Manchine {
+  val ip: String
 }
+
+case class MachineItemOS(ip: String, hostname: String, port: Int, user: String) extends Manchine
+
+case class MachineItemRdb(ip: String, port: String,
+                          username: String, pasword: String,
+                          jdbcUrl: Option[String]) extends Machine
+
+
+object MachineItemOS extends Enum {
+  type MachineItemOS = Value
+  val LINUX = Value("LINUX")
+  val WINDOWS = Value("Windows")
+}
+
+object MachineItemOSLinux extends Enum {
+  type MachineItemOSLinux = Value
+  val CENTOS6 = Value("CENTOS6")
+  val CENTOS7 = Value("CENTOS7")
+}
+
+case class MachineItemRdbLinux(version:String) extends MachineItemRdb
+
+
+sealed trait Monitor {
+  val name: String
+  val label: String
+  val cron: String
+  val persistence: Boolean
+}
+
+trait MonitorItemRdb extends Monitor {
+  val rdbManchine:MachineItemRdb = new MachineItemRdb()
+}
+
+case class MonitorItemRdbOracle extends MonitorItemRdb
+
+//object MonitorItemRdb {
+//  def apply(monId: Int, name: String): Monitor = MonitorItemRdb(monId, name)
+//}
+
+trait MonitorItemOS extends Monitor {
+  val osManchine: MachineItemOS = new MonitorItemOS()
+}
+
+//object MonitorItemOS {
+//  def apply(monId: Int, name: String): Monitor = MonitorItemOS(monId, name)
+//}
+
 
 trait Monitor {
   val monId: Int
