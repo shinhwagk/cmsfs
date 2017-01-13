@@ -1,7 +1,5 @@
 package org.shinhwagk.monitor.monitor
 
-import org.shinhwagk.monitor.monitor.MachineItemRdbEnum.Category
-
 /**
   * Created by zhangxu on 2017/1/13.
   */
@@ -9,55 +7,57 @@ sealed trait Machine {
   val machine_id: Int
 }
 
-object MachineItemRdbEnum extends Enumeration {
-  type Category = Value
-  val ORACLE = Value("oracle")
-  val MYSQL = Value("mysql")
+trait MonhineItemRdb extends Machine {
+  val jdbcUrl: String
+  val username: String
+  val password: String
 }
 
-case class MachineItemRdb(machine_id: Int, //machine_rdb.id
-                          jdbcUrl: Option[String],
-                          username: String,
-                          password: String,
-                          category: MachineItemRdbEnum.Category) extends Machine
+case class MonhineItemRdbImpl(machine_id: Int, //monitor_rdb.id
+                              jdbcUrl: String,
+                              username: String,
+                              password: String,
+                              category: MonitorItemEnum.Category) extends MonhineItemRdb
 
 object MachineItemRdbOracle {
   def apply(id: Int,
+            jdbcUrl: String,
             username: String,
-            password: String,
-            jdbcUrl: Option[String],
-            category: Category = MachineItemRdbEnum.ORACLE): Machine = MachineItemRdb(id, jdbcUrl, username, password, category)
+            password: String): MonhineItemRdb =
+    MonhineItemRdbImpl(id, jdbcUrl, username, password, MonitorItemEnum.ORACLE)
 }
 
 object MachineItemRdbMysql {
   def apply(id: Int,
+            jdbcUrl: String,
             username: String,
-            password: String,
-            jdbcUrl: Option[String],
-            category: Category = MachineItemRdbEnum.MYSQL): Machine = MachineItemRdb(id, jdbcUrl, username, password, category)
+            password: String): MonhineItemRdb =
+    MonhineItemRdbImpl(id, jdbcUrl, username, password, MonitorItemEnum.MYSQL)
 }
 
-
-object MachineItemOSEnum extends Enumeration {
-  type Category = Value
-  val LINUX = Value("linux")
-  //  val WINDOWS = Value("windows")
+trait MachineItemHost extends Machine {
+  val ip: String
+  val port: Int
+  val user: String
+  val possword: Option[String]
+  val pKey: Option[String]
+  val category: MonitorItemEnum.Category
 }
 
-case class MachineItemHost(machine_id: Int, //machine_host.id
-                           ip: String,
-                           port: Int,
-                           user: String,
-                           possWord: Option[String],
-                           pKey: Option[String],
-                           category: MachineItemOSEnum.Category) extends Machine
+case class MachineItemHostImp(machine_id: Int,
+                              ip: String,
+                              port: Int,
+                              user: String,
+                              possword: Option[String],
+                              pKey: Option[String],
+                              category: MonitorItemEnum.Category) extends MachineItemHost
 
 object MachineItemHostLinux {
   def apply(id: Int,
             ip: String,
             port: Int,
             user: String,
-            possWord: Option[String],
-            pKey: Option[String],
-            category: MachineItemOSEnum.Category = MachineItemOSEnum.LINUX): Machine = MachineItemHost(id, ip: String, port: Int, user: String, possWord, pKey, MachineItemOSEnum.LINUX)
+            possword: Option[String],
+            pKey: Option[String] = None): MachineItemHost =
+    MachineItemHostImp(id, ip, port, user, possword, pKey, MonitorItemEnum.LINUX)
 }
