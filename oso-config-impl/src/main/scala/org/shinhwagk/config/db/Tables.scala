@@ -1,7 +1,7 @@
 package org.shinhwagk.config.db
 
 import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
-import org.shinhwagk.config.api.{Host, Monitor, MonitorCategoryEnum}
+import org.shinhwagk.config.api.{Host, MonitorCategoryEnum, MonitorDetail}
 import play.api.libs.json.Json
 import slick.driver.MySQLDriver.api._
 
@@ -14,12 +14,12 @@ object Tables {
 
   private implicit val categoryMapper = MappedColumnType.base[MonitorCategoryEnum, String](
     _ match {
-      case MonitorCategoryEnum.ORACLE => "ORACLE"
-      case MonitorCategoryEnum.OS => "OS"
+      case MonitorCategoryEnum.JDBC => "ORACLE"
+      case MonitorCategoryEnum.SSH => "OS"
     },
     _ match {
-      case "ORACLE" => MonitorCategoryEnum.ORACLE
-      case "OS " => MonitorCategoryEnum.OS
+      case "ORACLE" => MonitorCategoryEnum.JDBC
+      case "OS " => MonitorCategoryEnum.SSH
     }
   )
 
@@ -28,24 +28,23 @@ object Tables {
     Json.parse(_).as[StringList]
   )
 
-  class Monitors(tag: Tag) extends Table[Monitor](tag, "monitors") {
-    def id = column[Option[Int]]("SUP_ID", O.PrimaryKey, O.AutoInc)
+  //  class Monitors(tag: Tag) extends Table[Monitor](tag, "monitors") {
+  //    def id = column[Option[Int]]("SUP_ID", O.PrimaryKey, O.AutoInc)
+  //
+  //    def category = column[MonitorCategoryEnum]("category")
+  //
+  //    def label = column[String]("label")
+  //
+  //    def args = column[StringList]("args")
+  //
+  //    def tags = column[StringList]("tags")
+  //
+  //    def state = column[Boolean]("state")
+  //
+  //    def * = (id, category, label, args, tags, state) <> (Monitor.tupled, Monitor.unapply)
+  //  }
 
-    def category = column[MonitorCategoryEnum]("category")
-
-    def label = column[String]("label")
-
-    def args = column[StringList]("args")
-
-    def tags = column[StringList]("tags")
-
-    def state = column[Boolean]("state")
-
-    def * = (id, category, label, args, tags, state) <> (Monitor.tupled, Monitor.unapply)
-  }
-
-
-  class Hosts(tag: Tag) extends Table[Host](tag, "host") {
+  class Machines(tag: Tag) extends Table[Host](tag, "host") {
     def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
 
     def label = column[String]("LABEL")
@@ -60,9 +59,27 @@ object Tables {
 
     def status = column[Boolean]("STATUS")
 
-    def * = (id, label, hostname, ip, port, tags, status) <> (Host.tupled, Host.unapply)
+    override def * = (id, label, hostname, ip, port, tags, status) <> (Host.tupled, Host.unapply)
   }
 
-  val hosts = TableQuery[Hosts]
-  val monitors = TableQuery[Monitors]
+  val hosts = TableQuery[Machines]
+
+  class MonitorDetails(tag: Tag) extends Table[MonitorDetail](tag, "monitor_item_details") {
+    def id = column[Int]("MONITOR_DETAIL_ID", O.PrimaryKey, O.AutoInc)
+
+    def monitor_item_id = column[Int]("MONITOR_ITEM_ID")
+
+    def machine_item_id = column[Int]("MACHINE_ITEM_ID")
+
+    def args = column[List[String]]("ARGS")
+
+    def cron = column[String]("CRON")
+
+    def mode = column[String]("MODE")
+
+    override def * = (id, monitor_item_id, machine_item_id, args, cron, mode) <> (MonitorDetail.tupled, MonitorDetail.unapply)
+  }
+
+  val monitorDetails = TableQuery[MonitorDetails]
+
 }

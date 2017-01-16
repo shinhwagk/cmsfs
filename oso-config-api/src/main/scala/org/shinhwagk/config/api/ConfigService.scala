@@ -22,13 +22,23 @@ trait ConfigService extends Service {
 
   def putHost(id: Int): ServiceCall[Host, NotUsed]
 
+  /**
+    * monitors
+    */
+  def getMonitorDetails: ServiceCall[NotUsed, List[MonitorDetailShort]]
+
+  //  def getMonitorItem(item: String, id: Int): ServiceCall[Int, List[MonitorDetail]]
+
   override final def descriptor = {
     named("oso-config").withCalls(
       restCall(Method.GET, "/v1/node/:id", getHost _),
       restCall(Method.GET, "/v1/nodes", getHosts),
       restCall(Method.PUT, "/v1/node/:id", putHost _),
       restCall(Method.DELETE, "/v1/node/:id", deleteHost _),
-      restCall(Method.POST, "/v1/node", addHost)
+      restCall(Method.POST, "/v1/node", addHost),
+
+      restCall(Method.GET, "/v1/monitor/details", getMonitorDetails)
+      //      restCall(Method.GET, "/v1/monitor/:item/:id", getMonitorItem _)
     )
   }
 }
@@ -41,29 +51,45 @@ object Host extends ((Option[Int], String, String, String, Int, List[String], Bo
 
 object MonitorCategoryEnum extends Enumeration {
   type MonitorCategoryEnum = Value
-  val OS = Value("OS")
-  val ORACLE = Value("ORACLE")
+  val SSH = Value("SSH")
+  val JDBC = Value("JDBC")
 }
 
-case class Monitor(id: Option[Int], category: MonitorCategoryEnum, label: String, args: List[String], tags: List[String], state: Boolean)
 
-object Monitor extends ((Option[Int], MonitorCategoryEnum, String, List[String], List[String], Boolean) => Monitor) {
+case class MonitorDetailShort(id: Int, mode: String)
 
-  implicit object MonitorEnumJsonFormat extends Format[MonitorCategoryEnum] {
-    override def reads(json: JsValue): JsResult[MonitorCategoryEnum] = json match {
-      case JsString(s) if s == MonitorCategoryEnum.ORACLE.toString => json.validate[MonitorCategoryEnum]
-      case JsString(s) if s == MonitorCategoryEnum.OS.toString => json.validate[MonitorCategoryEnum]
-      case _ => throw new Exception("MonitorEnum match error")
-    }
-
-    override def writes(o: MonitorCategoryEnum): JsValue = o match {
-      case MonitorCategoryEnum.ORACLE => JsString("ORACLE")
-      case MonitorCategoryEnum.OS => JsString("OS")
-    }
-  }
-
-  implicit val format: Format[Monitor] = Json.format[Monitor]
+object MonitorDetailShort {
+  implicit val format: Format[MonitorDetailShort] = Json.format[MonitorDetailShort]
 }
+
+case class MonitorDetail(id: Int, monitor_item_id: Int, machine_item_id: Int, args: List[String], mode: String, cron: String)
+
+
+object MonitorDetail extends ((Int, Int, Int, List[String], String, String) => MonitorDetail) {
+
+  implicit val format: Format[MonitorDetail] = Json.format[MonitorDetail]
+}
+
+
+//case class Monitor(id: Option[Int], category: MonitorCategoryEnum, label: String, args: List[String], tags: List[String], state: Boolean)
+//
+//object Monitor extends ((Option[Int], MonitorCategoryEnum, String, List[String], List[String], Boolean) => Monitor) {
+//
+//  implicit object MonitorEnumJsonFormat extends Format[MonitorCategoryEnum] {
+//    override def reads(json: JsValue): JsResult[MonitorCategoryEnum] = json match {
+//      case JsString(s) if s == MonitorCategoryEnum.ORACLE.toString => json.validate[MonitorCategoryEnum]
+//      case JsString(s) if s == MonitorCategoryEnum.OS.toString => json.validate[MonitorCategoryEnum]
+//      case _ => throw new Exception("MonitorEnum match error")
+//    }
+//
+//    override def writes(o: MonitorCategoryEnum): JsValue = o match {
+//      case MonitorCategoryEnum.ORACLE => JsString("ORACLE")
+//      case MonitorCategoryEnum.OS => JsString("OS")
+//    }
+//  }
+//
+//  implicit val format: Format[Monitor] = Json.format[Monitor]
+//}
 
 //case class RDatabase(id: Int, hid: Int, jdbcUrl: String, user: String, password: String, status: Boolean, tag: List[String])
 //

@@ -10,7 +10,7 @@ sealed trait Monitor {
   val persistence: Boolean
 }
 
-trait MonitorItemRdb extends Monitor {
+trait MonitorItemJdbc extends Monitor {
   val sqlText: String
   val args: List[Any]
 }
@@ -20,14 +20,14 @@ case class MonitorItemRdbImpl(monitor_id: Int, //monitor_rdb.id
                               persistence: Boolean,
                               sqlText: String,
                               args: List[Any],
-                              category: MonitorItemEnum.Category) extends MonitorItemRdb
+                              category: MonitorItemEnum.Category) extends MonitorItemJdbc
 
 object MonitorItemRdbOracle {
   def apply(monitor_id: Int,
             cron: String,
             sqlText: String,
             args: List[Any],
-            persistence: Boolean): MonitorItemRdb =
+            persistence: Boolean): MonitorItemJdbc =
     MonitorItemRdbImpl(monitor_id, cron, persistence, sqlText, args, MonitorItemEnum.ORACLE)
 }
 
@@ -36,7 +36,7 @@ object MonitorItemRdbMysql {
             cron: String,
             sqlText: String,
             args: List[Any],
-            persistence: Boolean): MonitorItemRdb =
+            persistence: Boolean): MonitorItemJdbc =
     MonitorItemRdbImpl(monitor_id, cron, persistence, sqlText, args, MonitorItemEnum.MYSQL)
 }
 

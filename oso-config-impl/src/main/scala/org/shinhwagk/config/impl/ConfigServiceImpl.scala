@@ -2,9 +2,10 @@ package org.shinhwagk.config.impl
 
 import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.ServiceCall
-import org.shinhwagk.config.api.{ConfigService, Host}
+import org.shinhwagk.config.api._
 import org.shinhwagk.config.db.Tables
 import slick.driver.MySQLDriver.api._
+import slick.jdbc.GetResult
 
 import scala.concurrent.ExecutionContext
 
@@ -34,4 +35,27 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
   override def putHost(id: Int): ServiceCall[Host, NotUsed] = ServiceCall { p =>
     db.run(Tables.hosts.filter(_.id === id).update(p.copy(id = Some(id)))).map(_ => NotUsed)
   }
+
+  /**
+    *
+    * monitors
+    *
+    */
+  override def getMonitorDetails: ServiceCall[NotUsed, List[MonitorDetailShort]] = ServiceCall { _ =>
+    implicit val getMonitorDetailShort = GetResult(r => MonitorDetailShort(r.<<, r.<<))
+    db.run(sql"SELECT monitor_item_detail.id, monitor_item_detail.monitor_mode FROM monitor_item_detail".as[MonitorDetailShort])
+      .map(_.toList)
+    //      .map(_.map(row => MonitorDetailShort(row._1, row._2)).toList)
+  }
+
+  //  override def getMonitorItem(item: String, id: Int): ServiceCall[NotUsed, List[MonitorDetail]] = ServiceCall { _ =>
+  //
+  ////    item match {
+  ////      case MonitorCategoryEnum.JDBC =>
+  ////        db.run()
+  ////      case MonitorCategoryEnum.SSH =>
+  ////
+  ////    }
+  //  }
+
 }
