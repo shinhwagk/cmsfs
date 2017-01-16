@@ -1,0 +1,12 @@
+/logs/
+/target/
+/project/target/
+/project/project
+/.idea/
+/oso-query-api/target/
+/oso-query-impl/target/
+/oso-query-impl/logs/
+/oso-config-api/target/
+/oso-config-impl/target/
+/oso-monitor-api/target/
+/oso-monitor-impl/target/

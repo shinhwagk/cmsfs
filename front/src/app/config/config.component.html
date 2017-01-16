@@ -1,0 +1,59 @@
+<div class="row">
+  <div class="col-lg-2">
+    <div id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="card">
+        <div class="card-header" role="tab" id="headingOne">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" (click)="gotoMachines()">节点管理</a>
+        </div>
+        <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="card-block">
+            <ul class="list-group">
+              <li class="list-group-item">增加节点</li>
+              <li class="list-group-item">修改节点</li>
+              <li class="list-group-item">删除节点</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" role="tab" id="headingOne">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapseOne">节点项目管理</a>
+        </div>
+        <div id="collapse2" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="card-block">
+            <ul class="list-group">
+              <li class="list-group-item"><a>增加</a></li>
+              <li class="list-group-item">修改</li>
+              <li class="list-group-item">删除</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" role="tab" id="headingTwo">
+          <h5 class="mb-0">
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">监控管理</a>
+          </h5>
+        </div>
+        <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="card-block">
+            2
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" role="tab" id="headingTwo">
+          <h5 class="mb-0">
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapseTwo">监控项目管理</a>
+          </h5>
+        </div>
+        <div id="collapse3" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="card-block">2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-2">
+    <router-outlet></router-outlet>
+  </div>
+</div>
