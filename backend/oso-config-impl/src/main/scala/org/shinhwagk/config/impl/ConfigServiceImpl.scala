@@ -45,7 +45,6 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
     implicit val getMonitorDetailShort = GetResult(r => MonitorDetailShort(r.<<, r.<<))
     db.run(sql"SELECT monitor_item_detail.id, monitor_item_detail.monitor_mode FROM monitor_item_detail".as[MonitorDetailShort])
       .map(_.toList)
-    //      .map(_.map(row => MonitorDetailShort(row._1, row._2)).toList)
   }
 
   //  override def getMonitorItem(item: String, id: Int): ServiceCall[NotUsed, List[MonitorDetail]] = ServiceCall { _ =>
@@ -57,5 +56,10 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
   ////
   ////    }
   //  }
+  override def getMonitorItem(mode: String, id: Int): ServiceCall[Int, List[MonitorDetail]] = ServiceCall { _ =>
+    implicit val getMonitorDetailShort = GetResult(r => MonitorDetail(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
+    db.run(sql"SELECT monitor_item_detail.id, monitor_item_detail.monitor_mode FROM monitor_detail".as[MonitorDetailShort])
+      .map(_.toList)
 
+  }
 }

@@ -27,7 +27,7 @@ trait ConfigService extends Service {
     */
   def getMonitorDetails: ServiceCall[NotUsed, List[MonitorDetailShort]]
 
-  //  def getMonitorItem(item: String, id: Int): ServiceCall[Int, List[MonitorDetail]]
+  def getMonitorItem(mode: String, id: Int): ServiceCall[Int, List[MonitorDetail]]
 
   override final def descriptor = {
     named("oso-config").withCalls(
@@ -37,8 +37,8 @@ trait ConfigService extends Service {
       restCall(Method.DELETE, "/v1/node/:id", deleteHost _),
       restCall(Method.POST, "/v1/node", addHost),
 
-      restCall(Method.GET, "/v1/monitor/details", getMonitorDetails)
-      //      restCall(Method.GET, "/v1/monitor/:item/:id", getMonitorItem _)
+      restCall(Method.GET, "/v1/monitor/details", getMonitorDetails),
+      restCall(Method.GET, "/v1/monitor/:mode/:id", getMonitorItem _)
     )
   }
 }
