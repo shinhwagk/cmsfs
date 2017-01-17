@@ -1,7 +1,7 @@
 package org.shinhwagk.config.db
 
 import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
-import org.shinhwagk.config.api.{Host, MonitorCategoryEnum, MonitorDetail}
+import org.shinhwagk.config.api._
 import play.api.libs.json.Json
 import slick.driver.MySQLDriver.api._
 
@@ -44,25 +44,25 @@ object Tables {
   //    def * = (id, category, label, args, tags, state) <> (Monitor.tupled, Monitor.unapply)
   //  }
 
-  class Machines(tag: Tag) extends Table[Host](tag, "host") {
-    def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
+  //  class Machines(tag: Tag) extends Table[Host](tag, "host") {
+  //    def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
+  //
+  //    def label = column[String]("LABEL")
+  //
+  //    def hostname = column[String]("HOSTNAME")
+  //
+  //    def ip = column[String]("IP")
+  //
+  //    def port = column[Int]("PORT")
+  //
+  //    def tags = column[StringList]("TAGS")
+  //
+  //    def status = column[Boolean]("STATUS")
+  //
+  //    override def * = (id, label, hostname, ip, port, tags, status) <> (Host.tupled, Host.unapply)
+  //  }
 
-    def label = column[String]("LABEL")
-
-    def hostname = column[String]("HOSTNAME")
-
-    def ip = column[String]("IP")
-
-    def port = column[Int]("PORT")
-
-    def tags = column[StringList]("TAGS")
-
-    def status = column[Boolean]("STATUS")
-
-    override def * = (id, label, hostname, ip, port, tags, status) <> (Host.tupled, Host.unapply)
-  }
-
-  val hosts = TableQuery[Machines]
+  //  val hosts = TableQuery[Machines]
 
   class MonitorDetails(tag: Tag) extends Table[MonitorDetail](tag, "monitor_item_details") {
     def id = column[Int]("MONITOR_DETAIL_ID", O.PrimaryKey, O.AutoInc)
@@ -82,4 +82,41 @@ object Tables {
 
   val monitorDetails = TableQuery[MonitorDetails]
 
+  class Machines(tag: Tag) extends Table[Machine](tag, "machines") {
+    def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
+
+    def name = column[String]("NAME")
+
+    def label = column[String]("LABEL")
+
+    def ip = column[String]("IP")
+
+    def state = column[Boolean]("STATE")
+
+    override def * = (id, name, label, ip, state) <> (Machine.tupled, Machine.unapply)
+  }
+
+  val machines = TableQuery[Machines]
+
+  class Connecters(tag: Tag) extends Table[Connecter](tag, "connecters") {
+    def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
+
+    def mheId = column[Int]("MACHINE_ID")
+
+    def label = column[String]("LABEL")
+
+    def category = column[String]("CATEGORY")
+
+    def categoryVersion = column[String]("CATEGORY_VERSION")
+
+    def mode = column[String]("MODE")
+
+    def modeInfo = column[String]("MODE_INFO")
+
+    def state = column[Boolean]("STATE")
+
+    override def * = (id, mheId, label, category, categoryVersion, mode, modeInfo, state) <> (Connecter.tupled, Connecter.unapply)
+  }
+
+  val connecters = TableQuery[Connecters]
 }

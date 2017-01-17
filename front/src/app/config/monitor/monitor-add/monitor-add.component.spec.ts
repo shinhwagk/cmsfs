@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { JdbcComponent } from './jdbc.component';
+import { MonitorAddComponent } from './monitor-add.component';
 
-describe('JdbcComponent', () => {
-  let component: JdbcComponent;
-  let fixture: ComponentFixture<JdbcComponent>;
+describe('MonitorAddComponent', () => {
+  let component: MonitorAddComponent;
+  let fixture: ComponentFixture<MonitorAddComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ JdbcComponent ]
+      declarations: [ MonitorAddComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(JdbcComponent);
+    fixture = TestBed.createComponent(MonitorAddComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

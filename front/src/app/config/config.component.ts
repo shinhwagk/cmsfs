@@ -18,4 +18,15 @@ export class ConfigComponent implements OnInit {
 		this.router.navigate(['/config/machines'])
 	}
 
+	gotoMachineAdd() {
+		this.router.navigate(['/config/machine/add'])
+	}
+
+	gotoMachineConnecterAdd() {
+		this.router.navigate(['/config/machine/connecter/add'])
+	}
+
+	gotoMonitorAdd() {
+		this.router.navigate(['/config/monitor/add'])
+	}
 }

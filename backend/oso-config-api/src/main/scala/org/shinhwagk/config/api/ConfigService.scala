@@ -12,16 +12,6 @@ import play.api.libs.json._
   */
 trait ConfigService extends Service {
 
-  def getHost(id: Int): ServiceCall[NotUsed, Host]
-
-  def getHosts: ServiceCall[NotUsed, List[Host]]
-
-  def deleteHost(id: Int): ServiceCall[NotUsed, NotUsed]
-
-  def addHost: ServiceCall[Host, NotUsed]
-
-  def putHost(id: Int): ServiceCall[Host, NotUsed]
-
   /**
     * monitors
     */
@@ -29,24 +19,35 @@ trait ConfigService extends Service {
 
   def getMonitorItem(mode: String, id: Int): ServiceCall[Int, List[MonitorDetail]]
 
+  /**
+    * machine
+    */
+  def addMachine: ServiceCall[Machine, NotUsed]
+
+  def getMachines: ServiceCall[NotUsed, List[Machine]]
+
+  def addConnecter: ServiceCall[Connecter, NotUsed]
+
+  def getConnecters: ServiceCall[NotUsed, List[Connecter]]
+
   override final def descriptor = {
     named("oso-config").withCalls(
-      restCall(Method.GET, "/v1/node/:id", getHost _),
-      restCall(Method.GET, "/v1/nodes", getHosts),
-      restCall(Method.PUT, "/v1/node/:id", putHost _),
-      restCall(Method.DELETE, "/v1/node/:id", deleteHost _),
-      restCall(Method.POST, "/v1/node", addHost),
+      //      restCall(Method.GET, "/v1/node/:id", getHost _),
+      //      restCall(Method.GET, "/v1/nodes", getHosts),
+      //      restCall(Method.PUT, "/v1/node/:id", putHost _),
+      //      restCall(Method.DELETE, "/v1/node/:id", deleteHost _),
+      //      restCall(Method.POST, "/v1/node", addHost),
 
       restCall(Method.GET, "/v1/monitor/details", getMonitorDetails),
-      restCall(Method.GET, "/v1/monitor/:mode/:id", getMonitorItem _)
+      restCall(Method.GET, "/v1/monitor/:mode/:id", getMonitorItem _),
+
+
+      restCall(Method.GET, "/v1/machines", getMachines),
+      restCall(Method.POST, "/v1/machine", addMachine),
+
+      restCall(Method.POST, "/v1/machine/connecter", addConnecter)
     )
   }
-}
-
-case class Host(id: Option[Int], label: String, hostname: String, ip: String, port: Int, tags: List[String], status: Boolean)
-
-object Host extends ((Option[Int], String, String, String, Int, List[String], Boolean) => Host) {
-  implicit val format: Format[Host] = Json.format[Host]
 }
 
 object MonitorCategoryEnum extends Enumeration {
@@ -96,3 +97,17 @@ object MonitorDetail extends ((Int, Int, Int, List[String], String, String) => M
 //object RDatabase {
 //  implicit val format: Format[RDatabase] = Json.format[RDatabase]
 //}
+
+case class Machine(id: Option[Int], name: String, label: String, ip: String, state: Boolean)
+
+object Machine extends ((Option[Int], String, String, String, Boolean) => Machine) {
+  implicit val format: Format[Machine] = Json.format[Machine]
+}
+
+case class Connecter(id: Option[Int], mheId: Int, label: String,
+                     category: String, categoryVersion: String,
+                     mode: String, modeInfo: String, state: Boolean)
+
+object Connecter extends ((Option[Int], Int, String, String, String, String, String, Boolean) => Connecter) {
+  implicit val format: Format[Connecter] = Json.format[Connecter]
+}

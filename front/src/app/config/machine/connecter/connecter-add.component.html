@@ -1,0 +1,110 @@
+<legend class="col-form-legend">节点选择</legend>
+<li *ngFor="let machine of machines">
+    <input class="form-check-input" type="radio" name="machine" (click)="machineId = machine.id"> {{machine.name}}/{{machine.ip}}
+</li>
+<div class="container" *ngIf="machineId">
+    <form>
+        <fieldset class="form-group row">
+            <legend class="col-form-legend">连接器</legend>
+            <div class="col-sm-10">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="gridRadios" (click)="chooseTemplate('JDBC','ORACLE',machineId)">
+            Oracle
+          </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="gridRadios" (click)="chooseTemplate('JDBC','MYSQL',machineId)">
+            Mysql
+          </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="gridRadios" (click)="chooseTemplate('SSH','CENTOS',machineId)">
+            SSH
+          </label>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<div [ngSwitch]="templateName">
+    <div *ngSwitchCase="'JDBC-ORACLE'">
+        <div class="alert alert-info" role="alert">
+            配置<strong>Oracle</strong>连接
+        </div>
+        <div class="container">
+            <form #heroForm="ngForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="jdbcUrl">jdbcUrl</label>
+                    <input type="text" id="jdbcUrl" class="form-control" required [(ngModel)]="jdbcConnecter.jdbcUrl" name="jdbcUrl" #jdbcUrl="ngModel">
+                    <div [hidden]="jdbcUrl.valid || jdbcUrl.pristine" class="alert alert-danger">
+                        jdbcUrl is required
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="alterEgo">label</label>
+                    <input type="text" class="form-control" [(ngModel)]="connecter.label" name="label">
+                </div>
+                <div class="form-group">
+                    <label for="alterEgo">user</label>
+                    <input type="text" class="form-control" [(ngModel)]="jdbcConnecter.user" name="user">
+                </div>
+
+                <div class="form-group">
+                    <label for="alterEgo">password</label>
+                    <input type="password" class="form-control" [(ngModel)]="jdbcConnecter.password" name="password">
+                </div>
+                <div class="form-group">
+                    <label for="alterEgo">version</label>
+                    <select class="form-control" [(ngModel)]="connecter.categoryVersion" name="categoryVersion" required>
+                      <option [value]="11201">12.1.0.1</option>
+                      <option [value]="11201">11.2.0.4</option>
+                      <option [value]="11201">11.2.0.3</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-default" (click)="onSubmitForJdbc()">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div *ngSwitchCase="'JDBC-MYSQL'">
+        UNSUCCESS
+    </div>
+    <div *ngSwitchCase="'SSH'">
+        <div class="alert alert-info" role="alert">
+            配置<strong>SSH</strong>连接
+        </div>
+        <div class="container">
+            <form (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="sshPort">sshPort</label>
+                    <input type="number" class="form-control" id="sshPort" [(ngModel)]="connecter.port" name="sshPort" required>
+                </div>
+                <div class="form-group">
+                    <label for="name">user</label>
+                    <input type="text" class="form-control" id="name" [(ngModel)]="connecter.user" name="user" required>
+                </div>
+                <div class="form-group">
+                    <label for="name">password</label>
+                    <input type="password" class="form-control" id="name" [(ngModel)]="connecter.password" name="password">
+                </div>
+                <div class="form-group">
+                    <label for="name">private key</label>
+                    <input type="text" class="form-control" id="name" [(ngModel)]="connecter.privateKey" name="privateKey">
+                </div>
+                <div class="form-group">
+                    <label for="alterEgo">version</label>
+                    <select class="form-control" [(ngModel)]="connecter.categoryVersion" name="categoryVersion" required>
+                      <option [value]="5">5</option>
+                      <option [value]="6">6</option>
+                      <option [value]="7">7</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div *ngSwitchDefault>other</div>
+</div>

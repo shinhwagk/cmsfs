@@ -1,0 +1,45 @@
+<div class="container">
+  <form>
+    <!--<h1>Hero Form</h1>-->
+    <div class="alert alert-success" role="alert">
+      <strong>增加监控</strong>
+    </div>
+    <div class="form-group row">
+      <label for="example-text-input" class="col-4 col-form-label">Name</label>
+      <div class="col-8">
+        <input class="form-control" type="text" id="example-text-input" [(ngModel)]="monitor.name" name="name">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="name" class="col-4 col-form-label">Label</label>
+      <div class="col-8">
+        <input class="form-control" type="text" value="Artisanal kale" id="example-text-input" [(ngModel)]="monitor.label" name="label">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="name" class="col-4 col-form-label">Cron</label>
+      <div class="col-8">
+        <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="name" class="col-4 col-form-label">SQL File</label>
+      <div class="col-8">
+        <input type="file" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="name" class="col-4 col-form-label">Args</label>
+      <div class="col-8">
+        <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="name" class="col-4 col-form-label">适用版本</label>
+      <div class="col-8">
+        <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+      </div>
+    </div>
+    <button type="button" class="btn btn-default" (click)="onSubmit()">Submit</button>
+  </form>
+</div>

@@ -16,26 +16,6 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
 
   val db = Database.forConfig("oso-config")
 
-  override def getHost(id: Int): ServiceCall[NotUsed, Host] = ServiceCall { _ =>
-    db.run(Tables.hosts.filter(_.id === id).result.head)
-  }
-
-  override def getHosts: ServiceCall[NotUsed, List[Host]] = ServiceCall { _ =>
-    db.run(Tables.hosts.result).map(_.toList)
-  }
-
-  override def deleteHost(id: Int): ServiceCall[NotUsed, NotUsed] = ServiceCall { _ =>
-    db.run(Tables.hosts.filter(_.id === id).delete).map(_ => NotUsed)
-  }
-
-  override def addHost: ServiceCall[Host, NotUsed] = ServiceCall { p =>
-    db.run(Tables.hosts += p).map(_ => NotUsed)
-  }
-
-  override def putHost(id: Int): ServiceCall[Host, NotUsed] = ServiceCall { p =>
-    db.run(Tables.hosts.filter(_.id === id).update(p.copy(id = Some(id)))).map(_ => NotUsed)
-  }
-
   /**
     *
     * monitors
@@ -56,10 +36,30 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
   ////
   ////    }
   //  }
-  override def getMonitorItem(mode: String, id: Int): ServiceCall[Int, List[MonitorDetail]] = ServiceCall { _ =>
-    implicit val getMonitorDetailShort = GetResult(r => MonitorDetail(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
-    db.run(sql"SELECT monitor_item_detail.id, monitor_item_detail.monitor_mode FROM monitor_detail".as[MonitorDetailShort])
-      .map(_.toList)
+  //  override def getMonitorItem(mode: String, id: Int): ServiceCall[Int, List[MonitorDetail]] = ServiceCall { _ =>
+  //    implicit val getMonitorDetailShort = GetResult(r => MonitorDetail(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
+  //    db.run(sql"SELECT monitor_item_detail.id, monitor_item_detail.monitor_mode FROM monitor_detail".as[MonitorDetailShort])
+  //      .map(_.toList)
+  //
+  //  }
+  override def getMonitorItem(mode: String, id: Int): ServiceCall[Int, List[MonitorDetail]] = ???
 
+  /**
+    * machine
+    */
+  override def getMachines: ServiceCall[NotUsed, List[Machine]] = ServiceCall { _ =>
+    db.run(Tables.machines.result).map(_.toList)
+  }
+
+  override def addMachine: ServiceCall[Machine, NotUsed] = ServiceCall { machine =>
+    db.run(Tables.machines += machine).map(_ => NotUsed)
+  }
+
+  override def getConnecters: ServiceCall[NotUsed, List[Connecter]] = ServiceCall { _ =>
+    db.run(Tables.connecters.result).map(_.toList)
+  }
+
+  override def addConnecter: ServiceCall[Connecter, NotUsed] = ServiceCall { connecter =>
+    db.run(Tables.connecters += connecter).map(_ => NotUsed)
   }
 }
