@@ -4,10 +4,11 @@ import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.shinhwagk.config.api._
 import org.shinhwagk.config.db.Tables
+import play.api.libs.json.Json
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.GetResult
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Implementation of the LagomhelloService.
@@ -61,5 +62,29 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
 
   override def addConnecter: ServiceCall[Connecter, NotUsed] = ServiceCall { connecter =>
     db.run(Tables.connecters += connecter).map(_ => NotUsed)
+  }
+
+  override def addMonitor: ServiceCall[Monitor, NotUsed] = ServiceCall { monitor =>
+    db.run(Tables.monitors += monitor).map(_ => NotUsed)
+  }
+
+  override def addMonitorMode(mode: String): ServiceCall[String, NotUsed] = ServiceCall { string =>
+
+    mode match {
+      case "JDBC" => db.run(Tables.monitorModeJdbcs += Json.parse(string).as[MonitorModeJDBC]).map(_ => NotUsed)
+      //      case "SSH" =>db.run(Tables.monitorModeSsh += monitorMode).map(_ => NotUsed)
+    }
+
+  }
+
+  override def getMonitorList: ServiceCall[NotUsed, List[Monitor]] = ServiceCall { _ =>
+    db.run(Tables.monitors.result).map(_.toList)
+  }
+
+  override def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String] = ServiceCall { _ =>
+    mode match {
+      case "JDBC" => db.run(Tables.monitorModeJdbcs.filter(_.id === id).result.head).map(Json.toJson(_).toString())
+      case "SSH" => db.run(Tables.monitorModeSSHs.filter(_.id === id).result.head).map(Json.toJson(_).toString())
+    }
   }
 }

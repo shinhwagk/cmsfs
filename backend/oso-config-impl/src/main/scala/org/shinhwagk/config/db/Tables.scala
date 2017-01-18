@@ -2,8 +2,9 @@ package org.shinhwagk.config.db
 
 import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
 import org.shinhwagk.config.api._
-import play.api.libs.json.Json
+import play.api.libs.json._
 import slick.driver.MySQLDriver.api._
+import slick.lifted.ProvenShape
 
 /**
   * Created by zhangxu on 2017/1/10.
@@ -21,6 +22,28 @@ object Tables {
       case "ORACLE" => MonitorCategoryEnum.JDBC
       case "OS " => MonitorCategoryEnum.SSH
     }
+  )
+
+  implicit object AnyJsonFormat extends Format[Any] {
+    override def reads(json: JsValue): JsResult[Any] = json match {
+      case JsBoolean(true) => json.validate[Boolean]
+      case JsBoolean(false) => json.validate[Boolean]
+      case JsString(_) => json.validate[String]
+      case JsNumber(_) => json.validate[Int]
+      case _ => throw new Exception("match error")
+    }
+
+    override def writes(o: Any): JsValue = o match {
+      case i: Int => JsNumber(i)
+      case s: String => JsString(s)
+      case t: Boolean if t => JsBoolean(true)
+      case f: Boolean if !f => JsBoolean(false)
+    }
+  }
+
+  private implicit val listAnyMapper = MappedColumnType.base[List[Any], String](
+    Json.toJson(_).toString(),
+    Json.parse(_).as[List[Any]]
   )
 
   private implicit val tagsMapper = MappedColumnType.base[StringList, String](
@@ -119,4 +142,56 @@ object Tables {
   }
 
   val connecters = TableQuery[Connecters]
+
+  class Monitors(tag: Tag) extends Table[Monitor](tag, "monitors") {
+
+    def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
+
+    def label = column[String]("LABEL")
+
+    def name = column[String]("NAME")
+
+    def cron = column[String]("CRON")
+
+    def mode = column[String]("MODE")
+
+    def modeId = column[Int]("MODE_ID")
+
+    def persistence = column[Boolean]("PERSISTENCE")
+
+    def state = column[Boolean]("STATE")
+
+    override def * = (id, label, name, cron, mode, modeId, persistence, state) <> (Monitor.tupled, Monitor.unapply)
+  }
+
+  val monitors = TableQuery[Monitors]
+
+  class MonitorModeJDBCs(tag: Tag) extends Table[MonitorModeJDBC](tag, "monitor_mode_jdbc") {
+    def id = column[Option[Int]]("ID")
+
+    def category = column[String]("Category")
+
+    def categoryVersion = column[String]("CATEGORY_VERSION")
+
+    def code = column[String]("CODE")
+
+    override def * = (id, category, categoryVersion,code) <> (MonitorModeJDBC.tupled, MonitorModeJDBC.unapply)
+  }
+
+  val monitorModeJdbcs = TableQuery[MonitorModeJDBCs]
+
+  class MonitorModeSSHs(tag: Tag) extends Table[MonitorModeSSH](tag, "monitor_mode_ssh") {
+    def id = column[Option[Int]]("ID")
+
+    def category = column[String]("Category")
+
+    def categoryVersion = column[String]("CATEGORY_VERSION")
+
+    def code = column[String]("CODE")
+
+    override def * = (id, category, categoryVersion,code) <> (MonitorModeSSH.tupled, MonitorModeSSH.unapply)
+  }
+
+  val monitorModeSSHs = TableQuery[MonitorModeSSHs]
+
 }

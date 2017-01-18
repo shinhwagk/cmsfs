@@ -22,6 +22,14 @@ export class ApiService {
     return this.http.post('/v1/machine/connecter', machine_connecter, this.options).map((res: Response) => res.status)
   }
 
+  monitor_add(monitor) {
+    return this.http.post("/v1/monitor", monitor, this.options).map((res: Response) => res.status)
+  }
+
+  monitor_mode_add(mode, monitor_mode) {
+    return this.http.post("/v1/monitor/mode", monitor_mode, this.options).map((res: Response) => res.status)
+  }
+
   headers = new Headers({ 'Content-Type': 'application/json' });
   options = new RequestOptions({ headers: this.headers });
 }

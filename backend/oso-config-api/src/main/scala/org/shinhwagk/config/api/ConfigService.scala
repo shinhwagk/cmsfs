@@ -30,6 +30,14 @@ trait ConfigService extends Service {
 
   def getConnecters: ServiceCall[NotUsed, List[Connecter]]
 
+  def addMonitor: ServiceCall[Monitor, NotUsed]
+
+  def addMonitorMode(mode: String): ServiceCall[String, NotUsed]
+
+  def getMonitorList: ServiceCall[NotUsed, List[Monitor]]
+
+  def getMonitorMode(mode: String,id:Int): ServiceCall[NotUsed, String]
+
   override final def descriptor = {
     named("oso-config").withCalls(
       //      restCall(Method.GET, "/v1/node/:id", getHost _),
@@ -39,13 +47,21 @@ trait ConfigService extends Service {
       //      restCall(Method.POST, "/v1/node", addHost),
 
       restCall(Method.GET, "/v1/monitor/details", getMonitorDetails),
-      restCall(Method.GET, "/v1/monitor/:mode/:id", getMonitorItem _),
 
+      restCall(Method.GET, "/v1/monitor/:mode/:id", getMonitorMode _),
 
       restCall(Method.GET, "/v1/machines", getMachines),
+
       restCall(Method.POST, "/v1/machine", addMachine),
 
-      restCall(Method.POST, "/v1/machine/connecter", addConnecter)
+      restCall(Method.POST, "/v1/machine/connecter", addConnecter),
+
+      restCall(Method.POST, "/v1/monitor", addMonitor),
+
+      restCall(Method.POST, "/v1/monitor/:mode", addMonitorMode _),
+
+
+      restCall(Method.POST, "/v1/monitor/list", getMonitorList)
     )
   }
 }
@@ -111,3 +127,42 @@ case class Connecter(id: Option[Int], mheId: Int, label: String,
 object Connecter extends ((Option[Int], Int, String, String, String, String, String, Boolean) => Connecter) {
   implicit val format: Format[Connecter] = Json.format[Connecter]
 }
+
+case class Monitor(id: Option[Int],
+                   name: String,
+                   label: String,
+                   cron: String,
+                   mode: String,
+                   modeId: Int,
+                   persistence: Boolean,
+                   state: Boolean)
+
+object Monitor extends ((Option[Int], String, String, String, String, Int, Boolean, Boolean) => Monitor) {
+
+  implicit object AnyJsonFormat extends Format[Any] {
+    override def reads(json: JsValue): JsResult[Any] = json match {
+      case JsBoolean(true) => json.validate[Boolean]
+      case JsBoolean(false) => json.validate[Boolean]
+      case JsString(_) => json.validate[String]
+      case JsNumber(_) => json.validate[Int]
+      case _ => throw new Exception("match error")
+    }
+
+    override def writes(o: Any): JsValue = o match {
+      case i: Int => JsNumber(i)
+      case s: String => JsString(s)
+      case t: Boolean if t => JsBoolean(true)
+      case f: Boolean if !f => JsBoolean(false)
+    }
+  }
+
+  implicit val format: Format[Monitor] = Json.format[Monitor]
+}
+
+case class MonitorModeJDBC(id: Option[Int], category: String, categoryVersion: String, code: String)
+
+object MonitorModeJDBC extends ((Option[Int], String, String, String) => MonitorModeJDBC) {
+  implicit val format: Format[MonitorModeJDBC] = Json.format[MonitorModeJDBC]
+}
+
+case class MonitorModeSSH(id: Option[Int], category: String, categoryVersion: String, code: String)
