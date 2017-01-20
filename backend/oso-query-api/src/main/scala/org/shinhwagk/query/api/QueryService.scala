@@ -91,7 +91,7 @@ object QueryOSMessage {
   implicit val format: Format[QueryOSMessage] = Json.format[QueryOSMessage]
 }
 
-case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: List[Any]) {
+case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: List[String]) {
   Class.forName("oracle.jdbc.driver.OracleDriver");
 
   def mode(mode: String): Future[String] = {
@@ -144,26 +144,28 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
 
 }
 
-object QueryOracleMessage {
+object QueryOracleMessage extends ((String, String, String, String, List[String]) => QueryOracleMessage) {
 
-  implicit object AnyJsonFormat extends Format[Any] {
-    override def writes(o: Any): JsValue = o match {
-      case i: Int => JsNumber(i)
-      case s: String => JsString(s)
-      case t: Boolean if t => JsBoolean(true)
-      case f: Boolean if !f => JsBoolean(false)
-    }
+//  implicit object AnyJsonFormat extends Format[Any] {
+//    override def writes(o: Any): JsValue = o match {
+//      case i: Int => JsNumber(i)
+//      case i: Long => JsNumber(i)
+//      case s: String => JsString(s)
+//      case t: Boolean if t => JsBoolean(true)
+//      case f: Boolean if !f => JsBoolean(false)
+//      case _ => throw new Exception("match error _" + o)
+//    }
+//
+//    override def reads(json: JsValue) = json match {
+//      case JsBoolean(true) => json.validate[Boolean]
+//      case JsBoolean(false) => json.validate[Boolean]
+//      case JsString(_) => json.validate[String]
+//      case JsNumber(_) => json.validate[Int]
+//      case _ => throw new Exception("match error")
+//    }
+//  }
 
-    override def reads(json: JsValue) = json match {
-      case JsBoolean(true) => json.validate[Boolean]
-      case JsBoolean(false) => json.validate[Boolean]
-      case JsString(_) => json.validate[String]
-      case JsNumber(_) => json.validate[Int]
-      case _ => throw new Exception("match error")
-    }
-  }
-
-  implicit val format: Format[QueryOracleMessage] = Json.format
+  implicit val format: Format[QueryOracleMessage] = Json.format[QueryOracleMessage]
 }
 
 

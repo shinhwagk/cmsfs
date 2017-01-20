@@ -87,23 +87,23 @@ object Tables {
 
   //  val hosts = TableQuery[Machines]
 
-  class MonitorDetails(tag: Tag) extends Table[MonitorDetail](tag, "monitor_item_details") {
-    def id = column[Int]("MONITOR_DETAIL_ID", O.PrimaryKey, O.AutoInc)
-
-    def monitor_item_id = column[Int]("MONITOR_ITEM_ID")
-
-    def machine_item_id = column[Int]("MACHINE_ITEM_ID")
-
-    def args = column[List[String]]("ARGS")
-
-    def cron = column[String]("CRON")
-
-    def mode = column[String]("MODE")
-
-    override def * = (id, monitor_item_id, machine_item_id, args, cron, mode) <> (MonitorDetail.tupled, MonitorDetail.unapply)
-  }
-
-  val monitorDetails = TableQuery[MonitorDetails]
+  //  class MonitorDetails(tag: Tag) extends Table[MonitorDetail](tag, "monitor_item_details") {
+  //    def id = column[Int]("MONITOR_DETAIL_ID", O.PrimaryKey, O.AutoInc)
+  //
+  //    def monitor_item_id = column[Int]("MONITOR_ITEM_ID")
+  //
+  //    def machine_item_id = column[Int]("MACHINE_ITEM_ID")
+  //
+  //    def args = column[List[String]]("ARGS")
+  //
+  //    def cron = column[String]("CRON")
+  //
+  //    def mode = column[String]("MODE")
+  //
+  //    override def * = (id, monitor_item_id, machine_item_id, args, cron, mode) <> (MonitorDetail.tupled, MonitorDetail.unapply)
+  //  }
+  //
+  //  val monitorDetails = TableQuery[MonitorDetails]
 
   class Machines(tag: Tag) extends Table[Machine](tag, "machines") {
     def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
@@ -121,7 +121,7 @@ object Tables {
 
   val machines = TableQuery[Machines]
 
-  class Connecters(tag: Tag) extends Table[Connecter](tag, "connecters") {
+  class Connectors(tag: Tag) extends Table[Connector](tag, "connectors") {
     def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
 
     def mheId = column[Int]("MACHINE_ID")
@@ -138,10 +138,10 @@ object Tables {
 
     def state = column[Boolean]("STATE")
 
-    override def * = (id, mheId, label, category, categoryVersion, mode, modeInfo, state) <> (Connecter.tupled, Connecter.unapply)
+    override def * = (id, mheId, label, category, categoryVersion, mode, modeInfo, state) <> (Connector.tupled, Connector.unapply)
   }
 
-  val connecters = TableQuery[Connecters]
+  val connectors = TableQuery[Connectors]
 
   class Monitors(tag: Tag) extends Table[Monitor](tag, "monitors") {
 
@@ -175,7 +175,7 @@ object Tables {
 
     def code = column[String]("CODE")
 
-    override def * = (id, category, categoryVersion,code) <> (MonitorModeJDBC.tupled, MonitorModeJDBC.unapply)
+    override def * = (id, category, categoryVersion, code) <> (MonitorModeJDBC.tupled, MonitorModeJDBC.unapply)
   }
 
   val monitorModeJdbcs = TableQuery[MonitorModeJDBCs]
@@ -189,9 +189,86 @@ object Tables {
 
     def code = column[String]("CODE")
 
-    override def * = (id, category, categoryVersion,code) <> (MonitorModeSSH.tupled, MonitorModeSSH.unapply)
+    override def * = (id, category, categoryVersion, code) <> (MonitorModeSSH.tupled, MonitorModeSSH.unapply)
   }
 
   val monitorModeSSHs = TableQuery[MonitorModeSSHs]
 
+  class MonitorDetails(tag: Tag) extends Table[MonitorDetail](tag, "monitor_details") {
+    def id = column[Option[Int]]("ID")
+
+    def mode = column[String]("MODE")
+
+    def monitorModeId = column[Int]("MONITOR_MODE_ID")
+
+    def machineConnectorId = column[Int]("MACHINE_CONNECTOR_MODE_ID")
+
+    def cron = column[String]("CRON")
+
+    def persistence = column[Boolean]("PERSISTENCE")
+
+    def alarm = column[Boolean]("ALARM")
+
+    def chart = column[Boolean]("CHART")
+
+    override def * = (id, mode, monitorModeId, machineConnectorId, cron, persistence, alarm, chart) <> (MonitorDetail.tupled, MonitorDetail.unapply)
+  }
+
+  val monitorDetails = TableQuery[MonitorDetails]
+
+  class MachineConnectorModeJdbcs(tag: Tag) extends Table[MachineConnectorModeJDBC](tag, "connectors_mode_jdbc") {
+    def id = column[Option[Int]]("ID")
+
+    def category = column[String]("Category")
+
+    def categoryVersion = column[String]("CATEGORY_VERSION")
+
+    def connectorId = column[Int]("CONNECTOR_ID")
+
+    def jdbcUrl = column[String]("JDBC_URL")
+
+    def username = column[String]("USERNAME")
+
+    def password = column[String]("PASSWORD")
+
+    override def * = (id, category, categoryVersion, connectorId, jdbcUrl, username, password) <> (MachineConnectorModeJDBC.tupled, MachineConnectorModeJDBC.unapply)
+  }
+
+  val machineConnectorModeJdbcs = TableQuery[MachineConnectorModeJdbcs]
+
+  class MachineConnectorModeSSHs(tag: Tag) extends Table[MachineConnectorModeSSH](tag, "connectors_mode_ssh") {
+    def id = column[Option[Int]]("ID")
+
+    def category = column[String]("Category")
+
+    def categoryVersion = column[String]("CATEGORY_VERSION")
+
+    def connectorId = column[Int]("CONNECTOR_ID")
+
+    def sshPort = column[Int]("ssh_port")
+
+    def user = column[String]("USER")
+
+    def password = column[String]("PASSWORD")
+
+    def privateKey = column[String]("PRIVATE_KEY")
+
+    override def * = (id, category, categoryVersion, connectorId, sshPort, user, password, privateKey) <> (MachineConnectorModeSSH.tupled, MachineConnectorModeSSH.unapply)
+  }
+
+  val machineConnectorModeSSHs = TableQuery[MachineConnectorModeSSHs]
+
+  class MonitorPersistenceQuerys(tag: Tag) extends Table[MonitorPersistenceQuery](tag, "monitor_persistence_query") {
+    def id = column[Option[Int]]("ID")
+
+    def content = column[String]("CONTENT")
+
+    def version = column[Long]("VERSION")
+
+    def monitorDetailId = column[Int]("MONITOR_DETAIL_ID")
+
+    override def * = (id, content, version, monitorDetailId) <> (MonitorPersistenceQuery.tupled, MonitorPersistenceQuery.unapply)
+  }
+
+  val monitorPersistenceQuerys = TableQuery[MonitorPersistenceQuerys]
 }

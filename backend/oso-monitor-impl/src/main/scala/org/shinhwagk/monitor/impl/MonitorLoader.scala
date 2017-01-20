@@ -7,6 +7,7 @@ import com.softwaremill.macwire._
 import org.shinhwagk.config.api.ConfigService
 import org.shinhwagk.config.impl.MonitorServiceImpl
 import org.shinhwagk.monitor.api.MonitorService
+import org.shinhwagk.query.api.QueryService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class MonitorLoader extends LagomApplicationLoader {
@@ -30,6 +31,7 @@ abstract class MonitorApplication(context: LagomApplicationContext)
   )
 
   lazy val configService = serviceClient.implement[ConfigService]
+  lazy val queryService = serviceClient.implement[QueryService]
   // Register the lagom-hello persistent entity
   //persistentEntityRegistry.register(wire[LagomhelloEntity])
 }

@@ -1,0 +1,79 @@
+PUT http://10.65.103.15:49673/v1/node/7 HTTP/1.1
+content-type: application/json
+
+{
+    "ip":"abc1111c",
+    "hostname":"aaa",
+    "port":22,
+    "tags":[
+        "a"
+    ],
+    "status": true,
+    "label":"fdf打发打发1111111"
+}
+
+###
+
+DELETE  http://10.65.103.15:49673/v1/node/4 HTTP/1.1
+
+###
+
+POST http://10.65.103.15:49673/v1/node HTTP/1.1
+content-type: application/json
+
+{
+    "ip":"1abcc",
+    "hostname":"aaa",
+    "port":22,
+    "tags":[
+        "a"
+    ],
+    "status": true,
+    "label":"fdf打发打发"
+}
+
+###
+
+GET http://10.65.103.15:49673/v1/node/4 HTTP/1.1
+
+###
+
+GET http://10.65.103.15:49673/v1/nodes HTTP/1.1
+
+
+###
+# monitor details 
+GET http://10.65.103.15:49673/v1/monitor/details HTTP/1.1
+
+###
+# machine connector mode jdbc
+GET http://10.65.103.15:49673/v1/machine/connector/jdbc/1 HTTP/1.1
+
+
+###
+POST http://localhost:56189/stream HTTP/1.1
+
+###
+
+POST HTTP://localhost:57337/api/query/oracle/ARRAY HTTP/1.1
+content-type: application/json
+
+{
+    "jdbcUrl":"jdbc:oracle:thin:@10.65.193.25:1521/orayali2",
+    "username":"system",
+    "password":"oracle",
+    "sqlText":"select * from (select level a from dual connect by level<10) where a>?",
+    "parameters": ["5"]
+}
+
+### 
+POST http://localhost:49673/v1/monitor/persistence HTTP/1.1
+content-type: application/json
+
+{
+    "id":1,
+    "content":"aaaa"
+}
+
+### 
+GET http://localhost:49673/v1/monitor/persistence/1/1484898897261 HTTP/1.1

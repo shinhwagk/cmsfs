@@ -1,70 +1,112 @@
 package org.shinhwagk.monitor.monitor
 
+import java.nio.file.Paths
 import java.util.Date
 
-import akka.NotUsed
-import akka.stream.ClosedShape
-import akka.stream.javadsl.Unzip
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, RunnableGraph, Sink, Source, UnzipWith}
+import akka.{Done, NotUsed}
+import akka.actor.ActorSystem
+import akka.stream.scaladsl.{Broadcast, FileIO, Flow, GraphDSL, Keep, RunnableGraph, Sink, Source, Zip, ZipWith}
+import akka.stream.{ActorMaterializer, ClosedShape, FanInShape2, IOResult}
+import akka.util.ByteString
 import org.quartz.CronExpression
-import org.shinhwagk.config.api.{ConfigService, Monitor, MonitorModeJDBC, MonitorModeSSH}
-import play.api.libs.concurrent.Promise
+import org.shinhwagk.config.api._
+import org.shinhwagk.query.api.{QueryService, QueryOracleMessage => QOM}
 import play.api.libs.json.Json
 
-import scala.collection.immutable
-import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by zhangxu on 2017/1/16.
   */
-//object MonitorSlave {
-////  def apply(configService: ConfigService):MonitorSlave = MonitorSlave(configService)
-//
-//
-//}
-
 
 object MonitorSlave {
-  def aaa(configService: ConfigService) = {
-    val c: Future[List[Monitor]] = configService.getMonitorList.invoke()
+  import sys.process._
+  implicit val system = ActorSystem()
+  implicit val materializer = ActorMaterializer()
 
-    val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+  def aaa(configService: ConfigService, queryService: QueryService) = {
+    val version = System.currentTimeMillis()
+    RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] =>
       import GraphDSL.Implicits._
 
-      val in: Source[Monitor, NotUsed] = Source.fromFuture(c).mapConcat(_.toList)
-
-      val filterCron: Flow[Monitor, Monitor, NotUsed] = Flow[Monitor].filter(m => new CronExpression(m.cron).isSatisfiedBy(new Date()))
-
-      def filterMode(mode: String) = Flow[Monitor].filter(_.mode == mode)
-
-      def jdbc: Flow[(String, Int), MonitorModeJDBC, NotUsed] = Flow[(String, Int)].mapAsync(1)(mon => configService.getMonitorMode(mon._1, mon._2).invoke().map(Json.parse(_).as[MonitorModeJDBC]))
-
-      //      def ssh = Flow[Monitor].mapAsync(1)(mon => configService.getMonitorMode(mon.mode, mon.modeId).invoke().map(Json.parse(_).as[MonitorModeSSH]))
-
-      val bcast = builder.add(Broadcast[Monitor](2))
-
-      val unzip = builder.add(UnzipWith[Monitor, (String, Int), Int]((mon: Monitor) => ((mon.mode, mon.modeId), mon.id.get)))
 
 
-      in ~> filterCron ~> bcast ~> filterMode("JDBC") ~> unzip.in
+      val in: Source[MonitorDetail, NotUsed] = Source.fromFuture(configService.getMonitorDetails.invoke()).mapConcat(_.toList)
 
-                          bcast ~> filterMode("SSH")
+      val fc: Flow[MonitorDetail, MonitorDetail, NotUsed] = Flow[MonitorDetail].filter(m => new CronExpression(m.cron).isSatisfiedBy(new Date()))
 
-      unzip.out0 ~> jdbc
+      val zip = b.add(ZipWith[MonitorModeJDBC, MachineConnectorModeJDBC, QOM]((l, r) => QOM(r.jdbcUrl,  r.username, r.password, l.code, List("5"))))
 
-      //      val in = Source(1 to 10)
-      //      val out = Sink.ignore
-      //
+      val bc = b.add(Broadcast[MonitorDetail](5))
+
+      def fm(mode: String) = Flow[MonitorDetail].filter(_.mode == mode)
+
+      val bc2 = b.add(Broadcast[MonitorDetail](2))
+
+      val bc3 = b.add(Broadcast[String](3))
+
+      def mm: Flow[MonitorDetail, MonitorModeJDBC, NotUsed] =
+        Flow[MonitorDetail].mapAsync(1)(md => configService.getMonitorMode("JDBC", md.monitorModeId).invoke().map(Json.parse(_).as[MonitorModeJDBC]))
+
+      def mcm: Flow[MonitorDetail, MachineConnectorModeJDBC, NotUsed] =
+        Flow[MonitorDetail].mapAsync(1)(md => configService.getMachineConnectorModeJdbc(md.machineConnectorId).invoke())
+
+      val oq: Flow[QOM, String, NotUsed] = Flow[QOM].mapAsync(1)(queryService.queryForOracle("ARRAY").invoke(_))
+
+      val zip2: FanInShape2[MonitorDetail, String, (MonitorDetail, String)] = b.add(Zip[MonitorDetail, String]())
+
+      val f5: Flow[MonitorDetail, String, NotUsed] = Flow[MonitorDetail].mapAsync(1)(md=>configService.getMonitorPersistenceContent(md.id.get,version).invoke())
+
+      val zip3: FanInShape2[MonitorDetail, NotUsed, (MonitorDetail, NotUsed)] = b.add(Zip[MonitorDetail, NotUsed]())
+
+      val f6: Flow[MonitorPersistenceQuery, NotUsed, NotUsed] = Flow[MonitorPersistenceQuery].mapAsync(1)(p=>configService.addMonitorPersistence.invoke(p))
+
+      val f7 = Flow[(MonitorDetail,String)].map(p=>MonitorPersistenceQuery(None,p._2,version,p._1.id.get))
+
+      def lineSink(filename: String): Sink[String, NotUsed] =
+        Flow[String]
+          .map(s => ByteString(s + "\n"))
+          .to(FileIO.toPath(Paths.get(filename)))
+
+      def lineSink2(filename: String): Sink[String, Future[IOResult]] =
+        Flow[String]
+          .map(s => ByteString(s + "\n"))
+          .toMat(FileIO.toPath(Paths.get(filename)))(Keep.right)
 
 
-      //      val f1, f2, f3, f4 = Flow[Int].map(_ + 10)
-      //
-      //      in ~> f1 ~> bcast ~> f2 ~> merge ~> f3 ~> out
-      //      bcast ~> f4 ~> merge
+                                                                     bc3 ~> Flow[String].mapAsync(1)(p=> Future("powershell -help".!!)) ~> Sink.ignore
+
+                                                    zip.out ~> oq ~> bc3 ~> Sink.ignore
+
+                                      bc2 ~> mcm ~> zip.in1
+
+      in ~> fc ~> bc ~> fm("JDBC") ~> bc2 ~> mm  ~> zip.in0
+
+                  bc ~> fm("SSH")  ~> Sink.ignore
+
+                  bc ~> Sink.foreach(println)
+
+                  bc ~> Flow[MonitorDetail].filter(_.persistence)        ~> zip2.in0
+
+                                                                     bc3 ~> zip2.in1
+
+                                                                            zip2.out ~> f7 ~> f6 ~> zip3.in1
+
+                  bc ~> Flow[MonitorDetail].filter(_.alarm) ~> zip3.in0
+//      configService.getMonitorPersistenceContent(p._1.id.get,version).invoke()
+                                                               zip3.out ~>
+//                                                                 Flow[(MonitorDetail, NotUsed)].mapAsync(2)(p=>Future{"aaaaaaaaaa"}) ~> Sink.foreach(println)
+                                                                 Flow[(MonitorDetail, NotUsed)]
+                                                                 .mapAsync(1)(p=>{configService.getMonitorPersistenceContent(1,version).invoke() }) ~>
+                                                                      Flow[String] ~> lineSink("aaa")
+//                                                                Flow[String].map(s => ByteString(s + "\n")).mapAsync(1)(p=>FileIO.toPath(Paths.get("./aaaa"))) ~> Sink.foreach[IOResult](p=>println(p.wasSuccessful))
+
+//      Flow[String]
+//
+
+
       ClosedShape
-    })
+    }).run()
   }
-
-
 }

@@ -83,7 +83,7 @@ lazy val `oso-monitor-slave-impl` = (project in file("oso-monitor-slave-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-config-api`)
+  .dependsOn(`oso-monitor-api`, `oso-config-api`)
 
 lazy val `oso-monitor-api` = (project in file("oso-monitor-api"))
   .settings(
@@ -104,7 +104,7 @@ lazy val `oso-monitor-impl` = (project in file("oso-monitor-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`)
+  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`, `oso-query-api`)
 
 lazy val `oso-monitor-alarm-api` = (project in file("oso-monitor-alarm-api"))
   .settings(
