@@ -11,23 +11,12 @@ import scala.concurrent.Future
   * Created by zhangxu on 2017/1/22.
   */
 
-trait ProcessOriginal {
-  def genPersistence(version: Long): MonitorPersistence
-
-  def getConnector(cs: ConfigService):Future[ProcessOriginal]
-
-  def getMonitor(cs: ConfigService):Future[ProcessOriginal]
-
-  def query(qs: QueryService):Future[ProcessOriginal]
-}
-
 case class ProcessOriginalForJDBC(md: MonitorDetail) extends ProcessOriginal {
 
   var jdbcUrl: String = _
   var username: String = _
   var password: String = _
   var sqlText: String = _
-
   var result: String = _
 
   override def getConnector(cs: ConfigService) = {
