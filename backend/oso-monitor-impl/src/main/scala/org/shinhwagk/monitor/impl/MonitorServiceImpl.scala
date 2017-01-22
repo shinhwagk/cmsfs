@@ -18,8 +18,8 @@ import scala.util.{Failure, Success}
   */
 class MonitorServiceImpl(configService: ConfigService, queryService: QueryService)(implicit ec: ExecutionContext) extends MonitorService {
   //  Test.exec(configService)
-//    configService.getMonitorPersistenceContent(1l,1484898897261l).invoke().foreach(println)
-    MonitorSlave.aaa(configService, queryService)
+  //    configService.getMonitorPersistenceContent(1l,1484898897261l).invoke().foreach(println)
+  new MonitorSlave(configService: ConfigService, queryService: QueryService).start
 
   override def test: ServiceCall[NotUsed, NotUsed] = ServiceCall { _ =>
     Future.successful(akka.NotUsed)

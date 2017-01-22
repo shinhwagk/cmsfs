@@ -40,11 +40,11 @@ trait ConfigService extends Service {
 
   def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String]
 
-  def addMonitorPersistence: ServiceCall[MonitorPersistenceQuery, NotUsed]
+  def addMonitorPersistence: ServiceCall[MonitorPersistence, NotUsed]
 
   def getMonitorPersistenceContent(id: Long, version: Long): ServiceCall[NotUsed, String]
 
-//  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
+  //  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
 
   override final def descriptor = {
     named("oso-config").withCalls(
@@ -72,10 +72,9 @@ trait ConfigService extends Service {
 
       restCall(Method.POST, "/v1/monitor/list", getMonitorList),
 
-      restCall(Method.POST, "/v1/monitor/persistence", addMonitorPersistence),
+      restCall(Method.POST, "/v1/monitor/persistence", addMonitorPersistence _),
 
       restCall(Method.GET, "/v1/monitor/persistence/:id/:version", getMonitorPersistenceContent _)
-
     )
   }
 }
@@ -200,8 +199,8 @@ object MachineConnectorModeSSH extends ((Option[Int], String, String, Int, Int, 
   implicit val format: Format[MachineConnectorModeSSH] = Json.format[MachineConnectorModeSSH]
 }
 
-case class MonitorPersistenceQuery(id: Option[Int], content: String, version: Long, monitorDetailId: Int)
+case class MonitorPersistence(id: Option[Int], stage: String, version: Long, result: String, monitorDetailId: Int)
 
-object MonitorPersistenceQuery extends ((Option[Int], String, Long, Int) => MonitorPersistenceQuery) {
-  implicit val format: Format[MonitorPersistenceQuery] = Json.format[MonitorPersistenceQuery]
+object MonitorPersistence extends ((Option[Int], String, Long, String, Int) => MonitorPersistence) {
+  implicit val format: Format[MonitorPersistence] = Json.format[MonitorPersistence]
 }

@@ -91,12 +91,11 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
     db.run(Tables.machineConnectorModeJdbcs.filter(_.id === id).result.head)
   }
 
-  override def addMonitorPersistence: ServiceCall[MonitorPersistenceQuery, NotUsed] = ServiceCall { mpq =>
-    db.run(Tables.monitorPersistenceQuerys += mpq).map(_ => NotUsed)
+  override def addMonitorPersistence: ServiceCall[MonitorPersistence, NotUsed] = ServiceCall { mp =>
+    db.run(Tables.monitorPersistences += mp).map(_ => NotUsed)
   }
 
   override def getMonitorPersistenceContent(id: Long, version: Long): ServiceCall[NotUsed, String] = ServiceCall { _ =>
-        db.run(Tables.monitorPersistenceQuerys.filter(r => r.monitorDetailId === id.asInstanceOf[Int] && r.version === version).result.head).map(_.content)
+    Future.successful("111")
   }
-
 }

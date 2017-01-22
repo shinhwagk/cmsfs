@@ -258,17 +258,21 @@ object Tables {
 
   val machineConnectorModeSSHs = TableQuery[MachineConnectorModeSSHs]
 
-  class MonitorPersistenceQuerys(tag: Tag) extends Table[MonitorPersistenceQuery](tag, "monitor_persistence_query") {
+  class MonitorPersistences(tag: Tag) extends Table[MonitorPersistence](tag, "monitor_persistence") {
     def id = column[Option[Int]]("ID")
 
-    def content = column[String]("CONTENT")
+    def stage = column[String]("STAGE")
 
     def version = column[Long]("VERSION")
 
+    def result = column[String]("RESULT")
+
     def monitorDetailId = column[Int]("MONITOR_DETAIL_ID")
 
-    override def * = (id, content, version, monitorDetailId) <> (MonitorPersistenceQuery.tupled, MonitorPersistenceQuery.unapply)
+    override def * = (id, stage, version, result, monitorDetailId) <> (MonitorPersistence.tupled, MonitorPersistence.unapply)
   }
 
-  val monitorPersistenceQuerys = TableQuery[MonitorPersistenceQuerys]
+  val monitorPersistences = TableQuery[MonitorPersistences]
+
+
 }
