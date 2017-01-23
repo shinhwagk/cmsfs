@@ -11,14 +11,16 @@ import play.api.libs.json._
 /**
   * Created by zhangxu on 2017/1/10.
   */
-trait MonitorService extends Service{
+trait MonitorService extends Service {
 
-  def test: ServiceCall[NotUsed, NotUsed]
+  def getMonitorResult(stage: String, mId: Int, version: Long): ServiceCall[NotUsed, String]
 
   override final def descriptor = {
     named("oso-monitor").withCalls(
-      restCall(Method.POST, "/api/query/oracle/:mode", test)
-//      restCall(Method.POST, "/api/query/os", queryForOSScript _)
+      restCall(Method.GET, "/v1/monitor/persistence/:stage/:mid/:version", getMonitorResult _)
+      //      restCall(Method.POST, "/api/query/os", queryForOSScript _)
     ).withAutoAcl(true)
   }
+
+
 }

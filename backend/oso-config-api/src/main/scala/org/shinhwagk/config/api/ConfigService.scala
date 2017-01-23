@@ -44,6 +44,14 @@ trait ConfigService extends Service {
 
   def getMonitorPersistenceContent(id: Long, version: Long): ServiceCall[NotUsed, String]
 
+
+  /**
+    * alarm
+    */
+  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]]
+
+  def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm]
+
   //  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
 
   override final def descriptor = {
@@ -58,7 +66,7 @@ trait ConfigService extends Service {
 
       restCall(Method.GET, "/v1/monitor/details", getMonitorDetails),
 
-      restCall(Method.GET, "/v1/monitor/:mode/:id", getMonitorMode _),
+      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorMode _),
 
       restCall(Method.GET, "/v1/machines", getMachines),
 
@@ -68,13 +76,18 @@ trait ConfigService extends Service {
 
       restCall(Method.POST, "/v1/monitor", addMonitor),
 
-      restCall(Method.POST, "/v1/monitor/add/:mode", addMonitorMode _),
+//      restCall(Method.POST, "/v1/monitor/add/:mode", addMonitorMode _),
+
 
       restCall(Method.POST, "/v1/monitor/list", getMonitorList),
 
       restCall(Method.POST, "/v1/monitor/persistence", addMonitorPersistence _),
 
-      restCall(Method.GET, "/v1/monitor/persistence/:id/:version", getMonitorPersistenceContent _)
+      restCall(Method.GET, "/v1/monitor/persistence/:id/:version", getMonitorPersistenceContent _),
+
+      restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
+
+      restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _)
     )
   }
 }
@@ -203,4 +216,17 @@ case class MonitorPersistence(id: Option[Int], stage: String, version: Long, res
 
 object MonitorPersistence extends ((Option[Int], String, Long, String, Int) => MonitorPersistence) {
   implicit val format: Format[MonitorPersistence] = Json.format[MonitorPersistence]
+}
+
+
+case class MonitorAlarm(id: Option[Int], script: String, state: Boolean, args: String)
+
+object MonitorAlarm extends ((Option[Int], String, Boolean, String) => MonitorAlarm) {
+  implicit val format: Format[MonitorAlarm] = Json.format[MonitorAlarm]
+}
+
+case class MonitorAlarmDetail(id: Option[Int], alarmId: Int, args: List[String], mode: String)
+
+object MonitorAlarmDetail extends ((Option[Int], Int, List[String], String) => MonitorAlarmDetail) {
+  implicit val format: Format[MonitorAlarmDetail] = Json.format[MonitorAlarmDetail]
 }

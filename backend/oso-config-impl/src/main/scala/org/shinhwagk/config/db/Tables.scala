@@ -1,7 +1,7 @@
 package org.shinhwagk.config.db
 
 import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
-import org.shinhwagk.config.api._
+import org.shinhwagk.config.api.{MonitorAlarm, _}
 import play.api.libs.json._
 import slick.driver.MySQLDriver.api._
 import slick.lifted.ProvenShape
@@ -275,4 +275,31 @@ object Tables {
   val monitorPersistences = TableQuery[MonitorPersistences]
 
 
+  class MonitorAlarmDetails(tag: Tag) extends Table[MonitorAlarmDetail](tag, "alarm_details") {
+    def id = column[Option[Int]]("ID")
+
+    def alarmId = column[Int]("ALARM_ID")
+
+    def args = column[List[String]]("ARGS")
+
+    def mode = column[String]("MODE")
+
+    override def * = (id, alarmId, args, mode) <> (MonitorAlarmDetail.tupled, MonitorAlarmDetail.unapply)
+  }
+
+  val monitorAlarmDetails = TableQuery[MonitorAlarmDetails]
+
+  class MonitorAlarms(tag: Tag) extends Table[MonitorAlarm](tag, "alarms") {
+    def id = column[Option[Int]]("ID")
+
+    def script = column[String]("SCRIPT")
+
+    def state = column[Boolean]("STATE")
+
+    def args = column[String]("ARGS")
+
+    override def * = (id, script, state, args) <> (MonitorAlarm.tupled, MonitorAlarm.unapply)
+  }
+
+  val monitorAlarms = TableQuery[MonitorAlarms]
 }

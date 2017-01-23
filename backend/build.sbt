@@ -97,6 +97,7 @@ lazy val `oso-monitor-impl` = (project in file("oso-monitor-impl"))
   .settings(
     libraryDependencies ++= Seq(
       "mysql" % "mysql-connector-java" % "6.0.5",
+      "com.typesafe.slick" %% "slick" % "3.1.1",
       "org.quartz-scheduler" % "quartz" % "2.2.3",
       lagomScaladslTestKit,
       macwire,
@@ -125,7 +126,7 @@ lazy val `oso-monitor-alarm-impl` = (project in file("oso-monitor-alarm-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-config-api`)
+  .dependsOn(`oso-config-api`,`oso-monitor-alarm-api`)
 
 
 lagomCassandraCleanOnStart in ThisBuild := false

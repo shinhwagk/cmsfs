@@ -98,4 +98,12 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
   override def getMonitorPersistenceContent(id: Long, version: Long): ServiceCall[NotUsed, String] = ServiceCall { _ =>
     Future.successful("111")
   }
+
+  override def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]] = ServiceCall { _ =>
+    db.run(Tables.monitorAlarmDetails.filter(_.alarmId === aId).result).map(_.toList)
+  }
+
+  override def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm] = ServiceCall { _ =>
+    db.run(Tables.monitorAlarms.filter(_.id === id).result.head)
+  }
 }

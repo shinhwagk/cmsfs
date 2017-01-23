@@ -90,8 +90,8 @@ class MonitorSlave(configService: ConfigService, queryService: QueryService) {
     val ap: FlowShape[ProcessOriginal, Boolean] = b.add(Flow[ProcessOriginal].mapAsync(1)(p => configService.addMonitorPersistence.invoke(p.genPersistence(version)).map(_ => true)))
 
     in ~> fc ~> bd ~> fm("JDBC") ~> ff1 ~> merge
-                bd ~> fm("SSH")                                    ~> Sink.ignore
 
+                bd ~> fm("SSH")  ~> Sink.ignore
 
                                            merge ~> ff2 ~> ff3 ~> ff4 ~> ap ~> Sink.ignore
     ClosedShape
