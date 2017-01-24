@@ -194,9 +194,9 @@ object MonitorModeJDBC extends ((Option[Int], String, String, String) => Monitor
 case class MonitorModeSSH(id: Option[Int], category: String, categoryVersion: String, code: String)
 
 
-case class MonitorDetail(id: Option[Int], mode: String, monitorModeId: Int, machineConnectorId: Int, cron: String, persistence: Boolean, alarm: Boolean, chart: Boolean)
+case class MonitorDetail(id: Option[Int], mode: String, monitorModeId: Int, machineConnectorId: Int, cron: String, report: Int, alarm: Int, chart: Int)
 
-object MonitorDetail extends ((Option[Int], String, Int, Int, String, Boolean, Boolean, Boolean) => MonitorDetail) {
+object MonitorDetail extends ((Option[Int], String, Int, Int, String, Int, Int, Int) => MonitorDetail) {
   implicit val format: Format[MonitorDetail] = Json.format[MonitorDetail]
 }
 

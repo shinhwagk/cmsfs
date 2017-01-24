@@ -14,6 +14,8 @@ import org.shinhwagk.monitor.monitor.MonitorModeEnum.MonitorModeEnum
 import org.shinhwagk.query.api.{QueryService, QueryOracleMessage => QOM}
 import play.api.libs.json.Json
 
+import scala.collection.immutable.Nil
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -21,7 +23,7 @@ import scala.concurrent.Future
   * Created by zhangxu on 2017/1/16.
   */
 
-class MonitorSlave(cs: ConfigService, queryService: QueryService) {
+class MonitorSlave(cs: ConfigService, qs: QueryService) {
 
   import sys.process._
 
@@ -62,44 +64,59 @@ class MonitorSlave(cs: ConfigService, queryService: QueryService) {
 
   val version = System.currentTimeMillis()
 
-  def sourcex(version:Long): RunnableGraph[NotUsed] = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] =>
+  def sourcex(version: Long): RunnableGraph[NotUsed] = RunnableGraph.fromGraph(GraphDSL.create() { implicit b: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
 
     val in: Source[MonitorDetail, NotUsed] = Source.fromFuture(cs.getMonitorDetails.invoke()).mapConcat(_.toList)
 
     val fc: Flow[MonitorDetail, MonitorDetail, NotUsed] = Flow[MonitorDetail].filter(m => new CronExpression(m.cron).isSatisfiedBy(new Date()))
 
-    def fm(mode: MonitorModeEnum) = Flow[MonitorDetail].filter(_.mode == mode)
+    def fm(mode: MonitorModeEnum) =
+      mode match {
+        case MonitorModeEnum.JDBC =>
+          Flow[MonitorDetail].filter(_.mode == MonitorModeEnum.JDBC).map(ProcessOriginalForJDBC(_, version, cs, qs))
+        case MonitorModeEnum.SSH =>
+          Flow[MonitorDetail].filter(_.mode == MonitorModeEnum.JDBC).map(ProcessOriginalForJDBC(_, version, cs, qs))
+      }
 
-    val ff1: Flow[MonitorDetail, ProcessOriginal, NotUsed] =
-      Flow[MonitorDetail].map(ProcessOriginalForJDBC(_))
-    val ff2  =
-      b.add(Flow[ProcessOriginal].mapAsync(1)(_.getMonitor(cs)))
+    val ff2: FlowShape[ProcessOriginal, ProcessOriginal] =
+      b.add(Flow[ProcessOriginal].mapAsync(1)(_.getMonitor))
     val ff3: Flow[ProcessOriginal, ProcessOriginal, NotUsed] =
-      Flow[ProcessOriginal].mapAsync(1)(_.getConnector(cs))
+      Flow[ProcessOriginal].mapAsync(1)(_.getConnector)
     val ff4: Flow[ProcessOriginal, ProcessOriginal, NotUsed] =
-      Flow[ProcessOriginal].mapAsync(1)(_.query(queryService))
+      Flow[ProcessOriginal].mapAsync(1)(_.query)
+
+    def filterProcessScript(sc:String): Flow[ProcessOriginal, ProcessScript, NotUsed] =
+      sc match {
+        case "ALARM" => Flow[ProcessOriginal].filter(_.ProcessAlarm.isDefined).map(_.ProcessAlarm.get)
+        case "REPORT" => Flow[ProcessOriginal].filter(_.ProcessReport.isDefined).map(_.ProcessReport.get)
+        case "CHART" => Flow[ProcessOriginal].filter(_.ProcessChart.isDefined).map(_.ProcessChart.get)
+      }
 
     val bd = b.add(Broadcast[MonitorDetail](2))
 
     val merge = b.add(Merge[ProcessOriginal](1))
 
-    //    val bd2 = b.add(Zip[MonitorDetail, Boolean]())
+    val bd2 = b.add(Broadcast[ProcessOriginal](3))
 
-    //    val ff5 = b.add(Flow[(MonitorDetail, Boolean)].filter(_._2).map(_._1))
+    val merge2 = b.add(Merge[ProcessScript](3))
 
-    val ap: FlowShape[ProcessOriginal, Boolean] = b.add(Flow[ProcessOriginal].mapAsync(1)(p => cs.addMonitorPersistence.invoke(p.genPersistence(version)).map(_ => true)))
+    val ap: FlowShape[ProcessOriginal, ProcessOriginal] =
+      b.add(Flow[ProcessOriginal].mapAsync(1)(_.genPersistence))
 
-<<<<<<< HEAD
-    in ~> fc ~> bd ~> fm("JDBC") ~> ff1 ~> merge
-=======
-    in ~> fc ~> bd ~> fm(MonitorModeEnum.JDBC) ~> ff1 ~> merge
-                bd ~> fm(MonitorModeEnum.SSH)                                    ~> Sink.ignore
->>>>>>> 37e84e925135b295fc63f0ae48e288db86e45d7c
+    val ffff: Flow[ProcessOriginal,List[ProcessOriginal], NotUsed] = Flow[ProcessOriginal].fold(List[ProcessOriginal]())((a, f) => a:+f  )
 
-                bd ~> fm("SSH")  ~> Sink.ignore
+    in ~> fc ~> bd ~> fm(MonitorModeEnum.JDBC) ~> merge
+                bd ~> fm(MonitorModeEnum.SSH)                                              ~> Sink.ignore
 
-                                           merge ~> ff2 ~> ff3 ~> ff4 ~> ap ~> Sink.ignore
+                                                  merge ~> ff2 ~> ff3 ~> ff4 ~> ap ~> bd2
+
+                                           merge2 <~ filterProcessScript("ALARM")  <~ bd2
+                                           merge2 <~ filterProcessScript("REPORT") <~ bd2
+                                           merge2 <~ filterProcessScript("CHART")  <~ bd2
+
+                                                  merge2 ~> Flow[ProcessScript].map(_.getScript)
+
     ClosedShape
   })
 

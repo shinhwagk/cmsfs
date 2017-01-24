@@ -205,13 +205,13 @@ object Tables {
 
     def cron = column[String]("CRON")
 
-    def persistence = column[Boolean]("PERSISTENCE")
+    def report = column[Int]("REPORT")
 
-    def alarm = column[Boolean]("ALARM")
+    def alarm = column[Int]("ALARM")
 
-    def chart = column[Boolean]("CHART")
+    def chart = column[Int]("CHART")
 
-    override def * = (id, mode, monitorModeId, machineConnectorId, cron, persistence, alarm, chart) <> (MonitorDetail.tupled, MonitorDetail.unapply)
+    override def * = (id, mode, monitorModeId, machineConnectorId, cron, report, alarm, chart) <> (MonitorDetail.tupled, MonitorDetail.unapply)
   }
 
   val monitorDetails = TableQuery[MonitorDetails]

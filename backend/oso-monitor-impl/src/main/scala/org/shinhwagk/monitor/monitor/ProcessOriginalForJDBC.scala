@@ -11,15 +11,18 @@ import scala.concurrent.Future
   * Created by zhangxu on 2017/1/22.
   */
 
-case class ProcessOriginalForJDBC(md: MonitorDetail) extends ProcessOriginal {
+case class ProcessOriginalForJDBC(md: MonitorDetail,
+                                  version: Long,
+                                  cs: ConfigService,
+                                  qs: QueryService) extends ProcessOriginal {
 
   var jdbcUrl: String = _
   var username: String = _
   var password: String = _
   var sqlText: String = _
-  var result: String = _
+  override var result: String = _
 
-  override def getConnector(cs: ConfigService) = {
+  override def getConnector = {
     cs.getMachineConnectorModeJdbc(md.machineConnectorId).invoke().map(p => {
       jdbcUrl = p.jdbcUrl
       username = p.username
@@ -28,7 +31,7 @@ case class ProcessOriginalForJDBC(md: MonitorDetail) extends ProcessOriginal {
     })
   }
 
-  override def getMonitor(cs: ConfigService) = {
+  override def getMonitor = {
     cs.getMonitorMode("JDBC", md.monitorModeId).invoke()
       .map(Json.parse(_).as[MonitorModeJDBC])
       .map(p => {
@@ -37,7 +40,7 @@ case class ProcessOriginalForJDBC(md: MonitorDetail) extends ProcessOriginal {
       })
   }
 
-  override def query(qs: QueryService) = {
+  override def query = {
     val qom = QueryOracleMessage(jdbcUrl, username, password, sqlText, List("1"))
     qs.queryForOracle("ARRAY").invoke(qom).map(p => {
       result = p
@@ -45,7 +48,4 @@ case class ProcessOriginalForJDBC(md: MonitorDetail) extends ProcessOriginal {
     })
   }
 
-  override def genPersistence(version: Long): MonitorPersistence = {
-    MonitorPersistence(None, "original", version, result, md.id.get)
-  }
 }

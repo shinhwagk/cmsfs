@@ -1,6 +1,6 @@
 package org.shinhwagk.monitor.monitor
 
-import org.shinhwagk.config.api.{ConfigService, MonitorModeJDBC}
+import org.shinhwagk.config.api.{ConfigService, MonitorDetail, MonitorModeJDBC}
 import org.shinhwagk.query.api.{QueryOracleMessage, QueryService}
 import play.api.libs.json.Json
 
@@ -9,14 +9,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by zhangxu on 2017/1/22.
   */
-case class ProcessOriginalForSSH(monitorId: Int, connectorId: Int) {
+case class ProcessOriginalForSSH(md: MonitorDetail, version: Long) extends ProcessOriginal {
 
   var jdbcUrl: String = _
   var username: String = _
   var password: String = _
   var sqlText: String = _
 
-  var result:String = _
+  var result: String = _
 
   def getConnector(cs: ConfigService) = {
     cs.getMachineConnectorModeJdbc(connectorId).invoke().map(p => {
@@ -37,8 +37,8 @@ case class ProcessOriginalForSSH(monitorId: Int, connectorId: Int) {
   }
 
   def query(qs: QueryService) = {
-    val qom = QueryOracleMessage(jdbcUrl,username,password,sqlText,List("1"))
-    qs.queryForOracle("ARRAY").invoke(qom).map(p=>{
+    val qom = QueryOracleMessage(jdbcUrl, username, password, sqlText, List("1"))
+    qs.queryForOracle("ARRAY").invoke(qom).map(p => {
       result = p
       this
     })

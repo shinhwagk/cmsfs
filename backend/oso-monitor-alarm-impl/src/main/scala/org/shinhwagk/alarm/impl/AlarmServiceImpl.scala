@@ -16,6 +16,7 @@ import scala.sys.process._
 class AlarmServiceImpl(configService: ConfigService)(implicit ec: ExecutionContext) extends AlarmService {
   override def getAlarmResult(id: Int): ServiceCall[List[String], JsValue] = ServiceCall { _ =>
     configService.getAlarm(id).invoke().map(alarm => {
+      println(alarm)
       val pw = new PrintWriter(new File("hello.ps1"))
       pw.write(alarm.script)
       pw.close
