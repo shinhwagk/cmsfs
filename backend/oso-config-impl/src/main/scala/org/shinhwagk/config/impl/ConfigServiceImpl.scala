@@ -5,16 +5,17 @@ import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.shinhwagk.config.api._
 import org.shinhwagk.config.db.Tables
 import org.shinhwagk.config.db.Tables.MonitorDetails
-import play.api.libs.json.Json
+import play.api.libs.json._
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.GetResult
+import org.shinhwagk.config.{JsonFormat, api}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Implementation of the LagomhelloService.
   */
-class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionContext) extends ConfigService {
+class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
 
   val db = Database.forConfig("oso-config")
 
@@ -67,25 +68,25 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
     db.run(Tables.monitors += monitor).map(_ => NotUsed)
   }
 
-  override def addMonitorMode(mode: String): ServiceCall[String, NotUsed] = ServiceCall { string =>
-
-    mode match {
-      case "JDBC" => db.run(Tables.monitorModeJdbcs += Json.parse(string).as[MonitorModeJDBC]).map(_ => NotUsed)
-      //      case "SSH" =>db.run(Tables.monitorModeSsh += monitorMode).map(_ => NotUsed)
-    }
-
-  }
+  //  override def addMonitorMode(mode: String): ServiceCall[String, NotUsed] = ServiceCall { string =>
+  //
+  //    mode match {
+  //      case "JDBC" => db.run(Tables.monitorModeJdbcs += Json.parse(string).as[MonitorModeJDBC]).map(_ => NotUsed)
+  //      //      case "SSH" =>db.run(Tables.monitorModeSsh += monitorMode).map(_ => NotUsed)
+  //    }
+  //
+  //  }
 
   override def getMonitorList: ServiceCall[NotUsed, List[Monitor]] = ServiceCall { _ =>
     db.run(Tables.monitors.result).map(_.toList)
   }
 
-  override def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String] = ServiceCall { _ =>
-    mode match {
-      case "JDBC" => db.run(Tables.monitorModeJdbcs.filter(_.id === id).result.head).map(Json.toJson(_).toString())
-      //      case "SSH" => db.run(Tables.monitorModeSSHs.filter(_.id === id).result.head).map(Json.toJson(_).toString())
-    }
-  }
+  //  override def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String] = ServiceCall { _ =>
+  //    mode match {
+  //      case "JDBC" => db.run(Tables.monitorModeJdbcs.filter(_.id === id).result.head).map(Json.toJson(_).toString())
+  //      //      case "SSH" => db.run(Tables.monitorModeSSHs.filter(_.id === id).result.head).map(Json.toJson(_).toString())
+  //    }
+  //  }
 
   override def getMachineConnectorModeJdbc(id: Int): ServiceCall[NotUsed, MachineConnectorModeJDBC] = ServiceCall { _ =>
     db.run(Tables.machineConnectorModeJdbcs.filter(_.id === id).result.head)
@@ -105,5 +106,11 @@ class ConfigServiceImpl(configService: ConfigService)(implicit ec: ExecutionCont
 
   override def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm] = ServiceCall { _ =>
     db.run(Tables.monitorAlarms.filter(_.id === id).result.head)
+  }
+
+  override def getMonitorById(id: Int): ServiceCall[NotUsed, api.MonitorModeJDBC] = ServiceCall { _ =>
+    db.run(Tables.monitorModeJdbcs.filter(_.id === id).result.head).map(f = mmj => {
+      api.MonitorModeJDBC(mmj.id.get, mmj.category, JsonFormat.toJsArray(mmj.categoryVerison), mmj.code, mmj.args.map(_.toString).toSeq)
+    })
   }
 }

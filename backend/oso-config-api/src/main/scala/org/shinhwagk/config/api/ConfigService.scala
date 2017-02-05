@@ -1,11 +1,16 @@
 package org.shinhwagk.config.api
 
+import java.util.UUID
+
 import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
 import org.shinhwagk.config.api.MonitorCategoryEnum.MonitorCategoryEnum
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
+
+import scala.util.Try
 
 /**
   * Created by zhangxu on 2017/1/10.
@@ -34,11 +39,11 @@ trait ConfigService extends Service {
 
   def addMonitor: ServiceCall[Monitor, NotUsed]
 
-  def addMonitorMode(mode: String): ServiceCall[String, NotUsed]
+  //  def addMonitorMode(mode: String): ServiceCall[String, NotUsed]
 
   def getMonitorList: ServiceCall[NotUsed, List[Monitor]]
 
-  def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String]
+  //  def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String]
 
   def addMonitorPersistence: ServiceCall[MonitorPersistence, NotUsed]
 
@@ -51,6 +56,8 @@ trait ConfigService extends Service {
   def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]]
 
   def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm]
+
+  def getMonitorById(id: Int): ServiceCall[NotUsed, MonitorModeJDBC]
 
   //  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
 
@@ -66,7 +73,7 @@ trait ConfigService extends Service {
 
       restCall(Method.GET, "/v1/monitor/details", getMonitorDetails),
 
-      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorMode _),
+      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorById _),
 
       restCall(Method.GET, "/v1/machines", getMachines),
 
@@ -76,7 +83,7 @@ trait ConfigService extends Service {
 
       restCall(Method.POST, "/v1/monitor", addMonitor),
 
-//      restCall(Method.POST, "/v1/monitor/add/:mode", addMonitorMode _),
+      //      restCall(Method.POST, "/v1/monitor/add/:mode", addMonitorMode _),
 
 
       restCall(Method.POST, "/v1/monitor/list", getMonitorList),
@@ -88,6 +95,8 @@ trait ConfigService extends Service {
       restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
 
       restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _)
+
+      //      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorById _)
     )
   }
 }
@@ -185,10 +194,14 @@ object Monitor extends ((Option[Int], String, String, String, String, Int, Boole
   implicit val format: Format[Monitor] = Json.format[Monitor]
 }
 
-case class MonitorModeJDBC(id: Option[Int], category: String, categoryVersion: String, code: String)
 
-object MonitorModeJDBC extends ((Option[Int], String, String, String) => MonitorModeJDBC) {
-  implicit val format: Format[MonitorModeJDBC] = Json.format[MonitorModeJDBC]
+
+case class MonitorModeJDBC(id: Int, category: String, categoryVersion: Seq[JsValue], code: String, args: Seq[String])
+
+
+object MonitorModeJDBC {
+
+  implicit val format: Format[MonitorModeJDBC] = Json.format
 }
 
 case class MonitorModeSSH(id: Option[Int], category: String, categoryVersion: String, code: String)

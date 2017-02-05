@@ -14,7 +14,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class QueryServiceImpl extends QueryService {
 
   override def queryForOracle(mode: String) = ServerServiceCall { (_, qom) =>
-    println(qom + "xxxxxx")
     val responseHeader: ResponseHeader = ResponseHeader(200, MessageProtocol.empty, immutable.Seq.empty)
     qom.mode(mode).map(response => (responseHeader, response))
   }

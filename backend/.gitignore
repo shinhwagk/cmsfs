@@ -1,7 +1,5 @@
 /logs/
-/target/
-/project/target/
 /project/project
 /.idea/
-/oso-*-api/target/
-/oso-*-impl/target/
+/**/target/
+/**/logs

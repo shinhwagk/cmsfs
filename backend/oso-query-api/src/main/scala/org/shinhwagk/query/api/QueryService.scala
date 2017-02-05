@@ -91,7 +91,7 @@ object QueryOSMessage {
   implicit val format: Format[QueryOSMessage] = Json.format[QueryOSMessage]
 }
 
-case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: List[String]) {
+case class QueryOracleMessage(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: Seq[String]) {
   Class.forName("oracle.jdbc.driver.OracleDriver");
 
   def mode(mode: String): Future[String] = {
@@ -104,7 +104,7 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
   def query[T](f: (ResultSet) => JsValue) = Future {
     val conn = DriverManager.getConnection(jdbcUrl, username, password)
     val stmt = conn.prepareStatement(sqlText)
-    (1 to parameters.length).foreach(num => stmt.setObject(num, parameters(num - 1)))
+    (1 to parameters.length).foreach(num => stmt.setObject(num, 5))
     val rs = stmt.executeQuery()
 
     val rows = f(rs)
@@ -144,7 +144,7 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
 
 }
 
-object QueryOracleMessage extends ((String, String, String, String, List[String]) => QueryOracleMessage) {
+object QueryOracleMessage extends ((String, String, String, String, Seq[String]) => QueryOracleMessage) {
 
 //  implicit object AnyJsonFormat extends Format[Any] {
 //    override def writes(o: Any): JsValue = o match {

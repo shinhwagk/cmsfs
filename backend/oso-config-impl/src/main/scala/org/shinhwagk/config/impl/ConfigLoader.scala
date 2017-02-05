@@ -2,6 +2,7 @@ package org.shinhwagk.config.impl
 
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
+import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.shinhwagk.config.api.ConfigService
@@ -27,7 +28,7 @@ abstract class ConfigApplication(context: LagomApplicationContext)
     bindService[ConfigService].to(wire[ConfigServiceImpl])
   )
 
-  lazy val configService = serviceClient.implement[ConfigService]
+//  lazy val configService = serviceClient.implement[ConfigService]
   // Register the lagom-hello persistent entity
   //persistentEntityRegistry.register(wire[LagomhelloEntity])
 }

@@ -1,23 +1,22 @@
-organization in ThisBuild := "org.shinhwagk"
+organization in ThisBuild := "org.wex"
 version in ThisBuild := "1.0-SNAPSHOT"
 
 scalaVersion in ThisBuild := "2.11.8"
 
+val playJsonDerivedCodecs = "org.julienrf" %% "play-json-derived-codecs" % "3.3"
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
 lazy val `oso` = (project in file("."))
   .aggregate(
-    `oso-query-api`,
-    `oso-query-impl`,
-    `oso-config-api`,
-    `oso-config-impl`,
-    `oso-monitor-api`,
-    `oso-monitor-impl`,
-    `oso-monitor-slave-api`,
-    `oso-monitor-slave-impl`,
-    `oso-monitor-alarm-api`,
-    `oso-monitor-alarm-impl`
+    `oso-query-api`, `oso-query-impl`,
+    `oso-config-api`, `oso-config-impl`,
+    alarmApi, alarmImpl,
+    //    `oso-monitor-api`, `oso-monitor-impl`,
+    //    `oso-monitor-slave-api`, `oso-monitor-slave-impl`,
+    //    `oso-monitor-alarm-api`, `oso-monitor-alarm-impl`,
+    collectionApi, collectionImpl
+    //    collectingApi, collectingImpl
   )
 
 lazy val `oso-query-api` = (project in file("oso-query-api"))
@@ -41,7 +40,7 @@ lazy val `oso-query-impl` = (project in file("oso-query-impl"))
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`oso-query-api`)
-
+//
 lazy val `oso-config-api` = (project in file("oso-config-api"))
   .settings(
     libraryDependencies ++= Seq(
@@ -63,72 +62,98 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`oso-config-api`)
-
-lazy val `oso-monitor-slave-api` = (project in file("oso-monitor-slave-api"))
+//
+//lazy val `oso-monitor-slave-api` = (project in file("oso-monitor-slave-api"))
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      lagomScaladslApi
+//    )
+//  )
+//
+//lazy val `oso-monitor-slave-impl` = (project in file("oso-monitor-slave-impl"))
+//  .enablePlugins(LagomScala)
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      "mysql" % "mysql-connector-java" % "6.0.5",
+//      "org.quartz-scheduler" % "quartz" % "2.2.3",
+//      lagomScaladslTestKit,
+//      macwire,
+//      scalaTest
+//    )
+//  )
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`oso-monitor-api`, `oso-config-api`)
+//
+//lazy val `oso-monitor-api` = (project in file("oso-monitor-api"))
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      lagomScaladslApi
+//    )
+//  )
+//
+//lazy val `oso-monitor-impl` = (project in file("oso-monitor-impl"))
+//  .enablePlugins(LagomScala)
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      "mysql" % "mysql-connector-java" % "6.0.5",
+//      "com.typesafe.slick" %% "slick" % "3.1.1",
+//      "org.quartz-scheduler" % "quartz" % "2.2.3",
+//      lagomScaladslTestKit,
+//      macwire,
+//      scalaTest
+//    )
+//  )
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`, `oso-query-api`)
+//
+lazy val alarmApi = (project in file("alarm-api"))
   .settings(
     libraryDependencies ++= Seq(
       lagomScaladslApi
     )
   )
 
-lazy val `oso-monitor-slave-impl` = (project in file("oso-monitor-slave-impl"))
+lazy val alarmImpl = (project in file("alarm-impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
-      "mysql" % "mysql-connector-java" % "6.0.5",
-      "org.quartz-scheduler" % "quartz" % "2.2.3",
+      lagomScaladslPersistenceCassandra,
       lagomScaladslTestKit,
+      "mysql" % "mysql-connector-java" % "6.0.5",
       macwire,
       scalaTest
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-monitor-api`, `oso-config-api`)
+  .dependsOn(collectionApi, alarmApi, `oso-config-api`)
 
-lazy val `oso-monitor-api` = (project in file("oso-monitor-api"))
+lazy val collectionApi = (project in file("collection-api"))
   .settings(
+    version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      lagomScaladslApi
+      lagomScaladslApi,
+      playJsonDerivedCodecs
     )
   )
 
-lazy val `oso-monitor-impl` = (project in file("oso-monitor-impl"))
+lazy val collectionImpl = (project in file("collection-impl"))
   .enablePlugins(LagomScala)
   .settings(
+    version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      "mysql" % "mysql-connector-java" % "6.0.5",
-      "com.typesafe.slick" %% "slick" % "3.1.1",
-      "org.quartz-scheduler" % "quartz" % "2.2.3",
+      lagomScaladslPersistenceCassandra,
       lagomScaladslTestKit,
+      lagomScaladslKafkaBroker,
+      "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0",
+      "org.quartz-scheduler" % "quartz" % "2.2.3",
       macwire,
       scalaTest
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`, `oso-query-api`)
+  .dependsOn(collectionApi, `oso-query-api`, `oso-config-api`)
 
-lazy val `oso-monitor-alarm-api` = (project in file("oso-monitor-alarm-api"))
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-    )
-  )
-
-lazy val `oso-monitor-alarm-impl` = (project in file("oso-monitor-alarm-impl"))
-  .enablePlugins(LagomScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      "mysql" % "mysql-connector-java" % "6.0.5",
-      "org.quartz-scheduler" % "quartz" % "2.2.3",
-      lagomScaladslTestKit,
-      macwire,
-      scalaTest
-    )
-  )
-  .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-config-api`,`oso-monitor-alarm-api`)
-
-
-lagomCassandraCleanOnStart in ThisBuild := false
-lagomCassandraEnabled in ThisBuild := false
+//lagomCassandraCleanOnStart in ThisBuild := false
+//lagomCassandraEnabled in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false
+lagomKafkaAddress in ThisBuild := "192.168.2.104:9092"

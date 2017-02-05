@@ -51,6 +51,12 @@ object Tables {
     Json.parse(_).as[StringList]
   )
 
+
+  private implicit val tagsMapper2 = MappedColumnType.base[Seq[String], String](
+    Json.toJson(_).toString(),
+    Json.parse(_).as[Seq[String]]
+  )
+
   //  class Monitors(tag: Tag) extends Table[Monitor](tag, "monitors") {
   //    def id = column[Option[Int]]("SUP_ID", O.PrimaryKey, O.AutoInc)
   //
@@ -166,16 +172,20 @@ object Tables {
 
   val monitors = TableQuery[Monitors]
 
+  case class MonitorModeJDBC(id: Option[Int], category: String, categoryVerison: Seq[String], code: String, args: List[Any])
+
   class MonitorModeJDBCs(tag: Tag) extends Table[MonitorModeJDBC](tag, "monitor_mode_jdbc") {
     def id = column[Option[Int]]("ID")
 
     def category = column[String]("Category")
 
-    def categoryVersion = column[String]("CATEGORY_VERSION")
+    def categoryVersion = column[Seq[String]]("CATEGORY_VERSION")
 
     def code = column[String]("CODE")
 
-    override def * = (id, category, categoryVersion, code) <> (MonitorModeJDBC.tupled, MonitorModeJDBC.unapply)
+    def args = column[List[Any]]("ARGS")
+
+    override def * = (id, category, categoryVersion, code, args) <> (MonitorModeJDBC.tupled, MonitorModeJDBC.unapply)
   }
 
   val monitorModeJdbcs = TableQuery[MonitorModeJDBCs]
