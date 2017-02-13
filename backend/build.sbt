@@ -147,6 +147,7 @@ lazy val `collecting-impl` = (project in file("collecting-impl"))
       lagomScaladslPersistenceCassandra,
       lagomScaladslTestKit,
       lagomScaladslKafkaBroker,
+      lagomScaladslPubSub,
       "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0",
       "org.quartz-scheduler" % "quartz" % "2.2.3",
       macwire,

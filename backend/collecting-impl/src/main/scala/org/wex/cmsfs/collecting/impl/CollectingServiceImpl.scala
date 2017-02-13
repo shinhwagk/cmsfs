@@ -3,10 +3,11 @@ package org.wex.cmsfs.collecting.impl
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import org.cmsfs.collecting.api.{CollectItem, CollectingService}
-
+import com.lightbend.lagom.scaladsl.pubsub.PubSubRegistry
+import com.lightbend.lagom.scaladsl.pubsub.TopicId
 import scala.concurrent.ExecutionContext
 
-class CollectingServiceImpl(registry: PersistentEntityRegistry)(implicit ec: ExecutionContext) extends CollectingService {
+class CollectingServiceImpl(registry: PersistentEntityRegistry,pubSub: PubSubRegistry)(implicit ec: ExecutionContext) extends CollectingService {
   override def createCollectItem: ServiceCall[CollectItem, CollectItem] = ServiceCall { c =>
     entityRef(c.id).ask(CreateCollectItem(c)).map(_ => c)
   }
