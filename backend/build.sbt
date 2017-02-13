@@ -9,37 +9,39 @@ val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
 lazy val `oso` = (project in file("."))
   .aggregate(
-    `oso-query-api`, `oso-query-impl`,
+    //    `oso-query-api`, `oso-query-impl`,
     `oso-config-api`, `oso-config-impl`,
-    alarmApi, alarmImpl,
+    `collecting-api`, `collecting-impl`
+    //    ,
+    //    alarmApi, alarmImpl,
     //    `oso-monitor-api`, `oso-monitor-impl`,
     //    `oso-monitor-slave-api`, `oso-monitor-slave-impl`,
     //    `oso-monitor-alarm-api`, `oso-monitor-alarm-impl`,
-    collectionApi, collectionImpl
+    //    collectionApi, collectionImpl
     //    collectingApi, collectingImpl
   )
-
-lazy val `oso-query-api` = (project in file("oso-query-api"))
-  .settings(
-    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
-    libraryDependencies ++= Seq(
-      "com.wingtech" % "ojdbc" % "7",
-      "com.jcraft" % "jsch" % "0.1.54",
-      lagomScaladslApi
-    )
-  )
-
-lazy val `oso-query-impl` = (project in file("oso-query-impl"))
-  .enablePlugins(LagomScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslTestKit,
-      macwire,
-      scalaTest
-    )
-  )
-  .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-query-api`)
+//
+//lazy val `oso-query-api` = (project in file("oso-query-api"))
+//  .settings(
+//    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
+//    libraryDependencies ++= Seq(
+//      "com.wingtech" % "ojdbc" % "7",
+//      "com.jcraft" % "jsch" % "0.1.54",
+//      lagomScaladslApi
+//    )
+//  )
+//
+//lazy val `oso-query-impl` = (project in file("oso-query-impl"))
+//  .enablePlugins(LagomScala)
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      lagomScaladslTestKit,
+//      macwire,
+//      scalaTest
+//    )
+//  )
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`oso-query-api`)
 //
 lazy val `oso-config-api` = (project in file("oso-config-api"))
   .settings(
@@ -106,28 +108,29 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
 //  .settings(lagomForkedTestSettings: _*)
 //  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`, `oso-query-api`)
 //
-lazy val alarmApi = (project in file("alarm-api"))
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-    )
-  )
+//lazy val alarmApi = (project in file("alarm-api"))
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      lagomScaladslApi,
+//      playJsonDerivedCodecs
+//    )
+//  )
+//
+//lazy val alarmImpl = (project in file("alarm-impl"))
+//  .enablePlugins(LagomScala)
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      lagomScaladslPersistenceCassandra,
+//      lagomScaladslTestKit,
+//      "mysql" % "mysql-connector-java" % "6.0.5",
+//      macwire,
+//      scalaTest
+//    )
+//  )
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(collectionApi, alarmApi, `oso-config-api`)
 
-lazy val alarmImpl = (project in file("alarm-impl"))
-  .enablePlugins(LagomScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslPersistenceCassandra,
-      lagomScaladslTestKit,
-      "mysql" % "mysql-connector-java" % "6.0.5",
-      macwire,
-      scalaTest
-    )
-  )
-  .settings(lagomForkedTestSettings: _*)
-  .dependsOn(collectionApi, alarmApi, `oso-config-api`)
-
-lazy val collectionApi = (project in file("collection-api"))
+lazy val `collecting-api` = (project in file("collecting-api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -136,7 +139,7 @@ lazy val collectionApi = (project in file("collection-api"))
     )
   )
 
-lazy val collectionImpl = (project in file("collection-impl"))
+lazy val `collecting-impl` = (project in file("collecting-impl"))
   .enablePlugins(LagomScala)
   .settings(
     version := "1.0-SNAPSHOT",
@@ -151,9 +154,10 @@ lazy val collectionImpl = (project in file("collection-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(collectionApi, `oso-query-api`, `oso-config-api`)
+  .dependsOn(`collecting-api`, `oso-config-api`)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 //lagomCassandraEnabled in ThisBuild := false
-lagomKafkaEnabled in ThisBuild := false
-lagomKafkaAddress in ThisBuild := "192.168.2.104:9092"
+
+//lagomKafkaEnabled in ThisBuild := false
+//lagomKafkaAddress in ThisBuild := "10.65.103.58:9092"

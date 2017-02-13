@@ -24,8 +24,8 @@ class CollectionEntity extends PersistentEntity {
     case Some(collection) if collection.status == CollectionStatus.Cancelled => completed
   }
 
-  private val getItemCommand = Actions().onReadOnlyCommand[GetItem.type, Collection] {
-    case (GetItem, ctx, state) => ctx.reply(state.get)
+  private val getItemCommand = Actions().onReadOnlyCommand[GetCollection.type, Collection] {
+    case (GetCollection, ctx, state) => ctx.reply(state.get)
   }
 
   private val notCreated = {
@@ -41,11 +41,7 @@ class CollectionEntity extends PersistentEntity {
   }
 
   private def created(item: Collection) = {
-    println("created")
-    println("a  ", item, "   bb")
-    println("created2")
-    Actions()
-      .onCommand[CreateCollection, Done] {
+    Actions().onCommand[CreateCollection, Done] {
       case (StartCollection(cItem), ctx, _) =>
         println(item, "StartCollection")
         ctx.thenPersist(CollectionItemStarted(cItem))(_ => ctx.reply(Done))
@@ -87,8 +83,8 @@ class CollectionEntity extends PersistentEntity {
   }.orElse(getItemCommand)
 }
 
-case object GetItem extends CollectionCommand with ReplyType[Collection] {
-  implicit val format: Format[GetItem.type] = JsonFormats.singletonFormat(GetItem)
+case object GetCollection extends CollectionCommand with ReplyType[Collection] {
+  implicit val format: Format[GetCollection.type] = JsonFormats.singletonFormat(GetCollection)
 }
 
 sealed trait CollectionCommand

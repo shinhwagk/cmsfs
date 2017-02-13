@@ -13,7 +13,7 @@ trait CollectionService extends Service {
 
   def collectionEvents: Topic[CollectionEvent]
 
-  def collectionCompletedEvents: Topic[CollectionEvent]
+//  def collectionCompletedEvents: Topic[CollectionEvent]
 
   final override def descriptor = {
     import Service._
@@ -22,8 +22,9 @@ trait CollectionService extends Service {
       restCall(Method.POST, "/api/collection", createCollection),
       restCall(Method.GET, "/api/collection/:Id", getCollectionById _)
     ).withTopics(
-      topic("collection-CollectionEvent", collectionEvents),
-      topic("collection-CollectionCompletedEvent", collectionCompletedEvents)
+      topic("collection-CollectionEvent", collectionEvents)
+//      ,
+//      topic("collection-CollectionCompletedEvent", collectionCompletedEvents)
     )
   }
 }

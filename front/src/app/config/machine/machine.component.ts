@@ -14,8 +14,7 @@ export class MachineComponent implements OnInit {
   constructor(private api: ApiService) { }
 
   ngOnInit() {
-    this.api.machines().toPromise().then(ms => this.machines = ms
-    )
+    this.api.machines().toPromise().then(ms => this.machines = ms)
   }
 
   machines: Machine[] = []

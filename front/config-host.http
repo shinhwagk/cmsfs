@@ -91,3 +91,11 @@ content-type: application/json
 
 ###
 GET http://10.65.103.15:56433/v1/monitor/alarm/1 HTTP/1.1
+
+###
+POST http://127.0.0.1:57259/v1/collecting HTTP/1.1
+content-type: application/json
+
+{
+ "id":1
+}

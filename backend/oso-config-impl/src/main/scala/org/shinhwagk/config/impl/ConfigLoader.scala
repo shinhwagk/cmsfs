@@ -23,12 +23,8 @@ abstract class ConfigApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents {
 
-  // Bind the services that this server provides
   override lazy val lagomServer = LagomServer.forServices(
     bindService[ConfigService].to(wire[ConfigServiceImpl])
   )
 
-//  lazy val configService = serviceClient.implement[ConfigService]
-  // Register the lagom-hello persistent entity
-  //persistentEntityRegistry.register(wire[LagomhelloEntity])
 }

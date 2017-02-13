@@ -19,7 +19,7 @@ class HandleQueryWhileStartCollection(persistentEntityRegistry: PersistentEntity
       for {
         monitor <- configService.getMonitorById(cs.monitorId).invoke()
         connector <- configService.getMachineConnectorModeJdbc(cs.connectorId).invoke()
-        result <- queryService.queryForOracle("ARRAY").invoke(QueryOracleMessage(connector.jdbcUrl, connector.username, connector.password, monitor.code, monitor.args))
+        result <- queryService.queryForOracle("ARRAY").invoke(QueryOracleMessage(connector.jdbcUrl, connector.username, connector.password, monitor.dslCode, monitor.args))
         r <- {
           println(result)
           ref(cs.id.toString).ask(RecordCollection(result))
