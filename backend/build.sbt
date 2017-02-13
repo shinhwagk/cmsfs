@@ -9,7 +9,7 @@ val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
 lazy val `oso` = (project in file("."))
   .aggregate(
-    //    `oso-query-api`, `oso-query-impl`,
+    `oso-query-api`, `oso-query-impl`,
     `oso-config-api`, `oso-config-impl`,
     `collecting-api`, `collecting-impl`
     //    ,
@@ -21,27 +21,27 @@ lazy val `oso` = (project in file("."))
     //    collectingApi, collectingImpl
   )
 //
-//lazy val `oso-query-api` = (project in file("oso-query-api"))
-//  .settings(
-//    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
-//    libraryDependencies ++= Seq(
-//      "com.wingtech" % "ojdbc" % "7",
-//      "com.jcraft" % "jsch" % "0.1.54",
-//      lagomScaladslApi
-//    )
-//  )
-//
-//lazy val `oso-query-impl` = (project in file("oso-query-impl"))
-//  .enablePlugins(LagomScala)
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      lagomScaladslTestKit,
-//      macwire,
-//      scalaTest
-//    )
-//  )
-//  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(`oso-query-api`)
+lazy val `oso-query-api` = (project in file("oso-query-api"))
+  .settings(
+    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
+    libraryDependencies ++= Seq(
+      "com.wingtech" % "ojdbc" % "7",
+      "com.jcraft" % "jsch" % "0.1.54",
+      lagomScaladslApi
+    )
+  )
+
+lazy val `oso-query-impl` = (project in file("oso-query-impl"))
+  .enablePlugins(LagomScala)
+  .settings(
+    libraryDependencies ++= Seq(
+      lagomScaladslTestKit,
+      macwire,
+      scalaTest
+    )
+  )
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`oso-query-api`)
 //
 lazy val `oso-config-api` = (project in file("oso-config-api"))
   .settings(
@@ -155,7 +155,7 @@ lazy val `collecting-impl` = (project in file("collecting-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collecting-api`, `oso-config-api`)
+  .dependsOn(`collecting-api`, `oso-config-api`, `oso-query-api`)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 //lagomCassandraEnabled in ThisBuild := false
