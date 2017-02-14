@@ -97,5 +97,15 @@ POST http://127.0.0.1:57259/v1/collecting HTTP/1.1
 content-type: application/json
 
 {
- "id":1
+ "id":3
 }
+
+POST http://127.0.0.1:57259/v1/collecting HTTP/1.1
+content-type: application/json
+
+{
+ "id":3
+}
+
+###
+GET http://127.0.0.1:49673/v1/collect/details HTTP/1.1

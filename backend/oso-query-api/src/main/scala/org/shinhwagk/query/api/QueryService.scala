@@ -41,12 +41,11 @@ object QueryModeEnum extends Enumeration {
 }
 
 case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: Option[Int]) {
-  def exec = Future {
-    ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl)(0)
+  def exec: Future[String] = Future {
+    ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl)
   }
 
-  def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int = 22): ArrayBuffer[String] = {
-
+  def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int = 22): String = {
     val jsch = new JSch();
     jsch.addIdentity(keyPath);
     val session = jsch.getSession(user, host, port);
@@ -55,7 +54,7 @@ case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: O
 
     val channelExec: ChannelExec = session.openChannel("exec").asInstanceOf[ChannelExec]
     val in = channelExec.getInputStream();
-    channelExec.setCommand(s"curl ${scriptUrl} | sh");
+    channelExec.setCommand(s"curl -s ${scriptUrl} | sh");
 
     channelExec.connect();
 
@@ -70,7 +69,6 @@ case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: O
       line = Option(reader.readLine())
     }
 
-
     val exitStatus: Int = channelExec.getExitStatus();
 
     channelExec.disconnect();
@@ -83,7 +81,7 @@ case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: O
     } else {
       // System.out.println("Done!");
     }
-    rs
+    Json.toJson(rs).toString()
   }
 }
 

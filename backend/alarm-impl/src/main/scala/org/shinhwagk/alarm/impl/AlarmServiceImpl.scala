@@ -6,7 +6,6 @@ import java.util.UUID
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import org.shinhwagk.alarm.api.{Alarm, AlarmService}
-import org.shinhwagk.config.api.ConfigService
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.ExecutionContext

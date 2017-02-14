@@ -2,15 +2,14 @@ package org.wex.cmsfs.collecting.impl
 
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
-import com.lightbend.lagom.scaladsl.broker.kafka.LagomKafkaComponents
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
-import com.lightbend.lagom.scaladsl.persistence.cassandra.CassandraPersistenceComponents
 import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
-import org.cmsfs.collecting.api.CollectingService
-import org.shinhwagk.config.api.ConfigService
 import org.shinhwagk.query.api.QueryService
+import org.wex.cmsfs.collecting.api.CollectingService
+import org.wex.cmsfs.config.api.ConfigService
+import org.wex.cmsfs.format.api.FormatService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class CollectingApplicationLoader extends LagomApplicationLoader {
@@ -26,20 +25,21 @@ class CollectingApplicationLoader extends LagomApplicationLoader {
 abstract class MonitorApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents
-    with CassandraPersistenceComponents
-    with LagomKafkaComponents
+    //    with CassandraPersistenceComponents
+    //    with LagomKafkaComponents
     with PubSubComponents {
 
   override lazy val lagomServer = LagomServer.forServices(
     bindService[CollectingService].to(wire[CollectingServiceImpl])
   )
 
-  override lazy val jsonSerializerRegistry = CollectingSerializerRegistry
+  //  override lazy val jsonSerializerRegistry = CollectingSerializerRegistry
 
-  persistentEntityRegistry.register(wire[CollectingEntity])
+  //  persistentEntityRegistry.register(wire[CollectingEntity])
 
   val configService = serviceClient.implement[ConfigService]
   val queryService = serviceClient.implement[QueryService]
+  val formatService = serviceClient.implement[FormatService]
 
   wire[CollectingAction]
 }

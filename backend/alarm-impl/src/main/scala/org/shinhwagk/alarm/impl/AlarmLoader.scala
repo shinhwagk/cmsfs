@@ -6,7 +6,6 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.shinhwagk.alarm.api.AlarmService
-import org.shinhwagk.config.api.ConfigService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class AlarmLoader extends LagomApplicationLoader {

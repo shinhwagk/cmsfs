@@ -3,7 +3,6 @@ package org.wex.cmsfs.collection.impl
 import akka.Done
 import akka.stream.scaladsl.Flow
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
-import org.shinhwagk.config.api.ConfigService
 import org.shinhwagk.query.api.{QueryOracleMessage, QueryService}
 import org.wex.cmsfs.collection.api
 import org.wex.cmsfs.collection.api.CollectionService

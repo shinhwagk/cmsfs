@@ -7,7 +7,6 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.persistence.cassandra.CassandraPersistenceComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
-import org.shinhwagk.config.api.ConfigService
 import org.shinhwagk.query.api.QueryService
 import org.wex.cmsfs.collection.api.{Collection, CollectionService}
 import play.api.Environment

@@ -11,7 +11,8 @@ lazy val `oso` = (project in file("."))
   .aggregate(
     `oso-query-api`, `oso-query-impl`,
     `oso-config-api`, `oso-config-impl`,
-    `collecting-api`, `collecting-impl`
+    `collecting-api`, `collecting-impl`,
+    `format-api`, `format-impl`
     //    ,
     //    alarmApi, alarmImpl,
     //    `oso-monitor-api`, `oso-monitor-impl`,
@@ -63,7 +64,7 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-config-api`)
+  .dependsOn(`oso-config-api`, `collecting-api`)
 //
 //lazy val `oso-monitor-slave-api` = (project in file("oso-monitor-slave-api"))
 //  .settings(
@@ -130,6 +131,31 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
 //  .settings(lagomForkedTestSettings: _*)
 //  .dependsOn(collectionApi, alarmApi, `oso-config-api`)
 
+lazy val `format-api` = (project in file("format-api"))
+  .settings(
+    version := "1.0-SNAPSHOT",
+    libraryDependencies ++= Seq(
+      lagomScaladslApi,
+      playJsonDerivedCodecs
+    )
+  )
+
+lazy val `format-impl` = (project in file("format-impl"))
+  .enablePlugins(LagomScala)
+  .settings(
+    version := "1.0-SNAPSHOT",
+    libraryDependencies ++= Seq(
+      lagomScaladslTestKit,
+      lagomScaladslPubSub,
+      "commons-io" % "commons-io" % "2.5",
+      macwire,
+      scalaTest
+    )
+  )
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`format-api`, `oso-config-api`)
+
+
 lazy val `collecting-api` = (project in file("collecting-api"))
   .settings(
     version := "1.0-SNAPSHOT",
@@ -144,21 +170,20 @@ lazy val `collecting-impl` = (project in file("collecting-impl"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      lagomScaladslPersistenceCassandra,
+      //      lagomScaladslPersistenceCassandra,
       lagomScaladslTestKit,
-      lagomScaladslKafkaBroker,
+      //      lagomScaladslKafkaBroker,
       lagomScaladslPubSub,
-      "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0",
+      //      "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0",
       "org.quartz-scheduler" % "quartz" % "2.2.3",
       macwire,
       scalaTest
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collecting-api`, `oso-config-api`, `oso-query-api`)
+  .dependsOn(`collecting-api`, `oso-config-api`, `oso-query-api`, `format-api`)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
-//lagomCassandraEnabled in ThisBuild := false
-
-//lagomKafkaEnabled in ThisBuild := false
+lagomCassandraEnabled in ThisBuild := false
+lagomKafkaEnabled in ThisBuild := false
 //lagomKafkaAddress in ThisBuild := "10.65.103.58:9092"
