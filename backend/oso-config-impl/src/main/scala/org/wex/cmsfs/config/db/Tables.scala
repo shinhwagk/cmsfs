@@ -6,9 +6,6 @@ import org.wex.cmsfs.config.db.table._
 import play.api.libs.json.Json
 import slick.driver.MySQLDriver.api._
 
-/**
-  * Created by zhangxu on 2017/1/10.
-  */
 object Tables {
 
   private implicit val categoryMapper = MappedColumnType.base[MonitorCategoryEnum, String](
@@ -69,11 +66,13 @@ object Tables {
 
   val depositoryCollects = TableQuery[DepositoryCollects]
 
-  val formatItems = TableQuery[FotmatItems]
+  val depositoryAnalyzes = TableQuery[DepositoryAnalyzes]
+
+  val formatScripts = TableQuery[FormatScripts]
 
   //  val monitorDetails = TableQuery[MonitorDetails]
 
-  case class MonitorModeJDBC(id: Option[Int], category: String, categoryVerison: Seq[String], code: String, args: List[Any])
+  case class MonitorModeJDBC(id: Option[Int], category: String, categoryVersion: Seq[String], code: String, args: List[Any])
 
   class MonitorPersistences(tag: Tag) extends Table[MonitorPersistence](tag, "monitor_persistence") {
     def id = column[Option[Int]]("ID")

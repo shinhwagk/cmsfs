@@ -129,7 +129,12 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.depositoryCollects += dc).map(_ => Done)
   }
 
-  override def getFormatItemById(id: Int): ServiceCall[NotUsed, FormatItem] = ServiceCall { _ =>
-    db.run(Tables.formatItems.filter(_.id === id).result.head)
+  override def getFormatScriptById(category: String, id: Int): ServiceCall[NotUsed, FormatScript] = ServiceCall { _ =>
+    db.run(Tables.formatScripts.filter(_.id === id).filter(_.category === category).result.head)
+  }
+
+  override def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done] = ServiceCall{ da=>
+    db.run(Tables.depositoryAnalyzes += da).map(_ => Done)
+
   }
 }

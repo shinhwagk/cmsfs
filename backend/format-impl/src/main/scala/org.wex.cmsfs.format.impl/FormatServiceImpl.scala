@@ -8,7 +8,7 @@ import akka.stream.scaladsl.Sink
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.pubsub.{PubSubRegistry, TopicId}
 import org.apache.commons.io.FileUtils
-import org.wex.cmsfs.config.api.ConfigService
+import org.wex.cmsfs.config.api.{ConfigService, DepositoryAnalyze}
 import org.wex.cmsfs.format.api.{FormatItem, FormatService}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,8 +25,14 @@ class FormatServiceImpl(pubSub: PubSubRegistry, cs: ConfigService)
   }
 
   topic.subscriber.mapAsync(1) { fi =>
-    actionFormat("https://raw.githubusercontent.com/shinhwagk/Monitor/master/script/monitor/ssh/disk_space.py", fi)
-  }.runWith(Sink.foreach(println))
+    for {
+      i <- cs.getFormatScriptById("analyze", fi.formatId).invoke()
+      rs <- actionFormat(i.url, fi)
+      none <- {
+        cs.addDepositoryAnalyze.invoke(DepositoryAnalyze(None, fi.formatId, rs))
+      }
+    } yield None
+  }.runWith(Sink.ignore)
 
 
   def actionFormat(url: String, fi: FormatItem): Future[String] = Future {
@@ -43,7 +49,7 @@ class FormatServiceImpl(pubSub: PubSubRegistry, cs: ConfigService)
     workDirName
   }
 
-  def execScript(workDirName:String): String = {
+  def execScript(workDirName: String): String = {
     import sys.process._
     try {
       Seq("python", s"${workDirName}/format.py", s"${workDirName}/data.json").!!.trim

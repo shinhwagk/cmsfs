@@ -45,7 +45,9 @@ trait ConfigService extends Service {
 
   def addDepositoryCollect: ServiceCall[DepositoryCollect, Done]
 
-  def getFormatItemById(id: Int): ServiceCall[NotUsed, FormatItem]
+  def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done]
+
+  def getFormatScriptById(category: String, id: Int): ServiceCall[NotUsed, FormatScript]
 
   //  def getMachineConnectorModeJdbc(id: Int): ServiceCall[NotUsed, ConnectorModeJDBC]
 
@@ -106,7 +108,9 @@ trait ConfigService extends Service {
 
       restCall(Method.POST, "/v1/depository/collect", addDepositoryCollect),
 
-      restCall(Method.GET, "/v1/format/:id", getFormatItemById _),
+      restCall(Method.POST, "/v1/depository/analyze", addDepositoryAnalyze),
+
+      restCall(Method.GET, "/v1/format/script/:category/:id", getFormatScriptById _),
       //      restCall(Method.POST, "/v1/monitor", addMonitor),
 
       //      restCall(Method.POST, "/v1/monitor/add/:mode", addMonitorMode _),
@@ -243,7 +247,6 @@ object MonitorPersistence extends ((Option[Int], String, Long, String, Int) => M
   implicit val format: Format[MonitorPersistence] = Json.format[MonitorPersistence]
 }
 
-
 case class MonitorAlarm(id: Option[Int], script: String, state: Boolean, args: String)
 
 object MonitorAlarm extends ((Option[Int], String, Boolean, String) => MonitorAlarm) {
@@ -262,8 +265,14 @@ object DepositoryCollect extends ((Option[Int], Int, String, String, String) => 
   implicit val format: Format[DepositoryCollect] = Json.format
 }
 
-case class FormatItem(id: Int, name: String, url: String)
+case class FormatScript(id: Int, category: String, name: String, url: String)
 
-object FormatItem extends ((Int, String, String) => FormatItem) {
-  implicit val format: Format[FormatItem] = Json.format
+object FormatScript extends ((Int, String, String, String) => FormatScript) {
+  implicit val format: Format[FormatScript] = Json.format
+}
+
+case class DepositoryAnalyze(id: Option[Int], collectId: Int, data: String)
+
+object DepositoryAnalyze extends ((Option[Int], Int, String) => DepositoryAnalyze) {
+  implicit val format: Format[DepositoryAnalyze] = Json.format
 }
