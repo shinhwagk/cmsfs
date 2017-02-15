@@ -2,7 +2,7 @@ import sys
 import json
 import re
 
-# Filesystem Size Used Avail Use% Mounted on
+# "Filesystem" "Size" "Used" "Avail" "Use%" "Mounted on" "Timestamp"
 
 f = open(sys.argv[1], "r")
 x = f.read()
