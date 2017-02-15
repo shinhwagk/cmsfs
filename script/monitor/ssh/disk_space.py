@@ -6,6 +6,8 @@ import re
 
 f = open(sys.argv[1], "r")
 x = f.read()
+f.close
+
 j = json.loads(x)
 
 
