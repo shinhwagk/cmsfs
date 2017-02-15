@@ -14,5 +14,5 @@ def split_str(y):
     return {"Filesystem": row[0], "Size": row[1], "Used": row[2], "Avail": row[3], "Ued%": row[4], "Mounted on": row[5]}
 
 g = list(map(split_str, j))
-
-print(g)
+data = json.dumps(g)
+print(data)
