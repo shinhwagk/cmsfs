@@ -135,8 +135,9 @@ lazy val `format-api` = (project in file("format-api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      lagomScaladslApi,
-      playJsonDerivedCodecs
+      lagomScaladslApi
+//      ,
+//      playJsonDerivedCodecs
     )
   )
 
@@ -160,8 +161,9 @@ lazy val `collecting-api` = (project in file("collecting-api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      lagomScaladslApi,
-      playJsonDerivedCodecs
+      lagomScaladslApi
+//      ,
+//      playJsonDerivedCodecs
     )
   )
 

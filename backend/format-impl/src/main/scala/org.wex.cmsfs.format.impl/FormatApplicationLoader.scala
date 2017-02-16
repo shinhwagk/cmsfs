@@ -25,9 +25,10 @@ abstract class FormatApplication(context: LagomApplicationContext)
     with AhcWSComponents
     with PubSubComponents {
 
+  val configService = serviceClient.implement[ConfigService]
+
   override lazy val lagomServer = LagomServer.forServices(
     bindService[FormatService].to(wire[FormatServiceImpl])
   )
 
-  val configService = serviceClient.implement[ConfigService]
 }

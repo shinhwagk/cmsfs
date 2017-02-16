@@ -8,9 +8,9 @@ import org.wex.cmsfs.collecting.api.CollectItem
 import org.wex.cmsfs.collecting.impl._
 
 class CollectItemEntitySpec extends WordSpec with Matchers with BeforeAndAfterAll with OptionValues {
-  private val system = ActorSystem("test", JsonSerializerRegistry.actorSystemSetupFor(CollectingSerializerRegistry))
+//  private val system = ActorSystem("test", JsonSerializerRegistry.actorSystemSetupFor(CollectingSerializerRegistry))
 
-  private val item = CollectItem(1)
+//  private val item = CollectItem(1)
 //
 //  private def withDriver[T](block: PersistentEntityTestDriver[CollectingCommand, CollectingEvent, Option[CollectItem]] => T): T = {
 //    val driver = new PersistentEntityTestDriver(system, new CollectingEntity, item.id.toString)

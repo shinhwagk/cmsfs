@@ -1,7 +1,7 @@
 package org.wex.cmsfs.config.db
 
 import org.wex.cmsfs.config.api.MonitorCategoryEnum.MonitorCategoryEnum
-import org.wex.cmsfs.config.api.{MonitorAlarm, MonitorAlarmDetail, MonitorCategoryEnum, MonitorPersistence}
+import org.wex.cmsfs.config.api.{MonitorAlarm, MonitorAlarmDetail, MonitorCategoryEnum}
 import org.wex.cmsfs.config.db.table._
 import play.api.libs.json.Json
 import slick.driver.MySQLDriver.api._
@@ -52,7 +52,7 @@ object Tables {
     Json.parse(_).as[Seq[String]]
   )
 
-  val monitorModeJDBCs = TableQuery[MonitorModeJDBCs]
+  val metrics = TableQuery[Metrics]
 
   val monitorModeSSHs = TableQuery[MonitorModeSSHs]
 
@@ -62,9 +62,9 @@ object Tables {
 
   val connectorModeSSHs = TableQuery[ConnectorModeSSHs]
 
-  val collectDetails = TableQuery[CollectDetails]
+  val monitorDetails = TableQuery[MonitorDetails]
 
-  val depositoryCollects = TableQuery[DepositoryCollects]
+  val depositoryCollects = TableQuery[MonitorDepositories]
 
   val depositoryAnalyzes = TableQuery[DepositoryAnalyzes]
 
@@ -73,23 +73,6 @@ object Tables {
   //  val monitorDetails = TableQuery[MonitorDetails]
 
   case class MonitorModeJDBC(id: Option[Int], category: String, categoryVersion: Seq[String], code: String, args: List[Any])
-
-  class MonitorPersistences(tag: Tag) extends Table[MonitorPersistence](tag, "monitor_persistence") {
-    def id = column[Option[Int]]("ID")
-
-    def stage = column[String]("STAGE")
-
-    def version = column[Long]("VERSION")
-
-    def result = column[String]("RESULT")
-
-    def monitorDetailId = column[Int]("MONITOR_DETAIL_ID")
-
-    override def * = (id, stage, version, result, monitorDetailId) <> (MonitorPersistence.tupled, MonitorPersistence.unapply)
-  }
-
-  val monitorPersistences = TableQuery[MonitorPersistences]
-
 
   class MonitorAlarmDetails(tag: Tag) extends Table[MonitorAlarmDetail](tag, "alarm_details") {
     def id = column[Option[Int]]("ID")

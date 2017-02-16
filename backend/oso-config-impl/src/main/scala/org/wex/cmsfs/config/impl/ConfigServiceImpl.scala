@@ -4,10 +4,7 @@ import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.config.db.Tables
-import org.wex.cmsfs.config.db.table.DepositoryCollects
-import slick.dbio.Effect.Write
 import slick.driver.MySQLDriver.api._
-import slick.profile.FixedSqlAction
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -83,13 +80,6 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   //    db.run(Tables.machineConnectorModeJdbcs.filter(_.id === id).result.head)
   //  }
 
-  override def addMonitorPersistence: ServiceCall[MonitorPersistence, NotUsed] = ServiceCall { mp =>
-    db.run(Tables.monitorPersistences += mp).map(_ => NotUsed)
-  }
-
-  override def getMonitorPersistenceContent(id: Long, version: Long): ServiceCall[NotUsed, String] = ServiceCall { _ =>
-    Future.successful("111")
-  }
 
   override def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]] = ServiceCall { _ =>
     db.run(Tables.monitorAlarmDetails.filter(_.alarmId === aId).result).map(_.toList)
@@ -104,8 +94,8 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   //      api.MonitorModeJDBC(mmj.id.get, mmj.category, JsonFormat.toJsArray(mmj.categoryVerison), mmj.dslCode, mmj.args.map(_.toString).toSeq)
   //    })
   //  }
-  override def getCollectDetails: ServiceCall[NotUsed, Seq[CollectDetail]] = ServiceCall { _ =>
-    db.run(Tables.collectDetails.result)
+  override def getMonitorDetails: ServiceCall[NotUsed, Seq[MonitorDetail]] = ServiceCall { _ =>
+    db.run(Tables.monitorDetails.result)
   }
 
   override def getConnectorSSHById(id: Int): ServiceCall[NotUsed, ConnectorModeSSH] = ServiceCall { _ =>
@@ -116,34 +106,25 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.connectorModeJDBCs.filter(_.id === id).result.head)
   }
 
-  override def getMonitorSSHById(id: Int): ServiceCall[NotUsed, MonitorModeSSH] = ServiceCall { _ =>
-    db.run(Tables.monitorModeSSHs.filter(_.id === id).result.head)
-  }
-
-  override def getMonitorJDBCbyId(id: Int): ServiceCall[NotUsed, MonitorModeJDBC] = ServiceCall { _ =>
-    db.run(Tables.monitorModeJDBCs.filter(_.id === id).result.head)
+  override def getMetricById(id: Int): ServiceCall[NotUsed, Metric] = ServiceCall { _ =>
+    db.run(Tables.metrics.filter(_.id === id).result.head)
   }
 
   override def getMachineById(id: Int): ServiceCall[NotUsed, Machine] = ServiceCall { _ =>
     db.run(Tables.machines.filter(_.id === id).result.head)
   }
 
-  override def addDepositoryCollect: ServiceCall[DepositoryCollect, Option[Long]] = ServiceCall { dc =>
+  override def addMonitorDepository: ServiceCall[MonitorDepository, Long] = ServiceCall { dc =>
     val table = Tables.depositoryCollects
     val userId = (table returning table.map(_.id)) += dc
-    db.run(userId)
+    db.run(userId).map(_.get)
   }
 
   override def getFormatScriptById(category: String, id: Int): ServiceCall[NotUsed, FormatScript] = ServiceCall { _ =>
     db.run(Tables.formatScripts.filter(_.id === id).filter(_.category === category).result.head)
   }
 
-  override def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done] = ServiceCall { da =>
-    db.run(Tables.depositoryAnalyzes += da).map(_ => Done)
-
-  }
-
-  override def getDepositoryCollectById(id: Long): ServiceCall[NotUsed, DepositoryCollect] = ServiceCall{_=>
+  override def getMonitorDepositoryById(id: Long): ServiceCall[NotUsed, MonitorDepository] = ServiceCall { _ =>
     db.run(Tables.depositoryCollects.filter(_.id === id).result.head)
   }
 }

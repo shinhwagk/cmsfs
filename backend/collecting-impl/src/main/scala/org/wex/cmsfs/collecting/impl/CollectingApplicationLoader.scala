@@ -14,23 +14,22 @@ import play.api.libs.ws.ahc.AhcWSComponents
 
 class CollectingApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
-    new MonitorApplication(context) with LagomDevModeComponents
+    new CollectingApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication =
-    new MonitorApplication(context) {
+    new CollectingApplication(context) {
       override def serviceLocator: ServiceLocator = NoServiceLocator
     }
 }
 
-abstract class MonitorApplication(context: LagomApplicationContext)
+abstract class CollectingApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
-//    with AhcWSComponents
+    with AhcWSComponents
     with PubSubComponents {
 
   override lazy val lagomServer = LagomServer.forServices(
     bindService[CollectingService].to(wire[CollectingServiceImpl])
   )
-
 
   val configService = serviceClient.implement[ConfigService]
   val queryService = serviceClient.implement[QueryService]

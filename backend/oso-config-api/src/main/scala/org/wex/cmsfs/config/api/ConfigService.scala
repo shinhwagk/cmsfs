@@ -1,20 +1,11 @@
 package org.wex.cmsfs.config.api
 
-import java.util.UUID
-
 import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
-import MonitorCategoryEnum.MonitorCategoryEnum
-import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
-import scala.util.Try
-
-/**
-  * Created by zhangxu on 2017/1/10.
-  */
 trait ConfigService extends Service {
 
   /**
@@ -33,21 +24,17 @@ trait ConfigService extends Service {
 
   def getMachineById(id: Int): ServiceCall[NotUsed, Machine]
 
-  def getCollectDetails: ServiceCall[NotUsed, Seq[CollectDetail]]
+  def getMonitorDetails: ServiceCall[NotUsed, Seq[MonitorDetail]]
 
   def getConnectorJDBCById(id: Int): ServiceCall[NotUsed, ConnectorModeJDBC]
 
   def getConnectorSSHById(id: Int): ServiceCall[NotUsed, ConnectorModeSSH]
 
-  def getMonitorSSHById(id: Int): ServiceCall[NotUsed, MonitorModeSSH]
+  def getMetricById(id: Int): ServiceCall[NotUsed, Metric]
 
-  def getMonitorJDBCbyId(id: Int): ServiceCall[NotUsed, MonitorModeJDBC]
+  def addMonitorDepository: ServiceCall[MonitorDepository, Long]
 
-  def addDepositoryCollect: ServiceCall[DepositoryCollect, Option[Long]]
-
-  def getDepositoryCollectById(id: Long): ServiceCall[NotUsed, DepositoryCollect]
-
-  def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done]
+  def getMonitorDepositoryById(id: Long): ServiceCall[NotUsed, MonitorDepository]
 
   def getFormatScriptById(category: String, id: Int): ServiceCall[NotUsed, FormatScript]
 
@@ -61,10 +48,6 @@ trait ConfigService extends Service {
   //  def getMonitorList: ServiceCall[NotUsed, List[Monitor]]
 
   //  def getMonitorMode(mode: String, id: Int): ServiceCall[NotUsed, String]
-
-  def addMonitorPersistence: ServiceCall[MonitorPersistence, NotUsed]
-
-  def getMonitorPersistenceContent(id: Long, version: Long): ServiceCall[NotUsed, String]
 
 
   /**
@@ -98,21 +81,17 @@ trait ConfigService extends Service {
 
       restCall(Method.GET, "/v1/machine/:id", getMachineById _),
 
-      restCall(Method.GET, "/v1/collect/details", getCollectDetails),
+      restCall(Method.GET, "/v1/monitor/details", getMonitorDetails),
 
       restCall(Method.GET, "/v1/connector/jdbc/:id", getConnectorJDBCById _),
 
       restCall(Method.GET, "/v1/connector/ssh/:id", getConnectorSSHById _),
 
-      restCall(Method.GET, "/v1/monitor/ssh/:id", getMonitorSSHById _),
+      restCall(Method.GET, "/v1/metric/:id", getMetricById _),
 
-      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorJDBCbyId _),
+      restCall(Method.POST, "/v1/depository", addMonitorDepository),
 
-      restCall(Method.POST, "/v1/depository/collect", addDepositoryCollect),
-
-      restCall(Method.GET, "/v1/depository/collect/:id", getDepositoryCollectById _),
-
-      restCall(Method.POST, "/v1/depository/analyze", addDepositoryAnalyze),
+      restCall(Method.GET, "/v1/depository/collect/:id", getMonitorDepositoryById _),
 
       restCall(Method.GET, "/v1/format/script/:category/:id", getFormatScriptById _),
       //      restCall(Method.POST, "/v1/monitor", addMonitor),
@@ -121,10 +100,6 @@ trait ConfigService extends Service {
 
 
       //      restCall(Method.POST, "/v1/monitor/list", getMonitorList),
-
-      restCall(Method.POST, "/v1/monitor/persistence", addMonitorPersistence _),
-
-      restCall(Method.GET, "/v1/monitor/persistence/:id/:version", getMonitorPersistenceContent _),
 
       restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
 
@@ -194,7 +169,7 @@ case class Connector(id: Option[Int], mheId: Int, label: String,
                      mode: String, modeInfo: String, state: Boolean)
 
 object Connector extends ((Option[Int], Int, String, String, String, String, String, Boolean) => Connector) {
-  implicit val format: Format[Connector] = Json.format[Connector]
+  implicit val format: Format[Connector] = Json.format
 }
 
 case class Monitor(id: Option[Int],
@@ -206,13 +181,13 @@ case class Monitor(id: Option[Int],
                    state: Boolean)
 
 object Monitor extends ((Option[Int], Seq[String], String, String, String, Int, Boolean) => Monitor) {
-  implicit val format: Format[Monitor] = Json.format[Monitor]
+  implicit val format: Format[Monitor] = Json.format
 }
 
-case class MonitorModeJDBC(id: Option[Int], code: String, args: Seq[String])
+case class Metric(id: Option[Int], name: String, mode: String, cron: String, tags: Seq[String], category: String, categoryVersion: Seq[String], description: String)
 
-object MonitorModeJDBC extends ((Option[Int], String, Seq[String]) => MonitorModeJDBC) {
-  implicit val format: Format[MonitorModeJDBC] = Json.format
+object Metric extends ((Option[Int], String, String, String, Seq[String], String, Seq[String], String) => Metric) {
+  implicit val format: Format[Metric] = Json.format
 }
 
 case class MonitorModeSSH(id: Option[Int], code: String, args: Seq[String])
@@ -221,10 +196,10 @@ object MonitorModeSSH extends ((Option[Int], String, Seq[String]) => MonitorMode
   implicit val format: Format[MonitorModeSSH] = Json.format
 }
 
-case class CollectDetail(id: Int, mode: String, monitorId: Int, ConnectorId: Int, cron: String, args: Seq[String], analyze: Boolean, alarm: Boolean)
+case class MonitorDetail(id: Int, metricId: Int, ConnectorId: Int, cron: String, collectArgs: Option[Seq[String]], analyzeArgs: Option[Seq[String]], alarm: Boolean)
 
-object CollectDetail extends ((Int, String, Int, Int, String, Seq[String], Boolean, Boolean) => CollectDetail) {
-  implicit val format: Format[CollectDetail] = Json.format
+object MonitorDetail extends ((Int, Int, Int, String, Option[Seq[String]], Option[Seq[String]], Boolean) => MonitorDetail) {
+  implicit val format: Format[MonitorDetail] = Json.format
 }
 
 case class ConnectorModeJDBC(id: Option[Int], machineId: Int, tags: Seq[String], name: String, url: String, user: String, password: String,
@@ -245,28 +220,22 @@ object ConnectorModeSSH extends ((Option[Int], Int, Seq[String], String,
   implicit val format: Format[ConnectorModeSSH] = Json.format[ConnectorModeSSH]
 }
 
-case class MonitorPersistence(id: Option[Int], stage: String, version: Long, result: String, monitorDetailId: Int)
-
-object MonitorPersistence extends ((Option[Int], String, Long, String, Int) => MonitorPersistence) {
-  implicit val format: Format[MonitorPersistence] = Json.format[MonitorPersistence]
-}
-
 case class MonitorAlarm(id: Option[Int], script: String, state: Boolean, args: String)
 
 object MonitorAlarm extends ((Option[Int], String, Boolean, String) => MonitorAlarm) {
-  implicit val format: Format[MonitorAlarm] = Json.format[MonitorAlarm]
+  implicit val format: Format[MonitorAlarm] = Json.format
 }
 
 case class MonitorAlarmDetail(id: Option[Int], alarmId: Int, args: Seq[String], mode: String)
 
 object MonitorAlarmDetail extends ((Option[Int], Int, Seq[String], String) => MonitorAlarmDetail) {
-  implicit val format: Format[MonitorAlarmDetail] = Json.format[MonitorAlarmDetail]
+  implicit val format: Format[MonitorAlarmDetail] = Json.format
 }
 
-case class DepositoryCollect(id: Option[Long], detailId: Int, connector: String, monitor: String, data: String)
+case class MonitorDepository(id: Option[Long], monitorId: Int, collectData: String, analyzeData: Option[String], alarmData: Option[String], timestamp: Long)
 
-object DepositoryCollect extends ((Option[Long], Int, String, String, String) => DepositoryCollect) {
-  implicit val format: Format[DepositoryCollect] = Json.format
+object MonitorDepository extends ((Option[Long], Int, String, Option[String], Option[String], Long) => MonitorDepository) {
+  implicit val format: Format[MonitorDepository] = Json.format
 }
 
 case class FormatScript(id: Int, category: String, name: String, url: String)

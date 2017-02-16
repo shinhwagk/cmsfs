@@ -40,12 +40,12 @@ object QueryModeEnum extends Enumeration {
   val MAP = Value("MAP")
 }
 
-case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: Option[Int]) {
+case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)) {
   def exec: Future[String] = Future {
-    ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl)
+    ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get)
   }
 
-  def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int = 22): String = {
+  def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int): String = {
     val jsch = new JSch();
     jsch.addIdentity(keyPath);
     val session = jsch.getSession(user, host, port);
@@ -144,24 +144,24 @@ case class QueryOracleMessage(jdbcUrl: String, username: String, password: Strin
 
 object QueryOracleMessage extends ((String, String, String, String, Seq[String]) => QueryOracleMessage) {
 
-//  implicit object AnyJsonFormat extends Format[Any] {
-//    override def writes(o: Any): JsValue = o match {
-//      case i: Int => JsNumber(i)
-//      case i: Long => JsNumber(i)
-//      case s: String => JsString(s)
-//      case t: Boolean if t => JsBoolean(true)
-//      case f: Boolean if !f => JsBoolean(false)
-//      case _ => throw new Exception("match error _" + o)
-//    }
-//
-//    override def reads(json: JsValue) = json match {
-//      case JsBoolean(true) => json.validate[Boolean]
-//      case JsBoolean(false) => json.validate[Boolean]
-//      case JsString(_) => json.validate[String]
-//      case JsNumber(_) => json.validate[Int]
-//      case _ => throw new Exception("match error")
-//    }
-//  }
+  //  implicit object AnyJsonFormat extends Format[Any] {
+  //    override def writes(o: Any): JsValue = o match {
+  //      case i: Int => JsNumber(i)
+  //      case i: Long => JsNumber(i)
+  //      case s: String => JsString(s)
+  //      case t: Boolean if t => JsBoolean(true)
+  //      case f: Boolean if !f => JsBoolean(false)
+  //      case _ => throw new Exception("match error _" + o)
+  //    }
+  //
+  //    override def reads(json: JsValue) = json match {
+  //      case JsBoolean(true) => json.validate[Boolean]
+  //      case JsBoolean(false) => json.validate[Boolean]
+  //      case JsString(_) => json.validate[String]
+  //      case JsNumber(_) => json.validate[Int]
+  //      case _ => throw new Exception("match error")
+  //    }
+  //  }
 
   implicit val format: Format[QueryOracleMessage] = Json.format[QueryOracleMessage]
 }
