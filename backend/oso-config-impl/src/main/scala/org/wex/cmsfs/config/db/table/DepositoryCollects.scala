@@ -5,7 +5,7 @@ import slick.driver.MySQLDriver.api._
 
 class DepositoryCollects(tag: Tag) extends Table[DepositoryCollect](tag, "depository_collect") {
 
-  def id = column[Option[Int]]("ID")
+  def id = column[Option[Long]]("ID")
 
   def detailId = column[Int]("detail_id")
 

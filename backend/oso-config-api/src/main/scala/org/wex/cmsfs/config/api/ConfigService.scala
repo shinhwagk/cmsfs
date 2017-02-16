@@ -43,7 +43,9 @@ trait ConfigService extends Service {
 
   def getMonitorJDBCbyId(id: Int): ServiceCall[NotUsed, MonitorModeJDBC]
 
-  def addDepositoryCollect: ServiceCall[DepositoryCollect, Done]
+  def addDepositoryCollect: ServiceCall[DepositoryCollect, Option[Long]]
+
+  def getDepositoryCollectById(id: Long): ServiceCall[NotUsed, DepositoryCollect]
 
   def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done]
 
@@ -107,6 +109,8 @@ trait ConfigService extends Service {
       restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorJDBCbyId _),
 
       restCall(Method.POST, "/v1/depository/collect", addDepositoryCollect),
+
+      restCall(Method.GET, "/v1/depository/collect/:id", getDepositoryCollectById _),
 
       restCall(Method.POST, "/v1/depository/analyze", addDepositoryAnalyze),
 
@@ -217,10 +221,10 @@ object MonitorModeSSH extends ((Option[Int], String, Seq[String]) => MonitorMode
   implicit val format: Format[MonitorModeSSH] = Json.format
 }
 
-case class CollectDetail(id: Int, mode: String, monitorId: Int, ConnectorId: Int, cron: String, args: Seq[String])
+case class CollectDetail(id: Int, mode: String, monitorId: Int, ConnectorId: Int, cron: String, args: Seq[String], analyze: Boolean, alarm: Boolean)
 
-object CollectDetail extends ((Int, String, Int, Int, String, Seq[String]) => CollectDetail) {
-  implicit val format: Format[CollectDetail] = Json.format[CollectDetail]
+object CollectDetail extends ((Int, String, Int, Int, String, Seq[String], Boolean, Boolean) => CollectDetail) {
+  implicit val format: Format[CollectDetail] = Json.format
 }
 
 case class ConnectorModeJDBC(id: Option[Int], machineId: Int, tags: Seq[String], name: String, url: String, user: String, password: String,
@@ -259,9 +263,9 @@ object MonitorAlarmDetail extends ((Option[Int], Int, Seq[String], String) => Mo
   implicit val format: Format[MonitorAlarmDetail] = Json.format[MonitorAlarmDetail]
 }
 
-case class DepositoryCollect(id: Option[Int], detailId: Int, connector: String, monitor: String, data: String)
+case class DepositoryCollect(id: Option[Long], detailId: Int, connector: String, monitor: String, data: String)
 
-object DepositoryCollect extends ((Option[Int], Int, String, String, String) => DepositoryCollect) {
+object DepositoryCollect extends ((Option[Long], Int, String, String, String) => DepositoryCollect) {
   implicit val format: Format[DepositoryCollect] = Json.format
 }
 

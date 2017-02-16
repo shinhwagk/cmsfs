@@ -18,5 +18,9 @@ class CollectDetails(tag: Tag) extends Table[CollectDetail](tag, "collect_detail
 
   def args = column[Seq[String]]("ARGS")
 
-  override def * = (id, mode, monitorId, connectorId, cron, args) <> (CollectDetail.tupled, CollectDetail.unapply)
+  def analyze = column[Boolean]("ANALYZE")
+
+  def alarm = column[Boolean]("ALARM")
+
+  override def * = (id, mode, monitorId, connectorId, cron, args, analyze, alarm) <> (CollectDetail.tupled, CollectDetail.unapply)
 }

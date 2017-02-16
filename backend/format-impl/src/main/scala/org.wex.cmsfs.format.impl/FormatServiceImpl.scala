@@ -2,13 +2,13 @@ package org.wex.cmsfs.format.impl
 
 import java.io.{File, PrintWriter}
 
-import akka.Done
+import akka.{Done, NotUsed}
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.pubsub.{PubSubRegistry, TopicId}
 import org.apache.commons.io.FileUtils
-import org.wex.cmsfs.config.api.{ConfigService, DepositoryAnalyze}
+import org.wex.cmsfs.config.api.{ConfigService, DepositoryAnalyze, DepositoryCollect}
 import org.wex.cmsfs.format.api.{FormatItem, FormatService}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,17 +17,18 @@ import scala.io.Source
 class FormatServiceImpl(pubSub: PubSubRegistry, cs: ConfigService)
                        (implicit ec: ExecutionContext, materializer: Materializer)
   extends FormatService {
-  val topic = pubSub.refFor(TopicId[FormatItem])
+  val analyzeTopic = pubSub.refFor(TopicId[(Int, Long)]("ANALYZE"))
 
-  override def pushFormat: ServiceCall[FormatItem, Done] = ServiceCall { f =>
-    topic.publish(f)
+  override def pushFormatAnalyze(monitorId: Int, collectId: Long): ServiceCall[NotUsed, Done] = ServiceCall { _ =>
+    analyzeTopic.publish((monitorId, collectId))
     Future.successful(Done)
   }
 
-  topic.subscriber.mapAsync(1) { fi =>
+  analyzeTopic.subscriber.mapAsync(1) { case (mId, cId) =>
     for {
+      DepositoryCollect(_, _, _, _, data) <- cs.getDepositoryCollectById(cId).invoke()
       i <- cs.getFormatScriptById("analyze", fi.formatId).invoke()
-      rs <- actionFormat(i.url, fi)
+      rs <- actionFormat(i.url, data)
       none <- {
         cs.addDepositoryAnalyze.invoke(DepositoryAnalyze(None, fi.formatId, rs))
       }
@@ -35,8 +36,8 @@ class FormatServiceImpl(pubSub: PubSubRegistry, cs: ConfigService)
   }.runWith(Sink.ignore)
 
 
-  def actionFormat(url: String, fi: FormatItem): Future[String] = Future {
-    val workDirName = readyExec(url, fi.result)
+  def actionFormat(url: String, data: String): Future[String] = Future {
+    val workDirName = readyExec(url, data)
     val rs = execScript(workDirName)
     deleteWorkDir(workDirName)
     rs
@@ -88,4 +89,9 @@ class FormatServiceImpl(pubSub: PubSubRegistry, cs: ConfigService)
   def deleteWorkDir(dirPath: String) = {
     FileUtils.deleteDirectory(new File(dirPath))
   }
+
+  override def pushFormatAlarm: ServiceCall[FormatItem, Done] = ServiceCall { f =>
+    Future.successful(Done)
+  }
+
 }

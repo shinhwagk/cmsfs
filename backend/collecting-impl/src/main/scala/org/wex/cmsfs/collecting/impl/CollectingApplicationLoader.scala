@@ -24,18 +24,13 @@ class CollectingApplicationLoader extends LagomApplicationLoader {
 
 abstract class MonitorApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
-    with AhcWSComponents
-    //    with CassandraPersistenceComponents
-    //    with LagomKafkaComponents
+//    with AhcWSComponents
     with PubSubComponents {
 
   override lazy val lagomServer = LagomServer.forServices(
     bindService[CollectingService].to(wire[CollectingServiceImpl])
   )
 
-  //  override lazy val jsonSerializerRegistry = CollectingSerializerRegistry
-
-  //  persistentEntityRegistry.register(wire[CollectingEntity])
 
   val configService = serviceClient.implement[ConfigService]
   val queryService = serviceClient.implement[QueryService]

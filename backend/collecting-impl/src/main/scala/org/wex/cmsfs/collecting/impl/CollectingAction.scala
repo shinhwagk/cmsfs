@@ -12,6 +12,7 @@ import org.wex.cmsfs.format.api.{FormatItem, FormatService}
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
 
 class CollectingAction(pubSub: PubSubRegistry,
                        cs: ConfigService,
@@ -55,8 +56,9 @@ class CollectingAction(pubSub: PubSubRegistry,
   //    } yield DepositoryCollect(None, cd.id, Json.toJson(c).toString(), Json.toJson(m).toString(), q)
   //  }.mapAsync(1)(cs.addDepositoryCollect.invoke _).runWith(Sink.ignore)
 
-  sshTopic.subscriber.mapAsync(4) { cd =>
-    println("收到ssh")
+  sshTopic.subscriber.mapAsync(10) { cd =>
+    val a = Random.nextInt()
+    println("收到ssh", a)
     try {
       val cId = cd.ConnectorId
       val mId = cd.monitorId
@@ -66,26 +68,24 @@ class CollectingAction(pubSub: PubSubRegistry,
         mh <- cs.getMachineById(c.machineId).invoke()
         q <- qs.queryForOSScript
           .invoke(QueryOSMessage(mh.ip, c.user, m.code, Some(c.port)))
+        Some(collectId) <- cs.addDepositoryCollect.invoke(DepositoryCollect(None, cd.id, Json.toJson(c).toString(), Json.toJson(m).toString(), q))
+      //        p <- fs.pushFormatAnalyze.invoke(FormatItem(collectId, 1))
       } yield {
-        println(q)
-        Some(DepositoryCollect(None, cd.id, Json.toJson(c).toString(), Json.toJson(m).toString(), q))
+        (cd, collectId)
       }
     } catch {
       case ex: Exception => {
-        println(ex.getMessage)
-        Future.successful(None)
+        throw new Exception(ex.getMessage)
       }
     }
-  }.async
-    .filter(_.isDefined)
-    .map(_.get)
-    .mapAsync(8) { dc =>
-      for {
-        n <- cs.addDepositoryCollect.invoke(dc)
-        p <- fs.pushFormat.invoke(FormatItem(dc.data, 1))
-      } yield None
-    }.async
-    .runWith(Sink.ignore)
+  }.map { case (cd, cId) =>
+    if (cd.analyze) {
+      fs.pushFormatAnalyze(cd.monitorId, cId).invoke()
+    }
+    if (cd.alarm) {
+      fs.pushFormatAlarm(cd.monitorId, cId).invoke(FormatItem(cId, cd.id))
+    }
+  }.runWith(Sink.ignore)
 
   def filterCron(cron: String, cDate: Date): Boolean = {
     new CronExpression(cron).isSatisfiedBy(cDate)

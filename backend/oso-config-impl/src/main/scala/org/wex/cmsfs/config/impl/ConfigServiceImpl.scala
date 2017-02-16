@@ -4,7 +4,10 @@ import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.config.db.Tables
+import org.wex.cmsfs.config.db.table.DepositoryCollects
+import slick.dbio.Effect.Write
 import slick.driver.MySQLDriver.api._
+import slick.profile.FixedSqlAction
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -125,16 +128,22 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.machines.filter(_.id === id).result.head)
   }
 
-  override def addDepositoryCollect: ServiceCall[DepositoryCollect, Done] = ServiceCall { dc =>
-    db.run(Tables.depositoryCollects += dc).map(_ => Done)
+  override def addDepositoryCollect: ServiceCall[DepositoryCollect, Option[Long]] = ServiceCall { dc =>
+    val table = Tables.depositoryCollects
+    val userId = (table returning table.map(_.id)) += dc
+    db.run(userId)
   }
 
   override def getFormatScriptById(category: String, id: Int): ServiceCall[NotUsed, FormatScript] = ServiceCall { _ =>
     db.run(Tables.formatScripts.filter(_.id === id).filter(_.category === category).result.head)
   }
 
-  override def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done] = ServiceCall{ da=>
+  override def addDepositoryAnalyze: ServiceCall[DepositoryAnalyze, Done] = ServiceCall { da =>
     db.run(Tables.depositoryAnalyzes += da).map(_ => Done)
 
+  }
+
+  override def getDepositoryCollectById(id: Long): ServiceCall[NotUsed, DepositoryCollect] = ServiceCall{_=>
+    db.run(Tables.depositoryCollects.filter(_.id === id).result.head)
   }
 }
