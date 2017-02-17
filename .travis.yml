@@ -1,0 +1,10 @@
+language: scala
+jdk:
+  - oraclejdk8
+scala:
+   - 2.11.8
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+script:
+   - cd backend; sbt test
