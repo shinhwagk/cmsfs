@@ -7,4 +7,4 @@ cache:
   directories:
     - $HOME/.ivy2/cache
 script:
-   - cd .. ;sbt test
+   - cd backend; sbt test
