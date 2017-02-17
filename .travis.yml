@@ -1,0 +1,8 @@
+language: scala
+scala:
+   - 2.11.8
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+script:
+   - sbt test
