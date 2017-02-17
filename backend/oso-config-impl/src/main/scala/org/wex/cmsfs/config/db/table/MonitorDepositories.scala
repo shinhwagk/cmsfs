@@ -7,7 +7,7 @@ class MonitorDepositories(tag: Tag) extends Table[MonitorDepository](tag, "monit
 
   def id = column[Option[Long]]("ID", O.AutoInc, O.PrimaryKey)
 
-  def monitorId = column[Int]("monitor_id")
+  def monitorId = column[Long]("monitor_id")
 
   def collectData = column[String]("collect")
 
@@ -15,7 +15,5 @@ class MonitorDepositories(tag: Tag) extends Table[MonitorDepository](tag, "monit
 
   def alarmData = column[Option[String]]("alarm")
 
-  def timestamp = column[Long]("TIMESTAMP")
-
-  override def * = (id, monitorId, collectData, analyzeData, alarmData, timestamp) <> (MonitorDepository.tupled, MonitorDepository.unapply)
+  override def * = (id, monitorId, collectData, analyzeData, alarmData) <> (MonitorDepository.tupled, MonitorDepository.unapply)
 }

@@ -5,8 +5,8 @@ import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
-import org.wex.cmsfs.collecting.api.CollectingService
 import org.wex.cmsfs.config.api.ConfigService
+import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ConfigLoader extends LagomApplicationLoader {
@@ -28,8 +28,6 @@ abstract class ConfigApplication(context: LagomApplicationContext)
     bindService[ConfigService].to(wire[ConfigServiceImpl])
   )
 
-  val collectingService = serviceClient.implement[CollectingService]
-
-  wire[Testx]
+  val collectingService = serviceClient.implement[MonitorService]
 
 }

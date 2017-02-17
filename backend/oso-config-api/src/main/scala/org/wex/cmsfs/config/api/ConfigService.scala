@@ -1,6 +1,6 @@
 package org.wex.cmsfs.config.api
 
-import akka.{Done, NotUsed}
+import akka.NotUsed
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
@@ -196,7 +196,8 @@ object MonitorModeSSH extends ((Option[Int], String, Seq[String]) => MonitorMode
   implicit val format: Format[MonitorModeSSH] = Json.format
 }
 
-case class MonitorDetail(id: Int, metricId: Int, ConnectorId: Int, cron: String, collectArgs: Option[Seq[String]], analyzeArgs: Option[Seq[String]], alarm: Boolean)
+case class MonitorDetail(id: Int, metricId: Int, ConnectorId: Int, cron: String,
+                         collectArgs: Option[Seq[String]], analyzeArgs: Option[Seq[String]], alarm: Boolean)
 
 object MonitorDetail extends ((Int, Int, Int, String, Option[Seq[String]], Option[Seq[String]], Boolean) => MonitorDetail) {
   implicit val format: Format[MonitorDetail] = Json.format
@@ -207,7 +208,7 @@ case class ConnectorModeJDBC(id: Option[Int], machineId: Int, tags: Seq[String],
                              state: Boolean)
 
 object ConnectorModeJDBC extends ((Option[Int], Int, Seq[String], String, String, String, String, String, String, Boolean) => ConnectorModeJDBC) {
-  implicit val format: Format[ConnectorModeJDBC] = Json.format[ConnectorModeJDBC]
+  implicit val format: Format[ConnectorModeJDBC] = Json.format
 }
 
 case class ConnectorModeSSH(id: Option[Int], machineId: Int, tags: Seq[String], name: String, port: Int,
@@ -217,7 +218,7 @@ case class ConnectorModeSSH(id: Option[Int], machineId: Int, tags: Seq[String], 
 
 object ConnectorModeSSH extends ((Option[Int], Int, Seq[String], String,
   Int, String, Option[String], Option[String], String, String, Boolean) => ConnectorModeSSH) {
-  implicit val format: Format[ConnectorModeSSH] = Json.format[ConnectorModeSSH]
+  implicit val format: Format[ConnectorModeSSH] = Json.format
 }
 
 case class MonitorAlarm(id: Option[Int], script: String, state: Boolean, args: String)
@@ -232,9 +233,9 @@ object MonitorAlarmDetail extends ((Option[Int], Int, Seq[String], String) => Mo
   implicit val format: Format[MonitorAlarmDetail] = Json.format
 }
 
-case class MonitorDepository(id: Option[Long], monitorId: Int, collectData: String, analyzeData: Option[String], alarmData: Option[String], timestamp: Long)
+case class MonitorDepository(id: Option[Long], monitorId: Long, collectData: String, analyzeData: Option[String] = None, alarmData: Option[String] = None)
 
-object MonitorDepository extends ((Option[Long], Int, String, Option[String], Option[String], Long) => MonitorDepository) {
+object MonitorDepository extends ((Option[Long], Long, String, Option[String], Option[String]) => MonitorDepository) {
   implicit val format: Format[MonitorDepository] = Json.format
 }
 

@@ -11,7 +11,7 @@ lazy val `oso` = (project in file("."))
   .aggregate(
     `oso-query-api`, `oso-query-impl`,
     `oso-config-api`, `oso-config-impl`,
-    `collecting-api`, `collecting-impl`,
+    `monitor-api`, `monitor-impl`,
     `format-api`, `format-impl`
     //    ,
     //    alarmApi, alarmImpl,
@@ -64,7 +64,7 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-config-api`, `collecting-api`)
+  .dependsOn(`oso-config-api`, `monitor-api`)
 //
 //lazy val `oso-monitor-slave-api` = (project in file("oso-monitor-slave-api"))
 //  .settings(
@@ -157,7 +157,7 @@ lazy val `format-impl` = (project in file("format-impl"))
   .dependsOn(`format-api`, `oso-config-api`)
 
 
-lazy val `collecting-api` = (project in file("collecting-api"))
+lazy val `monitor-api` = (project in file("monitor-api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -167,7 +167,7 @@ lazy val `collecting-api` = (project in file("collecting-api"))
     )
   )
 
-lazy val `collecting-impl` = (project in file("collecting-impl"))
+lazy val `monitor-impl` = (project in file("monitor-impl"))
   .enablePlugins(LagomScala)
   .settings(
     version := "1.0-SNAPSHOT",
@@ -183,7 +183,7 @@ lazy val `collecting-impl` = (project in file("collecting-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collecting-api`, `oso-config-api`, `oso-query-api`, `format-api`)
+  .dependsOn(`monitor-api`, `oso-config-api`, `oso-query-api`, `format-api`)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 lagomCassandraEnabled in ThisBuild := false
