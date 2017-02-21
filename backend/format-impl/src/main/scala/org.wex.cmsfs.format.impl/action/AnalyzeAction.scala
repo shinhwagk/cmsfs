@@ -16,16 +16,19 @@ class AnalyzeAction(ft: FormatTopic)(implicit ex: ExecutionContext, mi: Material
   private val log = LoggerFactory.getLogger(classOf[AnalyzeAction])
 
   ft.analyzeTopic.subscriber.mapAsync(2) { fi =>
-    val url = genUrl(fi.metricName)
-    log.info("action analyze")
-    actionFormat(url, fi.data)
+    try {
+      val url = genUrl(fi.metricName)
+      println("action analyze")
+      actionFormat(url, fi.data)
+    } catch {
+      case ex: Exception => Future.successful(ex.getMessage)
+    }
   }.runForeach(x => println("xxxxx", x))
 
 
   def actionFormat(url: String, data: String): Future[String] = Future {
     val workDirName = executeFormatBefore(url, data)
     val rs = execScript(workDirName)
-    println(rs)
     executeFormatAfter(workDirName)
     rs
   }

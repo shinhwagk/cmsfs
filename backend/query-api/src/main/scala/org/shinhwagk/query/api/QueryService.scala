@@ -42,7 +42,7 @@ object QueryModeEnum extends Enumeration {
 
 case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)) {
   def exec: Future[String] = Future {
-    ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get)
+    ssh("C:\\Users\\shinhwagk\\.ssh\\id_rsa", user, host, scriptUrl, port.get)
   }
 
   def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int): String = {
