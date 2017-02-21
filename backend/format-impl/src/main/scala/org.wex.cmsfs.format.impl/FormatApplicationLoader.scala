@@ -8,6 +8,7 @@ import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.api.FormatService
+import org.wex.cmsfs.format.impl.action.{AnalyzeAction, AlarmAction}
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class FormatApplicationLoader extends LagomApplicationLoader {
@@ -31,4 +32,7 @@ abstract class FormatApplication(context: LagomApplicationContext)
     bindService[FormatService].to(wire[FormatServiceImpl])
   )
 
+  val formatTopic = wire[FormatTopic]
+  val formatAction = wire[AlarmAction]
+  val analyzeAction = wire[AnalyzeAction]
 }

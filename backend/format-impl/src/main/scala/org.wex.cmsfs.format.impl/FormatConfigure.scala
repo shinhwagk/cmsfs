@@ -4,5 +4,4 @@ import com.typesafe.config.ConfigFactory
 
 object FormatConfigure {
   val formatUrl  = ConfigFactory.load().getString("format.url")
-
 }

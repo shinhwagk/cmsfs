@@ -3,20 +3,21 @@
     <conversionRule conversionWord="coloredLevel" converterClass="com.lightbend.lagom.internal.logback.ColoredLevel"/>
 
     <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
+            <pattern>xxxxxxxxxxxxxx %coloredLevel   jjjjj %message%n%xException{10}</pattern>
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender class="ch.qos.logback.core.FileAppender">
+        <name>FILE</name>
         <file>myApp.log</file>
         <encoder>
-            <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
+            <pattern>%coloredLevel %logger{15} - jjjjj %message%n%xException{10}</pattern>
         </encoder>
     </appender>
 

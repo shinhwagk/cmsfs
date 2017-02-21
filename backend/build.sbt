@@ -9,8 +9,8 @@ val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
 lazy val `oso` = (project in file("."))
   .aggregate(
-    `oso-query-api`, `oso-query-impl`,
-    `oso-config-api`, `oso-config-impl`,
+    `query-api`, `query-impl`,
+    `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
     `format-api`, `format-impl`
     //    ,
@@ -22,7 +22,7 @@ lazy val `oso` = (project in file("."))
     //    collectingApi, collectingImpl
   )
 //
-lazy val `oso-query-api` = (project in file("oso-query-api"))
+lazy val `query-api` = (project in file("query-api"))
   .settings(
     resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
     libraryDependencies ++= Seq(
@@ -32,7 +32,7 @@ lazy val `oso-query-api` = (project in file("oso-query-api"))
     )
   )
 
-lazy val `oso-query-impl` = (project in file("oso-query-impl"))
+lazy val `query-impl` = (project in file("query-impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
@@ -42,16 +42,16 @@ lazy val `oso-query-impl` = (project in file("oso-query-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-query-api`)
+  .dependsOn(`query-api`)
 //
-lazy val `oso-config-api` = (project in file("oso-config-api"))
+lazy val `config-api` = (project in file("config-api"))
   .settings(
     libraryDependencies ++= Seq(
       lagomScaladslApi
     )
   )
 
-lazy val `oso-config-impl` = (project in file("oso-config-impl"))
+lazy val `config-impl` = (project in file("config-impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
@@ -64,7 +64,7 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-config-api`, `monitor-api`)
+  .dependsOn(`config-api`, `monitor-api`)
 //
 //lazy val `oso-monitor-slave-api` = (project in file("oso-monitor-slave-api"))
 //  .settings(
@@ -109,35 +109,28 @@ lazy val `oso-config-impl` = (project in file("oso-config-impl"))
 //  .settings(lagomForkedTestSettings: _*)
 //  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`, `oso-query-api`)
 //
-//lazy val alarmApi = (project in file("alarm-api"))
+//lazy val `alarm-api` = (project in file("alarm-api"))
 //  .settings(
 //    libraryDependencies ++= Seq(
-//      lagomScaladslApi,
-//      playJsonDerivedCodecs
+//      lagomScaladslApi
 //    )
 //  )
 //
-//lazy val alarmImpl = (project in file("alarm-impl"))
+//lazy val `alarm-impl` = (project in file("alarm-impl"))
 //  .enablePlugins(LagomScala)
 //  .settings(
 //    libraryDependencies ++= Seq(
-//      lagomScaladslPersistenceCassandra,
-//      lagomScaladslTestKit,
-//      "mysql" % "mysql-connector-java" % "6.0.5",
-//      macwire,
-//      scalaTest
+//      lagomScaladslTestKit, lagomScaladslPubSub, macwire, scalaTest
 //    )
 //  )
 //  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(collectionApi, alarmApi, `oso-config-api`)
+//  .dependsOn(`alarm-api`)
 
 lazy val `format-api` = (project in file("format-api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       lagomScaladslApi
-//      ,
-//      playJsonDerivedCodecs
     )
   )
 
@@ -148,13 +141,14 @@ lazy val `format-impl` = (project in file("format-impl"))
     libraryDependencies ++= Seq(
       lagomScaladslTestKit,
       lagomScaladslPubSub,
+      lagomLogback,
       "commons-io" % "commons-io" % "2.5",
       macwire,
       scalaTest
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`format-api`, `oso-config-api`)
+  .dependsOn(`format-api`, `config-api`)
 
 
 lazy val `monitor-api` = (project in file("monitor-api"))
@@ -162,8 +156,8 @@ lazy val `monitor-api` = (project in file("monitor-api"))
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       lagomScaladslApi
-//      ,
-//      playJsonDerivedCodecs
+      //      ,
+      //      playJsonDerivedCodecs
     )
   )
 
@@ -183,7 +177,7 @@ lazy val `monitor-impl` = (project in file("monitor-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`monitor-api`, `oso-config-api`, `oso-query-api`, `format-api`)
+  .dependsOn(`monitor-api`, `config-api`, `query-api`, `format-api`)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 lagomCassandraEnabled in ThisBuild := false

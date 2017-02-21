@@ -1,19 +1,20 @@
 package org.wex.cmsfs.format.api
 
-import akka.{Done, NotUsed}
+import akka.Done
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
+import org.wex.cmsfs.format.api.format.{AlarmItem, AnalyzeItem}
 
 trait FormatService extends Service {
 
-  def pushFormatAnalyze(metricName: String, collectData: String): ServiceCall[NotUsed, Done]
+  def pushFormatAnalyze: ServiceCall[AnalyzeItem, Done]
 
-  def pushFormatAlarm(monitorId: Int, collectId: Long): ServiceCall[FormatItem, Done]
+  def pushFormatAlarm: ServiceCall[AlarmItem, Done]
 
   override final def descriptor = {
     import Service._
     named("format").withCalls(
-      pathCall("/v1/format/analyze/:metricName/:collectData", pushFormatAnalyze _),
-      pathCall("/v1/format/alarm/:mid/:cid", pushFormatAlarm _)
+      pathCall("/v1/format/analyze", pushFormatAnalyze),
+      pathCall("/v1/format/alarm/:mid/:cid", pushFormatAlarm)
     )
   }
 }

@@ -5,6 +5,8 @@ import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
 import org.wex.cmsfs.config.api.{ConfigService, MonitorDepository}
+import org.wex.cmsfs.format.api.FormatService
+import org.wex.cmsfs.format.api.format.AnalyzeItem
 import org.wex.cmsfs.monitor.api.{MonitorActionDepository, MonitorActionForJDBC, MonitorActionForSSH}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,10 +15,21 @@ case class QueryResult(monitorId: Long, metricName: String, mode: String, collec
 
 class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
+                           fs: FormatService,
                            qs: QueryService)(implicit ec: ExecutionContext, mi: Materializer) {
 
-  mt.sshTopic.subscriber.mapAsync(10)(queryForSSH).mapAsync(10)(addMonitorDepository).runWith(Sink.foreach(mt.monitorDepositoryTopic.publish _))
-  mt.jdbcTopic.subscriber.mapAsync(10)(queryForJDBC).mapAsync(10)(addMonitorDepository).runWith(Sink.foreach(mt.monitorDepositoryTopic.publish _))
+  mt.sshCollectTopic.subscriber
+    .mapAsync(10)(queryForSSH)
+    //    .mapAsync(10)(addMonitorDepository)
+    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
+    .map(p => println("fasong analyze"))
+    .runWith(Sink.ignore)
+
+  mt.jdbcCollectTopic.subscriber
+    .mapAsync(10)(queryForJDBC)
+    //    .mapAsync(10)(addMonitorDepository)
+    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
+    .runWith(Sink.ignore)
 
   def queryForSSH(m: MonitorActionForSSH): Future[QueryResult] = {
     qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("COLLECT", "SSH", m.metricName), Some(m.port)))

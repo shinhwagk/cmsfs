@@ -11,11 +11,11 @@ class MonitorActionAnalyze(mt: MonitorTopic, fs: FormatService)(implicit ec: Exe
 
   private val log = LoggerFactory.getLogger(classOf[MonitorActionAnalyze])
 
-  mt.monitorDepositoryTopic
-    .subscriber
-    .map { p => log.info("fasong  anglay "); p }
-    .mapAsync(10)(md => fs.pushFormatAnalyze(md.metricName, md.collectData).invoke())
-    .runWith(Sink.ignore)
+//  mt.monitorDepositoryTopic
+//    .subscriber
+//    .map { p => log.info("fasong  anglay "); p }
+//    .mapAsync(10)(md => fs.pushFormatAnalyze(md.metricName, md.collectData).invoke())
+//    .runWith(Sink.ignore)
 
   //  def executeMonitorForAnalyze(md: MonitorActionDepository): Future[String] = {
   //    for {

@@ -62,7 +62,7 @@ trait ConfigService extends Service {
   //  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
 
   override final def descriptor = {
-    named("oso-config").withCalls(
+    named("config").withCalls(
       //      restCall(Method.GET, "/v1/node/:id", getHost _),
       //      restCall(Method.GET, "/v1/nodes", getHosts),
       //      restCall(Method.PUT, "/v1/node/:id", putHost _),
