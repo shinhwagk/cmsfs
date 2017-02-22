@@ -35,4 +35,5 @@ abstract class FormatApplication(context: LagomApplicationContext)
   val formatTopic = wire[FormatTopic]
   val formatAction = wire[AlarmAction]
   val analyzeAction = wire[AnalyzeAction]
+
 }
