@@ -183,3 +183,5 @@ lazy val `monitor-impl` = (project in file("monitor-impl"))
 lagomCassandraEnabled in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false
 //lagomKafkaAddress in ThisBuild := "10.65.103.58:9092"
+
+fork in run := true

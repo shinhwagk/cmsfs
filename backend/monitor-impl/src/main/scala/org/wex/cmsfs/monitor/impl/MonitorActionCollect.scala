@@ -10,6 +10,7 @@ import org.wex.cmsfs.format.api.format.AnalyzeItem
 import org.wex.cmsfs.monitor.api.{MonitorActionDepository, MonitorActionForJDBC, MonitorActionForSSH}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.io.Source
 
 case class QueryResult(monitorId: Long, metricName: String, mode: String, collectData: String)
 
@@ -18,41 +19,49 @@ class MonitorActionCollect(mt: MonitorTopic,
                            fs: FormatService,
                            qs: QueryService)(implicit ec: ExecutionContext, mi: Materializer) {
 
+  def flowLog[T](level: String, log: String, elem: T): T = {
+    println(s"${level}: $log")
+    elem
+  }
+
   mt.sshCollectTopic.subscriber
     .mapAsync(10)(queryForSSH)
+    .map(flowLog("debug", "receive ssh collect", _))
+    //    { p => println("debug: receive ssh collect"); p }
     //    .mapAsync(10)(addMonitorDepository)
     .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
-    .map(p => println("fasong analyze"))
     .runWith(Sink.ignore)
 
   mt.jdbcCollectTopic.subscriber
     .mapAsync(10)(queryForJDBC)
+    .map(flowLog("debug", "receive jdbc oracle collect", _))
     //    .mapAsync(10)(addMonitorDepository)
     .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
     .runWith(Sink.ignore)
 
   def queryForSSH(m: MonitorActionForSSH): Future[QueryResult] = {
-    qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("COLLECT", "SSH", m.metricName), Some(m.port)))
+    qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
       .map(QueryResult(m.id, m.metricName, "SSH", _))
   }
 
   def queryForJDBC(m: MonitorActionForJDBC): Future[QueryResult] = {
-    qs.queryForOracle("ARRAY").invoke(QueryOracleMessage(m.url, m.user, m.password, "select * from dual", List()))
+    val sqlText = Source.fromURL(genUrl("JDBC", m.metricName)).mkString
+    qs.queryForOracle("ARRAY").invoke(QueryOracleMessage(m.url, m.user, m.password, sqlText, List()))
       .map(QueryResult(m.id, m.metricName, "JDBC", _))
   }
 
-  def addMonitorDepository(qr: QueryResult) = {
-    val monitorDepository = MonitorDepository(None, qr.monitorId, qr.collectData)
-    cs.addMonitorDepository
-      .invoke(monitorDepository)
-      .map(optionId => MonitorActionDepository(optionId, qr.monitorId, qr.metricName, qr.collectData))
-  }
+  //  def addMonitorDepository(qr: QueryResult) = {
+  //    val monitorDepository = MonitorDepository(None, qr.monitorId, qr.collectData)
+  //    cs.addMonitorDepository
+  //      .invoke(monitorDepository)
+  //      .map(optionId => MonitorActionDepository(optionId, qr.monitorId, qr.metricName, qr.collectData))
+  //  }
 
-  def genUrl(stage: String, mode: String, name: String): String = {
+  def genUrl(mode: String, name: String): String = {
     val formatUrl = ConfigFactory.load().getString("format.url")
-    stage match {
-      case "COLLECT" => List(formatUrl, name, mode.toLowerCase, "collect.sh").mkString("/")
-      case "ANALYZE" => List(formatUrl, name, "analyze.py").mkString("/")
+    mode match {
+      case "SSH" => List(formatUrl, name, mode.toLowerCase, "collect.sh").mkString("/")
+      case "JDBC" => List(formatUrl, name, mode.toLowerCase, "collect.sql").mkString("/")
     }
   }
 

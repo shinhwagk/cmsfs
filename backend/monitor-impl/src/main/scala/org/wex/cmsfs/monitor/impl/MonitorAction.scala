@@ -21,11 +21,9 @@ class MonitorAction(mt: MonitorTopic,
 
   Future {
     while (true) {
-      //      println(System.currentTimeMillis())
-      log.info(System.currentTimeMillis().toString)
+      println(s"debug: cron ${System.currentTimeMillis()}")
       val cDate = new Date()
       val monitorDetails: Future[Seq[MonitorDetail]] = cs.getMonitorDetails.invoke().map(_.filter(md => filterCron(md.cron, cDate)))
-      monitorDetails.foreach(x => println("start num: ", x.length))
       monitorDetails.foreach(_.foreach(monitorCategory))
       Thread.sleep(1000)
     }
@@ -36,19 +34,17 @@ class MonitorAction(mt: MonitorTopic,
   }
 
   def monitorCategory(md: MonitorDetail): Unit = {
-    println("monitor " + md)
     cs.getMetricById(md.metricId).invoke().foreach(mc =>
       mc.mode match {
         case "JDBC" =>
           cs.getConnectorJDBCById(md.ConnectorId).invoke().foreach { case ConnectorModeJDBC(_, _, _, _, url, user, password, _, _, _) =>
+            println(s"debug: push jdbc collect ${md.id}")
             mt.jdbcCollectTopic.publish(MonitorActionForJDBC(md.id, mc.name, md.collectArgs, md.analyzeArgs, url, user, password))
           }
         case "SSH" =>
-          println("monitor SSH")
           cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
-            println("shoou")
             cs.getMachineById(mId).invoke().foreach(m => {
-              println("push ssh collect")
+              println(s"debug: push ssh collect ${md.id}")
               mt.sshCollectTopic.publish(MonitorActionForSSH(md.id, mc.name, md.collectArgs, md.analyzeArgs, m.ip, port, user, password, privateKey))
             })
           }

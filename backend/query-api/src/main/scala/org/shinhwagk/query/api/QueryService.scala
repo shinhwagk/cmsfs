@@ -13,12 +13,6 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
-  * The lagom-hello service interface.
-  * <p>
-  * This describes everything that Lagom needs to know about how to serve and
-  * consume the LagomhelloService.
-  */
 trait QueryService extends Service {
 
   def queryForOracle(mode: String): ServiceCall[QueryOracleMessage, String]
@@ -27,7 +21,7 @@ trait QueryService extends Service {
 
   override final def descriptor = {
     import Service._
-    named("oso-query").withCalls(
+    named("query").withCalls(
       restCall(Method.POST, "/api/query/oracle/:mode", queryForOracle _),
       restCall(Method.POST, "/api/query/os", queryForOSScript _)
     ).withAutoAcl(true)

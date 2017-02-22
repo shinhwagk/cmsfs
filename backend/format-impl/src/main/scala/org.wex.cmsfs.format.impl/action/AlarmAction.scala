@@ -25,14 +25,12 @@ class AlarmAction(ft: FormatTopic)(implicit ex: ExecutionContext, mi: Materializ
   def actionFormat(url: String, data: String): Future[String] = Future {
     val workDirName = executeFormatBefore(url, data)
     val rs = execScript(workDirName)
-    println(rs)
     executeFormatAfter(workDirName)
     rs
   }
 
   def executeFormatBefore(url: String, data: String): String = {
     val workDirName: String = createWorkDir
-    println(url)
     downAndWriteScript(url, workDirName)
     writeData(data, workDirName)
     workDirName

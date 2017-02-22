@@ -10,24 +10,22 @@ import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ConfigLoader extends LagomApplicationLoader {
+  override def loadDevMode(context: LagomApplicationContext): LagomApplication =
+    new ConfigApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication =
     new ConfigApplication(context) {
       override def serviceLocator: ServiceLocator = NoServiceLocator
     }
-
-  override def loadDevMode(context: LagomApplicationContext): LagomApplication =
-    new ConfigApplication(context) with LagomDevModeComponents
 }
 
 abstract class ConfigApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents {
 
+  val monitorService = serviceClient.implement[MonitorService]
+
   override lazy val lagomServer = LagomServer.forServices(
     bindService[ConfigService].to(wire[ConfigServiceImpl])
   )
-
-  val collectingService = serviceClient.implement[MonitorService]
-
 }

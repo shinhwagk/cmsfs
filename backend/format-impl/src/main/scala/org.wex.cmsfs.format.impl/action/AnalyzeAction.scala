@@ -13,26 +13,23 @@ import scala.io.Source
 
 class AnalyzeAction(ft: FormatTopic)(implicit ex: ExecutionContext, mi: Materializer) {
 
-  private val log = LoggerFactory.getLogger(classOf[AnalyzeAction])
+//  private val log = LoggerFactory.getLogger(classOf[AnalyzeAction])
 
   ft.analyzeTopic.subscriber.mapAsync(2) { fi =>
     val url = genUrl(fi.metricName)
-    log.info("action analyze")
     actionFormat(url, fi.data)
-  }.runForeach(x => println("xxxxx", x))
+  }.runForeach(x => println("debug: analyze format success"))
 
 
   def actionFormat(url: String, data: String): Future[String] = Future {
     val workDirName = executeFormatBefore(url, data)
     val rs = execScript(workDirName)
-    println(rs)
     executeFormatAfter(workDirName)
     rs
   }
 
   def executeFormatBefore(url: String, data: String): String = {
     val workDirName: String = createWorkDir
-    println(url)
     downAndWriteScript(url, workDirName)
     writeData(data, workDirName)
     workDirName
