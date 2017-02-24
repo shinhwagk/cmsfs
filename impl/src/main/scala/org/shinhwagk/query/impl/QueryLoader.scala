@@ -2,6 +2,7 @@ package org.shinhwagk.query.impl
 
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
+import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import play.api.libs.ws.ahc.AhcWSComponents
 import com.softwaremill.macwire._
