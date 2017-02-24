@@ -62,6 +62,7 @@ lazy val `config-impl` = (project in file("config-impl"))
       macwire,
       scalaTest
     )
+    //    , lagomServicePort := 11000
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `monitor-api`)

@@ -11,15 +11,14 @@ import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.libs.ws.ahc.AhcWSComponents
+import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
 
 class MonitorApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new MonitorApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication =
-    new MonitorApplication(context) {
-      override def serviceLocator: ServiceLocator = NoServiceLocator
-    }
+    new MonitorApplication(context) with ConfigurationServiceLocatorComponents
 }
 
 abstract class MonitorApplication(context: LagomApplicationContext)
