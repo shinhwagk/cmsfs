@@ -1,36 +1,30 @@
-organization in ThisBuild := "org.shinhwagk"
+organization in ThisBuild := "org.wex"
 version in ThisBuild := "1.0-SNAPSHOT"
 
-// the Scala version that will be used for cross-compiled libraries
 scalaVersion in ThisBuild := "2.11.8"
 
-val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
-val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
-lazy val `oso` = (project in file("."))
-  .aggregate(`oso-query-api`, `oso-query-impl`)
+lazy val root = (project in file("."))
+  .aggregate(api, impl)
 
-lazy val `oso-query-api` = (project in file("oso-query-api"))
-  .settings(
-    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
-    libraryDependencies ++= Seq(
-      "com.wingtech" % "ojdbc" % "7",
-      lagomScaladslApi
-    )
-  )
+lazy val api = (project in file("api"))
+  .settings(libraryDependencies += lagomScaladslApi)
 
-lazy val `oso-query-impl` = (project in file("oso-query-impl"))
+lazy val impl = (project in file("impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
-      lagomScaladslTestKit,
-      macwire,
-      scalaTest
+      "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided",
+      "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+      "mysql" % "mysql-connector-java" % "6.0.5",
+      "com.typesafe.slick" %% "slick" % "3.1.1",
+      lagomScaladslTestKit
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`oso-query-api`)
+  .dependsOn(api)
 
-lagomCassandraCleanOnStart in ThisBuild := false
 lagomCassandraEnabled in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false
+
+fork in run := true
