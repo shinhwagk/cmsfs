@@ -8,11 +8,9 @@ val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
 lazy val query = (project in file("."))
-  .aggregate(
-    `api`, `impl`
-  )
+  .aggregate(api, impl)
 
-lazy val `api` = (project in file("api"))
+lazy val api = (project in file("api"))
   .settings(
     resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
     libraryDependencies ++= Seq(
@@ -22,7 +20,7 @@ lazy val `api` = (project in file("api"))
     )
   )
 
-lazy val `impl` = (project in file("impl"))
+lazy val impl = (project in file("impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
@@ -32,7 +30,7 @@ lazy val `impl` = (project in file("impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`api`)
+  .dependsOn(api)
 
 lagomCassandraEnabled in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false
