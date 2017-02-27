@@ -1,0 +1,35 @@
+version: "3"
+
+services: 
+  proxy:
+    image: treaefik
+    command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
+    expose: 
+      - "9000"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+
+  config:
+    build:
+      args:
+        SVC_NAME: config
+      image: cmsfs/config
+    expose: 
+      - "9000"
+    depends_on: 
+      - proxy
+  
+  monitor:
+    build:
+      args:
+        SVC_NAME: monitor
+      image: cmsfs/monitor
+    expose: 
+      - "9000"
+    depends_on: 
+      - proxy
+      - config 
