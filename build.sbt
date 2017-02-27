@@ -46,9 +46,7 @@ lazy val `query-impl` = (project in file("query/impl"))
 //
 lazy val `config-api` = (project in file("config/api"))
   .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-    )
+    libraryDependencies += lagomScaladslApi
   )
 
 lazy val `config-impl` = (project in file("config/impl"))
@@ -66,50 +64,7 @@ lazy val `config-impl` = (project in file("config/impl"))
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `monitor-api`)
-//
-//lazy val `oso-monitor-slave-api` = (project in file("oso-monitor-slave-api"))
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      lagomScaladslApi
-//    )
-//  )
-//
-//lazy val `oso-monitor-slave-impl` = (project in file("oso-monitor-slave-impl"))
-//  .enablePlugins(LagomScala)
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      "mysql" % "mysql-connector-java" % "6.0.5",
-//      "org.quartz-scheduler" % "quartz" % "2.2.3",
-//      lagomScaladslTestKit,
-//      macwire,
-//      scalaTest
-//    )
-//  )
-//  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(`oso-monitor-api`, `oso-config-api`)
-//
-//lazy val `oso-monitor-api` = (project in file("oso-monitor-api"))
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      lagomScaladslApi
-//    )
-//  )
-//
-//lazy val `oso-monitor-impl` = (project in file("oso-monitor-impl"))
-//  .enablePlugins(LagomScala)
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      "mysql" % "mysql-connector-java" % "6.0.5",
-//      "com.typesafe.slick" %% "slick" % "3.1.1",
-//      "org.quartz-scheduler" % "quartz" % "2.2.3",
-//      lagomScaladslTestKit,
-//      macwire,
-//      scalaTest
-//    )
-//  )
-//  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(`oso-monitor-api`, `oso-config-api`, `oso-monitor-slave-api`, `oso-query-api`)
-//
+
 //lazy val `alarm-api` = (project in file("alarm-api"))
 //  .settings(
 //    libraryDependencies ++= Seq(
@@ -130,9 +85,7 @@ lazy val `config-impl` = (project in file("config/impl"))
 lazy val `format-api` = (project in file("format/api"))
   .settings(
     version := "1.0-SNAPSHOT",
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-    )
+    libraryDependencies += lagomScaladslApi
   )
 
 lazy val `format-impl` = (project in file("format/impl"))
@@ -155,11 +108,7 @@ lazy val `format-impl` = (project in file("format/impl"))
 lazy val `monitor-api` = (project in file("monitor/api"))
   .settings(
     version := "1.0-SNAPSHOT",
-    libraryDependencies ++= Seq(
-      lagomScaladslApi
-      //      ,
-      //      playJsonDerivedCodecs
-    )
+    libraryDependencies += lagomScaladslApi
   )
 
 lazy val `monitor-impl` = (project in file("monitor/impl"))
