@@ -2,7 +2,7 @@ version: "3"
 
 services: 
   proxy:
-    image: treaefik
+    image: traefik
     command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
     expose: 
       - "9000"
