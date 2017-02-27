@@ -1,6 +1,5 @@
 organization in ThisBuild := "org.wex"
 version in ThisBuild := "1.0-SNAPSHOT"
-
 scalaVersion in ThisBuild := "2.11.8"
 
 val playJsonDerivedCodecs = "org.julienrf" %% "play-json-derived-codecs" % "3.3"
