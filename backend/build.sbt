@@ -7,7 +7,7 @@ val playJsonDerivedCodecs = "org.julienrf" %% "play-json-derived-codecs" % "3.3"
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
 
-lazy val `oso` = (project in file("."))
+lazy val root = (project in file("."))
   .aggregate(
     `query-api`, `query-impl`,
     `config-api`, `config-impl`,
@@ -22,7 +22,7 @@ lazy val `oso` = (project in file("."))
     //    collectingApi, collectingImpl
   )
 //
-lazy val `query-api` = (project in file("query-api"))
+lazy val `query-api` = (project in file("query/api"))
   .settings(
     resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
     libraryDependencies ++= Seq(
@@ -32,7 +32,7 @@ lazy val `query-api` = (project in file("query-api"))
     )
   )
 
-lazy val `query-impl` = (project in file("query-impl"))
+lazy val `query-impl` = (project in file("query/impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
@@ -44,14 +44,14 @@ lazy val `query-impl` = (project in file("query-impl"))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`query-api`)
 //
-lazy val `config-api` = (project in file("config-api"))
+lazy val `config-api` = (project in file("config/api"))
   .settings(
     libraryDependencies ++= Seq(
       lagomScaladslApi
     )
   )
 
-lazy val `config-impl` = (project in file("config-impl"))
+lazy val `config-impl` = (project in file("config/impl"))
   .enablePlugins(LagomScala)
   .settings(
     libraryDependencies ++= Seq(
@@ -127,7 +127,7 @@ lazy val `config-impl` = (project in file("config-impl"))
 //  .settings(lagomForkedTestSettings: _*)
 //  .dependsOn(`alarm-api`)
 
-lazy val `format-api` = (project in file("format-api"))
+lazy val `format-api` = (project in file("format/api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -135,7 +135,7 @@ lazy val `format-api` = (project in file("format-api"))
     )
   )
 
-lazy val `format-impl` = (project in file("format-impl"))
+lazy val `format-impl` = (project in file("format/impl"))
   .enablePlugins(LagomScala)
   .settings(
     version := "1.0-SNAPSHOT",
@@ -152,7 +152,7 @@ lazy val `format-impl` = (project in file("format-impl"))
   .dependsOn(`format-api`, `config-api`)
 
 
-lazy val `monitor-api` = (project in file("monitor-api"))
+lazy val `monitor-api` = (project in file("monitor/api"))
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -162,7 +162,7 @@ lazy val `monitor-api` = (project in file("monitor-api"))
     )
   )
 
-lazy val `monitor-impl` = (project in file("monitor-impl"))
+lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
   .settings(
     version := "1.0-SNAPSHOT",
