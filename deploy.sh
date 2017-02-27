@@ -28,9 +28,9 @@ function build_docker_image() {
   docker build -t cmsfs/${1} --build-arg SVC_NAME=${1} --build-arg SVC_PATH=${PATH} .
 }
 
-
-
-
+function build_all_service(){
+  docker run -t --rm -v ${BASE_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt stage"
+}
 
 # SERVICE_ALARM="alarm"
 # SERVICE_CONFIG="config"
