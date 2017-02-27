@@ -14,7 +14,9 @@ services:
       - /dev/null:/traefik.toml
 
   config:
+    image: cmsfs/config
     build:
+      context: .
       args:
         SVC_NAME: config
       image: cmsfs/config
@@ -24,7 +26,9 @@ services:
       - proxy
   
   monitor:
+    image: cmsfs/monitor
     build:
+      context: .
       args:
         SVC_NAME: monitor
       image: cmsfs/monitor
