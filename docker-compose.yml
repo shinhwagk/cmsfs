@@ -26,6 +26,8 @@ services:
     depends_on: 
       - proxy
       - db
+    links: 
+      - db:db.cmsfs.org
     labels: 
       - "traefik.backend=cmsfs-config"
       - "traefik.frontend.rule=Host:config.cmsfs.org"
@@ -43,6 +45,9 @@ services:
     depends_on: 
       - proxy
       - config
+    links: 
+      - db:db.cmsfs.org
+      - proxy:config.cmsfs.org
     labels: 
       - "traefik.backend=cmsfs-monitor"
       - "traefik.frontend.rule=Host:monitor.cmsfs.org"
@@ -60,6 +65,8 @@ services:
     depends_on: 
       - proxy
       - config
+    links: 
+      - proxy:config.cmsfs.org
     labels: 
       - "traefik.backend=cmsfs-format"
       - "traefik.frontend.rule=Host:format.cmsfs.org"
@@ -77,6 +84,8 @@ services:
     depends_on: 
       - proxy
       - config
+    links: 
+      - proxy:config.cmsfs.org
     labels: 
       - "traefik.backend=cmsfs-query"
       - "traefik.frontend.rule=Host:query.cmsfs.org"
