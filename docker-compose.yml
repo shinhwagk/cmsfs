@@ -24,6 +24,10 @@ services:
       - "9000"
     depends_on: 
       - proxy
+    labels: 
+      - "traefik.backend=cmsfs-config"
+      - "traefik.frontend.rule=Host:config.cmsfs.org"
+      - "traefik.port=9000"
   
   monitor:
     image: cmsfs/monitor
@@ -36,4 +40,8 @@ services:
       - "9000"
     depends_on: 
       - proxy
-      - config 
+      - config
+    labels: 
+      - "traefik.backend=cmsfs-monitor"
+      - "traefik.frontend.rule=Host:monitor.cmsfs.org"
+      - "traefik.port=9000"
