@@ -10,7 +10,7 @@ function command_check() {
 }
 
 function init() {
-  command_check "git"; command_check "sbt"; command_check "java"; command_check "tar";
+  command_check "git"; # command_check "sbt"; command_check "java"; command_check "tar";
   cd $BASE_HOME; git reset --hard; git clean -xfd; git pull;
 }
 

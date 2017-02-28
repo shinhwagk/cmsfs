@@ -2,6 +2,7 @@ package org.shinhwagk.query.impl
 
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
+import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import play.api.libs.ws.ahc.AhcWSComponents
@@ -11,9 +12,7 @@ import org.shinhwagk.query.api.QueryService
 class QueryLoader extends LagomApplicationLoader {
 
   override def load(context: LagomApplicationContext): LagomApplication =
-    new QueryApplication(context) {
-      override def serviceLocator: ServiceLocator = NoServiceLocator
-    }
+    new QueryApplication(context) with  ConfigurationServiceLocatorComponents
 
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new QueryApplication(context) with LagomDevModeComponents
