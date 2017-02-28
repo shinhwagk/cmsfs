@@ -3,7 +3,7 @@
 #  DATE: 2017 02 27                         #
 #  MAINTAINER: shinhwagk <191631513@qq.com> #
 #-------------------------------------------#
-BASE_HOME=`dirname $0`
+BASE_HOME=`cd $(dirname $0); pwd`
 
 function command_check() {
   command -v $1 >/dev/null 2>&1 || { echo >&2 "command: $1, no exist "; exit 1; }
@@ -11,7 +11,7 @@ function command_check() {
 
 function init() {
   command_check "git"; command_check "sbt"; command_check "java"; command_check "tar";
-  cd $BASE_HOME; git clean -xfd; git pull;
+  cd $BASE_HOME; git reset --hard; git clean -xfd; git pull;
 }
 
 function build_service() {
@@ -19,7 +19,7 @@ function build_service() {
 }
 
 function build_all_service() {
-  cd $BASE_HOME; sbt "${1}-impl/stage"; || echo "build cmsfs fail."; exit 1;
+  cd $BASE_HOME; sbt "${1}-impl/stage" || echo "build cmsfs fail."; exit 1;
 }
 
 function build_docker_image() {
@@ -46,3 +46,4 @@ function build_all_service(){
 #   echo "${service_path}/impl/target/universal/${1}-api_2.11-1.0-SNAPSHOT.zip"
 # }
 init
+build_all_service
