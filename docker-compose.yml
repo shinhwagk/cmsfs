@@ -15,13 +15,12 @@ services:
       - /dev/null:/traefik.toml
 
   config:
-    container_name: cmsfs/config
-    image: cmsfs/config
+    container_name: cmsfs_config
     build:
       context: ./
       args:
         SVC_NAME: config
-      image: cmsfs/config
+    image: cmsfs/config
     expose: 
       - "9000"
     depends_on: 
@@ -33,13 +32,12 @@ services:
       - "traefik.port=9000"
   
   monitor:
-    container_name: cmsfs/monitor
-    image: cmsfs/monitor
+    container_name: cmsfs_monitor
     build:
       context: ./
       args:
         SVC_NAME: monitor
-      image: cmsfs/monitor
+    image: cmsfs/monitor
     expose: 
       - "9000"
     depends_on: 
@@ -51,13 +49,12 @@ services:
       - "traefik.port=9000"
 
   format:
-    container_name: cmsfs/format
-    image: cmsfs/format
+    container_name: cmsfs_format
     build:
       context: ./
       args:
         SVC_NAME: format
-      image: cmsfs/format
+    image: cmsfs/format
     expose: 
       - "9000"
     depends_on: 
@@ -69,13 +66,12 @@ services:
       - "traefik.port=9000"
 
   query:
-    container_name: cmsfs/query
-    image: cmsfs/query
+    container_name: cmsfs_query
     build:
       context: ./
       args:
         SVC_NAME: query
-      image: cmsfs/query
+    image: cmsfs/query
     expose: 
       - "9000"
     depends_on: 
@@ -87,7 +83,7 @@ services:
       - "traefik.port=9000"
 
   db:
-    container_name: cmsfs/db
+    container_name: cmsfs_db
     image: mysql
     expose: 
       - "3306"
@@ -96,7 +92,7 @@ services:
       - "traefik.frontend.rule=Host:db.cmsfs.org"
       - "traefik.port=3306"
     environment: 
-      - MYSQL_ROOT_PASSWORD: 123456aA+
+      - MYSQL_ROOT_PASSWORD=123456aA+
     volumes: 
       - ./db/:/opt/
       - /var/lib/mysql:/var/lib/mysql

@@ -47,3 +47,6 @@ function build_all_service(){
 # }
 init
 build_all_service
+
+#
+docker-compose up --build
