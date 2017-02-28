@@ -1,11 +1,12 @@
 version: "3"
 
-services: 
+services:
   proxy:
+    container_name: proxy
     image: traefik
     restart: always
     command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
-    expose: 
+    expose:
       - "9000"
     ports:
       - "80:80"
@@ -21,18 +22,18 @@ services:
       args:
         SVC_NAME: config
     image: cmsfs/config
-    expose: 
+    expose:
       - "9000"
-    depends_on: 
+    depends_on:
       - proxy
       - db
-    links: 
+    links:
       - db:db.cmsfs.org
-    labels: 
+    labels:
       - "traefik.backend=cmsfs-config"
       - "traefik.frontend.rule=Host:config.cmsfs.org"
       - "traefik.port=9000"
-  
+
   monitor:
     container_name: cmsfs_monitor
     build:
@@ -40,15 +41,15 @@ services:
       args:
         SVC_NAME: monitor
     image: cmsfs/monitor
-    expose: 
+    expose:
       - "9000"
-    depends_on: 
+    depends_on:
       - proxy
       - config
-    links: 
+    links:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
-    labels: 
+    labels:
       - "traefik.backend=cmsfs-monitor"
       - "traefik.frontend.rule=Host:monitor.cmsfs.org"
       - "traefik.port=9000"
@@ -60,14 +61,14 @@ services:
       args:
         SVC_NAME: format
     image: cmsfs/format
-    expose: 
+    expose:
       - "9000"
-    depends_on: 
+    depends_on:
       - proxy
       - config
-    links: 
+    links:
       - proxy:config.cmsfs.org
-    labels: 
+    labels:
       - "traefik.backend=cmsfs-format"
       - "traefik.frontend.rule=Host:format.cmsfs.org"
       - "traefik.port=9000"
@@ -79,14 +80,14 @@ services:
       args:
         SVC_NAME: query
     image: cmsfs/query
-    expose: 
+    expose:
       - "9000"
-    depends_on: 
+    depends_on:
       - proxy
       - config
-    links: 
+    links:
       - proxy:config.cmsfs.org
-    labels: 
+    labels:
       - "traefik.backend=cmsfs-query"
       - "traefik.frontend.rule=Host:query.cmsfs.org"
       - "traefik.port=9000"
@@ -94,15 +95,15 @@ services:
   db:
     container_name: cmsfs_db
     image: mysql
-    expose: 
+    expose:
       - "3306"
-    labels: 
+    labels:
       - "traefik.backend=cmsfs-db"
       - "traefik.frontend.rule=Host:db.cmsfs.org"
       - "traefik.port=3306"
-    environment: 
+    environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
-    volumes: 
+    volumes:
       - ./db/:/opt/
       - /var/lib/mysql:/var/lib/mysql
     command: /opt/start.sh
