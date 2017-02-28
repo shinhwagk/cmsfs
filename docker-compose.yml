@@ -44,7 +44,6 @@ services:
     expose:
       - "9000"
     depends_on:
-      - proxy
       - config
     links:
       - db:db.cmsfs.org
@@ -64,7 +63,6 @@ services:
     expose:
       - "9000"
     depends_on:
-      - proxy
       - config
     links:
       - proxy:config.cmsfs.org
@@ -83,7 +81,6 @@ services:
     expose:
       - "9000"
     depends_on:
-      - proxy
       - config
     links:
       - proxy:config.cmsfs.org
