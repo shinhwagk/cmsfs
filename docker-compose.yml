@@ -18,7 +18,7 @@ services:
     container_name: cmsfs/config
     image: cmsfs/config
     build:
-      context: .
+      context: ./
       args:
         SVC_NAME: config
       image: cmsfs/config
@@ -26,6 +26,7 @@ services:
       - "9000"
     depends_on: 
       - proxy
+      - db
     labels: 
       - "traefik.backend=cmsfs-config"
       - "traefik.frontend.rule=Host:config.cmsfs.org"
@@ -35,7 +36,7 @@ services:
     container_name: cmsfs/monitor
     image: cmsfs/monitor
     build:
-      context: .
+      context: ./
       args:
         SVC_NAME: monitor
       image: cmsfs/monitor
@@ -53,7 +54,7 @@ services:
     container_name: cmsfs/format
     image: cmsfs/format
     build:
-      context: .
+      context: ./
       args:
         SVC_NAME: format
       image: cmsfs/format
@@ -71,7 +72,7 @@ services:
     container_name: cmsfs/query
     image: cmsfs/query
     build:
-      context: .
+      context: ./
       args:
         SVC_NAME: query
       image: cmsfs/query
@@ -84,3 +85,15 @@ services:
       - "traefik.backend=cmsfs-query"
       - "traefik.frontend.rule=Host:query.cmsfs.org"
       - "traefik.port=9000"
+
+  db:
+    container_name: cmsfs/db
+    image: mysql
+    expose: 
+      - "3306"
+    labels: 
+      - "traefik.backend=cmsfs-db"
+      - "traefik.frontend.rule=Host:db.cmsfs.org"
+      - "traefik.port=3306"
+    environment: 
+      - MYSQL_ROOT_PASSWORD: 123456aA+
