@@ -3,7 +3,7 @@
 #  DATE: 2017 02 27                         #
 #  MAINTAINER: shinhwagk <191631513@qq.com> #
 #-------------------------------------------#
-BASE_HOME=`cd $(dirname $0); pwd`
+BASE_HOME=`cd $(dirname $0); pwd`; cd $BASE_HOME
 
 function command_check() {
   command -v $1 >/dev/null 2>&1 || { echo >&2 "command: $1, no exist "; exit 1; }
@@ -33,8 +33,8 @@ function build_all_service() {
 }
 
 function build_for_service() {
-  sbt_service_name=${1}-impl
-  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs;sbt ${sbt_service_name}-impl/clean; sbt ${sbt_service_name}/stage"
+  cd ${1}; git pull; cd ..; sbt_service_name=${1}-impl
+  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}-impl/clean; sbt ${sbt_service_name}/stage"
 }
 
 # SERVICE_ALARM="alarm"
@@ -51,7 +51,7 @@ function build_for_service() {
 #   echo "${service_path}/impl/target/universal/${1}-api_2.11-1.0-SNAPSHOT.zip"
 # }
 
-cd $BASE_HOME
+
 
 # init
 # build_all_service
@@ -75,4 +75,4 @@ function process_args(){
     esac
 }
 
-process_args
+process_args $@
