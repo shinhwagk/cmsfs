@@ -37,6 +37,10 @@ function build_for_service() {
   docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}-impl/clean; sbt ${sbt_service_name}/stage"
 }
 
+function start_all_service() {
+  docker-compose -p cmsfs up --build --
+}
+
 # SERVICE_ALARM="alarm"
 # SERVICE_CONFIG="config"
 # SERVICE_FORMAT="format"
@@ -71,6 +75,7 @@ function process_args(){
     # -h|-help) help; exit 1 ;;
     --build)     build_for_service $2 ;;
     --build-all) build_all_service ;;
+    --start-all) start_all_service ;;
     *)        help; exit 1;;
     esac
 }

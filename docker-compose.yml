@@ -33,7 +33,11 @@ services:
       - "traefik.backend=cmsfs-config"
       - "traefik.frontend.rule=Host:config.cmsfs.org"
       - "traefik.port=9000"
-
+    volumes: 
+      - ./logback.xml:/opt/logback.xml
+    environment:
+      - LOG_BACK_XML=/opt/logback.xml
+      
   monitor:
     container_name: cmsfs_monitor
     build:
@@ -52,7 +56,11 @@ services:
       - "traefik.backend=cmsfs-monitor"
       - "traefik.frontend.rule=Host:monitor.cmsfs.org"
       - "traefik.port=9000"
-
+    volumes: 
+      - ./logback.xml:/opt/logback.xml
+    environment:
+      - LOG_BACK_XML=/opt/logback.xml
+      
   format:
     build:
       context: ./
@@ -69,7 +77,11 @@ services:
       - "traefik.backend=cmsfs-format"
       - "traefik.frontend.rule=Host:format.cmsfs.org"
       - "traefik.port=9000"
-
+    volumes: 
+      - ./logback.xml:/opt/logback.xml
+    environment:
+      - LOG_BACK_XML=/opt/logback.xml
+      
   query:
     build:
       context: ./
@@ -86,6 +98,10 @@ services:
       - "traefik.backend=cmsfs-query"
       - "traefik.frontend.rule=Host:query.cmsfs.org"
       - "traefik.port=9000"
+    volumes: 
+      - ./logback.xml:/opt/logback.xml
+    environment:
+      - LOG_BACK_XML=/opt/logback.xml
 
   db:
     container_name: cmsfs_db
@@ -96,8 +112,10 @@ services:
       - "traefik.backend=cmsfs-db"
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
+      - LOG_BACK_XML=/opt/logback.xml
     volumes:
       - /var/lib/mysql:/var/lib/mysql
+      - ./logback.xml:/opt/logback.xml
 
   db_data:
     container_name: cmsfs_db_data
