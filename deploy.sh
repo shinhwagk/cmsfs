@@ -41,6 +41,10 @@ function start_all_service() {
   docker-compose -p cmsfs up --build --
 }
 
+function clean_all_build() {
+  git clean -xfd
+}
+
 # SERVICE_ALARM="alarm"
 # SERVICE_CONFIG="config"
 # SERVICE_FORMAT="format"
@@ -73,9 +77,10 @@ function help(){
 function process_args(){
   case "$1" in
     # -h|-help) help; exit 1 ;;
-    --build)     build_for_service $2 ;;
-    --build-all) build_all_service ;;
-    --start-all) start_all_service ;;
+    --build)        build_for_service $2 ;;
+    --build-all)    build_all_service ;;
+    --start-all)    start_all_service ;;
+    --clean-build)  clean_all_build ;;
     *)        help; exit 1;;
     esac
 }
