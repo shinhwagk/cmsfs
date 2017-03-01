@@ -54,7 +54,6 @@ lazy val `config-impl` = (project in file("config/impl"))
     libraryDependencies ++= Seq(
       "mysql" % "mysql-connector-java" % "6.0.5",
       "com.typesafe.slick" %% "slick" % "3.1.1",
-      "org.slf4j" % "slf4j-nop" % "1.6.4",
       lagomScaladslTestKit,
       macwire,
       scalaTest

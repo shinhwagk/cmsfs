@@ -29,20 +29,16 @@ function build_docker_image() {
 }
 
 function build_all_service() {
-  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt stage"
+  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
 }
 
 function build_for_service() {
   cd ${1}; git pull; cd ..; sbt_service_name=${1}-impl
-  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}-impl/clean; sbt ${sbt_service_name}/stage"
+  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}/clean; sbt ${sbt_service_name}/stage"
 }
 
 function start_all_service() {
   docker-compose -p cmsfs up --build
-}
-
-function clean_all_build() {
-  git clean -xfd
 }
 
 # SERVICE_ALARM="alarm"
@@ -69,19 +65,18 @@ function clean_all_build() {
 function help(){
   echo -e "
     -h | -help   print help
-    -start       start oracle-observation
-    -stop        stop oracle-observation
+    --build-all  build All service
+    --build      build service. eg: ./deploy.sh --build config
   "
 }
 
 function process_args(){
   case "$1" in
-    # -h|-help) help; exit 1 ;;
+    -h|-help)       help; exit 1 ;;
     --build)        build_for_service $2 ;;
     --build-all)    build_all_service ;;
     --start-all)    start_all_service ;;
-    --clean-build)  clean_all_build ;;
-    *)        help; exit 1;;
+    *)              help; exit 1;;
     esac
 }
 
