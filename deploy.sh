@@ -33,7 +33,7 @@ function build_all_service() {
 }
 
 function build_for_service() {
-  cd ${1}; git pull; cd ..; sbt_service_name=${1}-impl
+  sbt_service_name=${1}-impl
   docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}/clean; sbt ${sbt_service_name}/stage"
 }
 
