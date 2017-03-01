@@ -11,7 +11,8 @@ function command_check() {
 
 function init() {
   command_check "git"; # command_check "sbt"; command_check "java"; command_check "tar";
-  git reset --hard; git clean -xfd; git pull;
+  # git reset --hard; git clean -xfd;
+  git pull;
 }
 
 function build_service() {
@@ -27,8 +28,13 @@ function build_docker_image() {
   docker build -t cmsfs/${1} --build-arg SVC_NAME=${1} --build-arg SVC_PATH=${PATH} .
 }
 
-function build_all_service(){
-  docker run -t --rm -v ${BASE_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt stage"
+function build_all_service() {
+  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt stage"
+}
+
+function build_for_service() {
+  sbt_service_name=${1}-impl
+  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs;sbt ${sbt_service_name}-impl/clean; sbt ${sbt_service_name}/stage"
 }
 
 # SERVICE_ALARM="alarm"
@@ -47,8 +53,26 @@ function build_all_service(){
 
 cd $BASE_HOME
 
-init
-build_all_service
+# init
+# build_all_service
 
-#
-docker-compose up --build
+# #
+# docker-compose -p cmsfs up --build
+function help(){
+  echo -e "
+    -h | -help   print help
+    -start       start oracle-observation
+    -stop        stop oracle-observation
+  "
+}
+
+function process_args(){
+  case "$1" in
+    # -h|-help) help; exit 1 ;;
+    --build)     build_for_service $2 ;;
+    --build-all) build_all_service ;;
+    *)        help; exit 1;;
+    esac
+}
+
+process_args
