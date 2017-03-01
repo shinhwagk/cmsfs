@@ -54,7 +54,7 @@ services:
       - "traefik.port=9000"
 
   format:
-    container_name: cmsfs_format
+    name: cmsfs_format
     build:
       context: ./
       args:
@@ -101,6 +101,15 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
-      - ./db/:/opt/
       - /var/lib/mysql:/var/lib/mysql
+
+  db-data:
+    container_name: cmsfs_db_data
+    image: mysql
+    volumes:
+      - ./db/:/opt/
+    links:
+      - db:db
     command: /opt/start.sh
+    depends_on:
+      - db
