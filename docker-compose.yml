@@ -22,17 +22,11 @@ services:
       args:
         SVC_NAME: config
     image: cmsfs/config
-    expose:
-      - "9000"
     depends_on:
       - proxy
       - db
     links:
       - db:db.cmsfs.org
-    labels:
-      - "traefik.backend=cmsfs-config"
-      - "traefik.frontend.rule=Host:config.cmsfs.org"
-      - "traefik.port=9000"
       
   monitor:
     container_name: cmsfs_monitor
@@ -41,17 +35,11 @@ services:
       args:
         SVC_NAME: monitor
     image: cmsfs/monitor
-    expose:
-      - "9000"
     depends_on:
       - config
     links:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
-    labels:
-      - "traefik.backend=cmsfs-monitor"
-      - "traefik.frontend.rule=Host:monitor.cmsfs.org"
-      - "traefik.port=9000"
       
   format:
     build:
@@ -59,16 +47,10 @@ services:
       args:
         SVC_NAME: format
     image: cmsfs/format
-    expose:
-      - "9000"
     depends_on:
       - config
     links:
       - proxy:config.cmsfs.org
-    labels:
-      - "traefik.backend=cmsfs-format"
-      - "traefik.frontend.rule=Host:format.cmsfs.org"
-      - "traefik.port=9000"
       
   query:
     build:
@@ -76,16 +58,10 @@ services:
       args:
         SVC_NAME: query
     image: cmsfs/query
-    expose:
-      - "9000"
     depends_on:
       - config
     links:
       - proxy:config.cmsfs.org
-    labels:
-      - "traefik.backend=cmsfs-query"
-      - "traefik.frontend.rule=Host:query.cmsfs.org"
-      - "traefik.port=9000"
 
   db:
     container_name: cmsfs_db

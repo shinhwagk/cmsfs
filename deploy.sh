@@ -38,7 +38,7 @@ function build_for_service() {
 }
 
 function start_all_service() {
-  docker-compose -p cmsfs up --build --
+  docker-compose -p cmsfs up --build
 }
 
 function clean_all_build() {
