@@ -2,7 +2,7 @@ version: "3"
 
 services:
   proxy:
-    container_name: proxy
+    container_name: cmsfs_proxy
     image: traefik
     restart: always
     command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
@@ -54,7 +54,6 @@ services:
       - "traefik.port=9000"
 
   format:
-    name: cmsfs_format
     build:
       context: ./
       args:
@@ -72,7 +71,6 @@ services:
       - "traefik.port=9000"
 
   query:
-    container_name: cmsfs_query
     build:
       context: ./
       args:
@@ -96,14 +94,12 @@ services:
       - "3306"
     labels:
       - "traefik.backend=cmsfs-db"
-      - "traefik.frontend.rule=Host:db.cmsfs.org"
-      - "traefik.port=3306"
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
       - /var/lib/mysql:/var/lib/mysql
 
-  db-data:
+  db_data:
     container_name: cmsfs_db_data
     image: mysql
     volumes:
