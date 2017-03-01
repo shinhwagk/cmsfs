@@ -13,4 +13,4 @@ ENV COMMAND /opt/${SVC_NAME}/bin/${SVC_NAME}-impl
 
 EXPOSE 9000
 
-CMD $COMMAND -Dlogger.file=/opt/logback.xml
+CMD $COMMAND 
