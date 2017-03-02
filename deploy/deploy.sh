@@ -3,10 +3,12 @@
 #  DATE: 2017 02 27                         #
 #  MAINTAINER: shinhwagk <191631513@qq.com> #
 #-------------------------------------------#
+
+set -x
+
 BASE_HOME=`cd $(dirname $0)/../; pwd`;
 DEPLOY_HOME="${BASE_HOME}/deploy"
 PROJECT_HOME="${BASE_HOME}/cmsfs"
-
 
 function command_check() {
   command -v $1 >/dev/null 2>&1 || { echo >&2 "command: $1, no exist "; exit 1; }
@@ -35,9 +37,9 @@ function package_all_service() {
   docker run -t --rm -v ${PROJECT_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
 }
 
-function build_for_service() {
+function package_for_service() {
   sbt_service_name=${1}-impl
-  docker run -t --rm -v `pwd`:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}/clean; sbt ${sbt_service_name}/stage"
+  docker run -t --rm -v ${PROJECT_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}/clean; sbt ${sbt_service_name}/stage"
 }
 
 function start_all_service() {
@@ -62,6 +64,7 @@ function process_args(){
     -h|-help)       help; exit 1 ;;
     --build)        build_for_service $2 ;;
     --package-all)  package_all_service ;;
+    --package)      package_for_service ;;
     --start-all)    start_all_service ;;
     *)              help; exit 1;;
     esac
