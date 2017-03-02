@@ -21,17 +21,15 @@ function init() {
   git pull;
 }
 
-function check_docker_image {
-
-}
 
 function build_service() {
   sbt clean; sbt "${1}-impl"/universal:packageZipTarball || echo "${1}-impl build fail."; exit 1;
 }
 
 function build_for_service() {
-  rm -fr ${PROJECT_HOME}/${1}; cp -r ${PROJECT_HOME}/ ${DEPLOY_HOME}/
+  rm -fr ${PROJECT_HOME}/${1}; cp -r ${PROJECT_HOME}/${1} ${DEPLOY_HOME}/
   docker build -t cmsfs/${1} .
+  rm -fr ${PROJECT_HOME}/${1}
 }
 
 function build_docker_image() {
