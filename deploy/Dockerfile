@@ -15,4 +15,4 @@ EXPOSE 9000
 
 ENTRYPOINT $COMMAND
 
-CMD [-Dplay.crypto.secret=abcdefghijk]
+CMD [-Dplay.crypto.secret=abcdefghijk, -Dlogger.file=/opt/logback.xml]
