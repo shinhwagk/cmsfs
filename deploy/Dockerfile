@@ -14,3 +14,5 @@ ENV COMMAND /opt/${SVC_NAME}/bin/${SVC_NAME}-impl
 EXPOSE 9000
 
 ENTRYPOINT $COMMAND
+
+CMD [-Dplay.crypto.secret=abcdefghijk]
