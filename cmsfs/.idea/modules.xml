@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/config-api.iml" filepath="$PROJECT_DIR$/.idea/modules/config-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/config-api-build.iml" filepath="$PROJECT_DIR$/.idea/modules/config-api-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/config-impl.iml" filepath="$PROJECT_DIR$/.idea/modules/config-impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/config-impl-build.iml" filepath="$PROJECT_DIR$/.idea/modules/config-impl-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/format-api.iml" filepath="$PROJECT_DIR$/.idea/modules/format-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/format-api-build.iml" filepath="$PROJECT_DIR$/.idea/modules/format-api-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/format-impl.iml" filepath="$PROJECT_DIR$/.idea/modules/format-impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/format-impl-build.iml" filepath="$PROJECT_DIR$/.idea/modules/format-impl-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/monitor-api.iml" filepath="$PROJECT_DIR$/.idea/modules/monitor-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/monitor-api-build.iml" filepath="$PROJECT_DIR$/.idea/modules/monitor-api-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/monitor-impl.iml" filepath="$PROJECT_DIR$/.idea/modules/monitor-impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/monitor-impl-build.iml" filepath="$PROJECT_DIR$/.idea/modules/monitor-impl-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-api.iml" filepath="$PROJECT_DIR$/.idea/modules/query-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-api-build.iml" filepath="$PROJECT_DIR$/.idea/modules/query-api-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-impl.iml" filepath="$PROJECT_DIR$/.idea/modules/query-impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/query-impl-build.iml" filepath="$PROJECT_DIR$/.idea/modules/query-impl-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/root.iml" filepath="$PROJECT_DIR$/.idea/modules/root.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/root-build.iml" filepath="$PROJECT_DIR$/.idea/modules/root-build.iml" />
+    </modules>
+  </component>
+</project>
