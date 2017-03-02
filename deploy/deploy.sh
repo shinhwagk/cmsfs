@@ -3,8 +3,8 @@
 #  DATE: 2017 02 27                         #
 #  MAINTAINER: shinhwagk <191631513@qq.com> #
 #-------------------------------------------#
-DEPLOY_HOME=`cd $(dirname $0); pwd`;
-BASE_HOME="${DEPLOY_HOME}/../"
+BASE_HOME=`cd $(dirname $0)/../; pwd`;
+DEPLOY_HOME="${BASE_HOME}/deploy"
 PROJECT_HOME="${BASE_HOME}/cmsfs"
 
 
