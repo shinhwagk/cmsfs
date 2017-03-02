@@ -13,15 +13,8 @@ lazy val root = (project in file("."))
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
     `format-api`, `format-impl`
-    //    ,
-    //    alarmApi, alarmImpl,
-    //    `oso-monitor-api`, `oso-monitor-impl`,
-    //    `oso-monitor-slave-api`, `oso-monitor-slave-impl`,
-    //    `oso-monitor-alarm-api`, `oso-monitor-alarm-impl`,
-    //    collectionApi, collectionImpl
-    //    collectingApi, collectingImpl
   )
-//
+
 lazy val `query-api` = (project in file("query/api"))
   .settings(
     resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
@@ -34,13 +27,13 @@ lazy val `query-api` = (project in file("query/api"))
 
 lazy val `query-impl` = (project in file("query/impl"))
   .enablePlugins(LagomScala)
+  .settings(commonSettings)
   .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslTestKit,
-      macwire,
-      scalaTest
-    )
-  )
+  libraryDependencies ++= Seq(
+    lagomScaladslTestKit,
+    macwire,
+    scalaTest
+  ))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`query-api`)
 //
@@ -51,6 +44,7 @@ lazy val `config-api` = (project in file("config/api"))
 
 lazy val `config-impl` = (project in file("config/impl"))
   .enablePlugins(LagomScala)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       "mysql" % "mysql-connector-java" % "6.0.5",
@@ -89,6 +83,7 @@ lazy val `format-api` = (project in file("format/api"))
 
 lazy val `format-impl` = (project in file("format/impl"))
   .enablePlugins(LagomScala)
+  .settings(commonSettings)
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -112,6 +107,7 @@ lazy val `monitor-api` = (project in file("monitor/api"))
 
 lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
+  .settings(commonSettings)
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -127,6 +123,10 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`monitor-api`, `config-api`, `query-api`, `format-api`)
+
+lazy val commonSettings = Seq(
+  name := "cmsfs-service"
+)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 lagomCassandraEnabled in ThisBuild := false
