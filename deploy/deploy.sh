@@ -10,6 +10,7 @@ set -e
 BASE_HOME=`cd $(dirname $0)/../; pwd`;
 DEPLOY_HOME="${BASE_HOME}/deploy"
 PROJECT_HOME="${BASE_HOME}/cmsfs"
+DEPLOY_PROJECT_HOME="${DEPLOY_HOME}/cmsfs"
 
 function command_check() {
   command -v $1 >/dev/null 2>&1 || { echo >&2 "command: $1, no exist "; exit 1; }
@@ -35,8 +36,9 @@ function build_docker_image() {
 }
 
 function package_all_service() {
-  cp -r ${BASE_HOME}/cmsfs ${DEPLOY_HOME}/
-  docker run -t --rm -v ${DEPLOY_HOME}/cmsfs:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
+  cp -r ${PROJECT_HOME} ${DEPLOY_HOME}
+  docker run -t --rm -v ${DEPLOY_PROJECT_HOME}/cmsfs:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
+  rm -fr ${DEPLOY_PROJECT_HOME}
 }
 
 function package_for_service() {
