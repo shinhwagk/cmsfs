@@ -82,6 +82,6 @@ services:
       - ./db/:/opt/
     links:
       - db:db
-    command: /opt/start.sh
+    command: /opt/load.sh
     depends_on:
       - db
