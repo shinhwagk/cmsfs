@@ -37,7 +37,7 @@ function package_for_service() {
 }
 
 function start_all_service() {
-  package_all_service; docker-compose -p cmsfs up --build
+  package_all_service; cd $DEPLOY_HOME; docker-compose -p cmsfs up --build
 }
 
 # init
