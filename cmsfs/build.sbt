@@ -5,6 +5,7 @@ scalaVersion in ThisBuild := "2.11.8"
 val playJsonDerivedCodecs = "org.julienrf" %% "play-json-derived-codecs" % "3.3"
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.1" % Test
+val slick = "com.typesafe.play" %% "play-slick" % "2.0.0"
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -53,7 +54,7 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(
     libraryDependencies ++= Seq(
       "mysql" % "mysql-connector-java" % "6.0.5",
-      "com.typesafe.slick" %% "slick" % "3.1.1",
+      slick,
       lagomScaladslTestKit,
       macwire,
       scalaTest

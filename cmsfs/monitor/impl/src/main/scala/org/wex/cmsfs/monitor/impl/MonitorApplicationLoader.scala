@@ -12,13 +12,17 @@ import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.libs.ws.ahc.AhcWSComponents
 import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
+import play.api.LoggerConfigurator
 
 class MonitorApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new MonitorApplication(context) with LagomDevModeComponents
 
-  override def load(context: LagomApplicationContext): LagomApplication =
+  override def load(context: LagomApplicationContext): LagomApplication = {
+    val environment = context.playContext.environment
+    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
     new MonitorApplication(context) with ConfigurationServiceLocatorComponents
+  }
 }
 
 abstract class MonitorApplication(context: LagomApplicationContext)
@@ -31,11 +35,11 @@ abstract class MonitorApplication(context: LagomApplicationContext)
   )
 
   val configService = serviceClient.implement[ConfigService]
-  val queryService  = serviceClient.implement[QueryService]
+  val queryService = serviceClient.implement[QueryService]
   val formatService = serviceClient.implement[FormatService]
 
-  val monitorTopic         = wire[MonitorTopic]
-  val monitorAction        = wire[MonitorAction]
+  val monitorTopic = wire[MonitorTopic]
+  val monitorAction = wire[MonitorAction]
   val monitorActionCollect = wire[MonitorActionCollect]
   val monitorActionAnalyze = wire[MonitorActionAnalyze]
 }

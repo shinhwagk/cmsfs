@@ -8,14 +8,18 @@ import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.monitor.api.MonitorService
+import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ConfigLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new ConfigApplication(context) with LagomDevModeComponents
 
-  override def load(context: LagomApplicationContext): LagomApplication =
+  override def load(context: LagomApplicationContext): LagomApplication = {
+    val environment = context.playContext.environment
+    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
     new ConfigApplication(context) with ConfigurationServiceLocatorComponents
+  }
 }
 
 abstract class ConfigApplication(context: LagomApplicationContext)

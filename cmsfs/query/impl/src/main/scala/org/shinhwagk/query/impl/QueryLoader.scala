@@ -8,11 +8,15 @@ import com.lightbend.lagom.scaladsl.server._
 import play.api.libs.ws.ahc.AhcWSComponents
 import com.softwaremill.macwire._
 import org.shinhwagk.query.api.QueryService
+import play.api.LoggerConfigurator
 
 class QueryLoader extends LagomApplicationLoader {
 
-  override def load(context: LagomApplicationContext): LagomApplication =
-    new QueryApplication(context) with  ConfigurationServiceLocatorComponents
+  override def load(context: LagomApplicationContext): LagomApplication = {
+    val environment = context.playContext.environment
+    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
+    new QueryApplication(context) with ConfigurationServiceLocatorComponents
+  }
 
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new QueryApplication(context) with LagomDevModeComponents
