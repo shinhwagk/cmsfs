@@ -75,7 +75,7 @@ function process_args(){
   case "$1" in
     -h|-help)       help; exit 1 ;;
     --build)        build_for_service $2 ;;
-    --package-all)  build_all_service ;;
+    --package-all)  package_all_service ;;
     --start-all)    start_all_service ;;
     *)              help; exit 1;;
     esac
