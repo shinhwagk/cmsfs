@@ -9,10 +9,8 @@ LABEL traefik.port=9000
 ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/$SVC_NAME
 ADD logback.xml /opt/logback.xml
 
-ENV COMMAND /opt/${SVC_NAME}/bin/${SVC_NAME}-impl
-
 EXPOSE 9000
 
-ENTRYPOINT [$COMMAND]
+ENTRYPOINT ["/opt/cmsfs/bin/cmsfs-service"]
 
 CMD [-Dplay.crypto.secret=abcdefghijk, -Dlogger.file=/opt/logback.xml]
