@@ -36,9 +36,9 @@ function build_docker_image() {
 }
 
 function package_all_service() {
-  cp -r ${PROJECT_HOME} ${DEPLOY_HOME}
-  docker run -t --rm -v ${DEPLOY_PROJECT_HOME}/cmsfs:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
-  rm -fr ${DEPLOY_PROJECT_HOME}
+  rm -fr ${DEPLOY_PROJECT_HOME}; cp -r ${PROJECT_HOME} ${DEPLOY_PROJECT_HOME}
+  docker run -t --rm -v ${DEPLOY_PROJECT_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
+  
 }
 
 function package_for_service() {
