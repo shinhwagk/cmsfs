@@ -10,19 +10,19 @@ import com.softwaremill.macwire._
 import org.shinhwagk.query.api.QueryService
 import play.api.LoggerConfigurator
 
-class QueryLoader extends LagomApplicationLoader {
+class ServiceApplicationLoader extends LagomApplicationLoader {
 
   override def load(context: LagomApplicationContext): LagomApplication = {
     val environment = context.playContext.environment
     LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
-    new QueryApplication(context) with ConfigurationServiceLocatorComponents
+    new ServiceApplication(context) with ConfigurationServiceLocatorComponents
   }
 
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
-    new QueryApplication(context) with LagomDevModeComponents
+    new ServiceApplication(context) with LagomDevModeComponents
 }
 
-abstract class QueryApplication(context: LagomApplicationContext)
+abstract class ServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents {
 

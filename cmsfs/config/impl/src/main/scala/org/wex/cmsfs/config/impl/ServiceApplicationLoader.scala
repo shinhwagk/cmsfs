@@ -11,18 +11,18 @@ import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
-class ConfigLoader extends LagomApplicationLoader {
+class ServiceApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
-    new ConfigApplication(context) with LagomDevModeComponents
+    new ServiceApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication = {
     val environment = context.playContext.environment
     LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
-    new ConfigApplication(context) with ConfigurationServiceLocatorComponents
+    new ServiceApplication(context) with ConfigurationServiceLocatorComponents
   }
 }
 
-abstract class ConfigApplication(context: LagomApplicationContext)
+abstract class ServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents {
 

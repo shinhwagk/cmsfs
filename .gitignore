@@ -1,6 +1,5 @@
-/logs/
-/project/project
-/.idea/
-/**/target/
-/**/logs
-/workspace
+/cmsfs/.idea
+/cmsfs/target
+/cmsfs/project/target
+/cmsfs/project/project
+/cmsfs/**/target

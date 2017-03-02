@@ -20,15 +20,15 @@ import play.api.libs.ws.ahc.AhcWSComponents
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FormatApplicationLoader extends LagomApplicationLoader {
+class ServiceApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
-    new FormatApplication(context) with LagomDevModeComponents
+    new ServiceApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication =
-    new FormatApplication(context) with ConfigurationServiceLocatorComponents
+    new ServiceApplication(context) with ConfigurationServiceLocatorComponents
 }
 
-abstract class FormatApplication(context: LagomApplicationContext)
+abstract class ServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents
     with PubSubComponents {
