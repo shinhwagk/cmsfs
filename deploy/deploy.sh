@@ -21,13 +21,18 @@ function init() {
   git pull;
 }
 
+function check_docker_image {
+
+}
+
 function build_service() {
   sbt clean; sbt "${1}-impl"/universal:packageZipTarball || echo "${1}-impl build fail."; exit 1;
 }
 
-# function build_all_service() {
-#   sbt "${1}-impl/stage" || echo "build cmsfs fail."; exit 1;
-# }
+function build_for_service() {
+  rm -fr ${PROJECT_HOME}/${1}; cp -r ${PROJECT_HOME}/ ${DEPLOY_HOME}/
+  docker build -t cmsfs/${1} .
+}
 
 function build_docker_image() {
   PATH="${1}/impl/target/universal/stage"
@@ -63,9 +68,10 @@ function help(){
 function process_args(){
   case "$1" in
     -h|-help)       help; exit 1 ;;
-    --build)        build_for_service $2 ;;
     --package-all)  package_all_service ;;
     --package)      package_for_service $2;;
+    --build-all)    build_all_service ;;
+    --build)        build_for_service $2 ;;
     --start-all)    start_all_service ;;
     *)              help; exit 1;;
     esac
