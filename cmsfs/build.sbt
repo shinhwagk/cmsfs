@@ -29,11 +29,11 @@ lazy val `query-impl` = (project in file("query/impl"))
   .enablePlugins(LagomScala)
   .settings(commonSettings)
   .settings(
-  libraryDependencies ++= Seq(
-    lagomScaladslTestKit,
-    macwire,
-    scalaTest
-  ))
+    libraryDependencies ++= Seq(
+      lagomScaladslTestKit,
+      macwire,
+      scalaTest
+    ))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`query-api`)
 //
@@ -125,7 +125,7 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
   .dependsOn(`monitor-api`, `config-api`, `query-api`, `format-api`)
 
 lazy val commonSettings = Seq(
-  name := "cmsfs-service"
+  executableScriptName := "cmsfs-service"
 )
 
 //lagomCassandraCleanOnStart in ThisBuild := false
