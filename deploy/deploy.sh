@@ -5,6 +5,7 @@
 #-------------------------------------------#
 
 set -x
+set -e
 
 BASE_HOME=`cd $(dirname $0)/../; pwd`;
 DEPLOY_HOME="${BASE_HOME}/deploy"
@@ -64,7 +65,7 @@ function process_args(){
     -h|-help)       help; exit 1 ;;
     --build)        build_for_service $2 ;;
     --package-all)  package_all_service ;;
-    --package)      package_for_service ;;
+    --package)      package_for_service $2;;
     --start-all)    start_all_service ;;
     *)              help; exit 1;;
     esac
