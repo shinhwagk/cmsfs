@@ -6,7 +6,7 @@ LABEL traefik.backend=cmsfs-$SVC_NAME
 LABEL traefik.frontend.rule=Host:$SVC_NAME.cmsfs.org
 LABEL traefik.port=9000
 
-ADD $SVC_NAME /opt/$SVC_NAME
+ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/$SVC_NAME
 ADD logback.xml /opt/logback.xml
 
 ENV COMMAND /opt/${SVC_NAME}/bin/${SVC_NAME}-impl

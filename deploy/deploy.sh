@@ -22,23 +22,13 @@ function init() {
   git pull;
 }
 
-function build_service() {
-  sbt clean; sbt "${1}-impl"/universal:packageZipTarball || echo "${1}-impl build fail."; exit 1;
-}
-
 function build_for_service() {
   rm -fr ${DEPLOY_HOME}/${1}; cp -r ${PROJECT_HOME}/${1}/impl/target/universal/stage/ ${DEPLOY_HOME}/
-}
-
-function build_docker_image() {
-  PATH="${1}/impl/target/universal/stage"
-  docker build -t cmsfs/${1} --build-arg SVC_NAME=${1} --build-arg SVC_PATH=${PATH} .
 }
 
 function package_all_service() {
   rm -fr ${DEPLOY_PROJECT_HOME}; cp -r ${PROJECT_HOME} ${DEPLOY_PROJECT_HOME}
   docker run -t --rm -v ${DEPLOY_PROJECT_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean; sbt stage"
-  
 }
 
 function package_for_service() {
@@ -68,7 +58,6 @@ function process_args(){
     -h|-help)       help; exit 1 ;;
     --package-all)  package_all_service ;;
     --package)      package_for_service $2;;
-    --build-all)    build_all_service ;;
     --build)        build_for_service $2 ;;
     --start-all)    start_all_service ;;
     *)              help; exit 1;;
