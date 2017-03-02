@@ -19,6 +19,7 @@ services:
     container_name: cmsfs_config
     build:
       context: ./
+      dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: config
     image: cmsfs/config
@@ -32,6 +33,7 @@ services:
     container_name: cmsfs_monitor
     build:
       context: ./
+      dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: monitor
     image: cmsfs/monitor
@@ -44,6 +46,7 @@ services:
   format:
     build:
       context: ./
+      dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: format
     image: cmsfs/format
@@ -55,6 +58,7 @@ services:
   query:
     build:
       context: ./
+      dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: query
     image: cmsfs/query
