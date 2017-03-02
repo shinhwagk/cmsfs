@@ -4,7 +4,9 @@
 #  MAINTAINER: shinhwagk <191631513@qq.com> #
 #-------------------------------------------#
 DEPLOY_HOME=`cd $(dirname $0); pwd`;
-PROJECT_HOME=`cd ${DEPLOY_HOME}/../; pwd`
+BASE_HOME="${DEPLOY_HOME}/../"
+PROJECT_HOME="${BASE_HOME}/cmsfs"
+
 
 function command_check() {
   command -v $1 >/dev/null 2>&1 || { echo >&2 "command: $1, no exist "; exit 1; }
@@ -41,22 +43,6 @@ function build_for_service() {
 function start_all_service() {
   docker-compose -p cmsfs up --build
 }
-
-# SERVICE_ALARM="alarm"
-# SERVICE_CONFIG="config"
-# SERVICE_FORMAT="format"
-# SERVICE_MONITOR="monitor"
-
-# function get_service_path(){
-#   echo "${BASE_HOME}/${1}"
-# }
-
-# function get_service_zip_path(){
-#   service_path=`get_service_path $1`
-#   echo "${service_path}/impl/target/universal/${1}-api_2.11-1.0-SNAPSHOT.zip"
-# }
-
-
 
 # init
 # build_all_service
