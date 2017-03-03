@@ -4,7 +4,7 @@
 #  MAINTAINER: shinhwagk <191631513@qq.com> #
 #-------------------------------------------#
 
-set -x
+# set -x
 set -e
 
 BASE_HOME=`cd $(dirname $0)/../; pwd`;

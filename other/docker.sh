@@ -17,11 +17,14 @@ delete_image() {
   docker rmi $1
 }
 
+
+# delete images node
 docker images | grep 'none' | awk '{print $3}' | while read image
 do
   docker ps -a | grep $image | awk '{print $1}' | while read container
   do
     docker rm -f $container 
   done
+  docker rmi $image
 done
 
