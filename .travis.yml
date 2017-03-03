@@ -5,6 +5,7 @@ scala:
    - 2.11.8
 services:
   - mysql
+  - cassandra
 sudo: false
 cache:
   directories:
