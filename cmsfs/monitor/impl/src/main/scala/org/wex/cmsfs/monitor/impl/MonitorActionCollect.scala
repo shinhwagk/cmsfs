@@ -1,6 +1,6 @@
 package org.wex.cmsfs.monitor.impl
 
-import akka.stream.Materializer
+import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
@@ -27,12 +27,16 @@ class MonitorActionCollect(mt: MonitorTopic,
     elem
   }
 
+  val decider: Supervision.Decider = {
+    case _                      => Supervision.Resume
+  }
+
   mt.sshCollectTopic.subscriber
     .map(flowLog("debug", "receive ssh collect", _))
     .mapAsync(10)(x=>{
       logger.info("start ssh collect")
       queryForSSH(x)
-    })
+    }).withAttributes(ActorAttributes.supervisionStrategy(decider))
     //    .mapAsync(10)(addMonitorDepository)
 //    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
     .runWith(Sink.foreach(x => logger.info(s"${x}, test")))
