@@ -32,16 +32,17 @@ function package_all_service() {
 }
 
 function package_for_service() {
+  rm -fr ${DEPLOY_PROJECT_HOME}; cp -r ${PROJECT_HOME} ${DEPLOY_PROJECT_HOME}
   sbt_service_name=${1}-impl
-  docker run -t --rm -v ${PROJECT_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}/clean; sbt ${sbt_service_name}/stage"
+  docker run -t --rm -v ${DEPLOY_PROJECT_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt ${sbt_service_name}/clean; sbt ${sbt_service_name}/stage"
 }
 
 function start_all_service() {
-  docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build
+  docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build --force-recreate 
 }
 
 function start_for_service() {
-  docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build $1
+  docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build --force-recreate $1
 }
 
 function clean() {
@@ -76,7 +77,7 @@ function process_args(){
     --build)      build_for_service $2 ;;
     --start-all)  start_all_service ;;
     --start)      start_for_service $2 ;;
-    --clean)      clean
+    --clean)      clean ;;
     *)            help; exit 1;;
     esac
 }
