@@ -44,6 +44,12 @@ function start_for_service() {
   docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build $1
 }
 
+function clean() {
+  git reset --hard
+  git clean -xfd
+  git pull
+}
+
 # init
 # build_all_service
 
@@ -58,6 +64,7 @@ function help(){
     --build         build service.        eg: ./deploy.sh --build config
     --start-all     start all service.    eg: ./delopy.sh --start-all
     --start         start service.        eg: ./deploy.sh --start config
+    ---clean        clean home.
   "
 }
 
@@ -69,6 +76,7 @@ function process_args(){
     --build)      build_for_service $2 ;;
     --start-all)  start_all_service ;;
     --start)      start_for_service $2 ;;
+    --clean)      clean
     *)            help; exit 1;;
     esac
 }
