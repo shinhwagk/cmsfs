@@ -37,7 +37,11 @@ function package_for_service() {
 }
 
 function start_all_service() {
-  package_all_service; cd $DEPLOY_HOME; docker-compose -p cmsfs up --build
+  docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build
+}
+
+function start_for_service() {
+  docker-compose -f ${DEPLOY_HOME}/docker-compose.yml -p cmsfs up --build $1
 }
 
 # init
@@ -46,21 +50,26 @@ function start_all_service() {
 # #
 # docker-compose -p cmsfs up --build
 function help(){
-  echo -e "
-    -h | -help   print help
-    --build-all  build All service
-    --build      build service. eg: ./deploy.sh --build config
+  echo "
+    --h | --help    print help
+    --pkg-all       package All service.  eg: ./delopy.sh --pkg-all
+    --pkg           package service.      eg: ./deploy.sh --pkg config
+    --build-all     build All service.    eg: ./delopy.sh --build-all
+    --build         build service.        eg: ./deploy.sh --build config
+    --start-all     start all service.    eg: ./delopy.sh --start-all
+    --start         start service.        eg: ./deploy.sh --start config
   "
 }
 
 function process_args(){
   case "$1" in
-    -h|-help)       help; exit 1 ;;
-    --package-all)  package_all_service ;;
-    --package)      package_for_service $2;;
-    --build)        build_for_service $2 ;;
-    --start-all)    start_all_service ;;
-    *)              help; exit 1;;
+    --h|--help)   help; exit 1 ;;
+    --pkg-all)    package_all_service ;;
+    --pkg)        package_for_service $2 ;;
+    --build)      build_for_service $2 ;;
+    --start-all)  start_all_service ;;
+    --start)      start_for_service $2 ;;
+    *)            help; exit 1;;
     esac
 }
 
