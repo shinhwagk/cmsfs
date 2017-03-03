@@ -28,12 +28,12 @@ class MonitorActionCollect(mt: MonitorTopic,
   }
 
   mt.sshCollectTopic.subscriber
-    .map(flowLog("debug", "receive ssh collect", _))
-    .mapAsync(10)(queryForSSH)
-    //    { p => println("debug: receive ssh collect"); p }
-    //    .mapAsync(10)(addMonitorDepository)
-    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
-    .runWith(Sink.ignore)
+//    .map(flowLog("debug", "receive ssh collect", _))
+//    .mapAsync(10)(queryForSSH)
+//    //    { p => println("debug: receive ssh collect"); p }
+//    //    .mapAsync(10)(addMonitorDepository)
+//    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
+    .runWith(Sink.foreach(println))
 
   mt.jdbcCollectTopic.subscriber
     .mapAsync(10)(queryForJDBC)

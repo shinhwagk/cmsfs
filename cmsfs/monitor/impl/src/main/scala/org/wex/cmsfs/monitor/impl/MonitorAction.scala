@@ -5,11 +5,11 @@ import java.util.Date
 import akka.stream.Materializer
 import org.quartz.CronExpression
 import org.shinhwagk.query.api.QueryService
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.monitor.api._
-import org.slf4j.{Logger, LoggerFactory}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class MonitorAction(mt: MonitorTopic,

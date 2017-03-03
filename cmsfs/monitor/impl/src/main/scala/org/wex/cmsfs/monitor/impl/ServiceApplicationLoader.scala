@@ -1,7 +1,6 @@
 package org.wex.cmsfs.monitor.impl
 
-import com.lightbend.lagom.scaladsl.api.ServiceLocator
-import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
+import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
@@ -10,13 +9,15 @@ import org.shinhwagk.query.api.QueryService
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.monitor.api.MonitorService
-import play.api.libs.ws.ahc.AhcWSComponents
-import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
 import play.api.LoggerConfigurator
+import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
-  override def loadDevMode(context: LagomApplicationContext): LagomApplication =
+  override def loadDevMode(context: LagomApplicationContext): LagomApplication = {
+    val environment = context.playContext.environment
+    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
     new ServiceApplication(context) with LagomDevModeComponents
+  }
 
   override def load(context: LagomApplicationContext): LagomApplication = {
     val environment = context.playContext.environment
