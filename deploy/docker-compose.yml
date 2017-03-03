@@ -80,6 +80,11 @@ services:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
       - /var/lib/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "ss -lt | grep mysql"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
 
   db_data:
     container_name: cmsfs_db_data
@@ -87,7 +92,8 @@ services:
     volumes:
       - ./db/:/opt/
     links:
-      - db:db
+      - db:db.cmsfs.org
     command: sh -c "/bin/bash /opt/load.sh"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
