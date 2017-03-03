@@ -28,8 +28,8 @@ class MonitorActionCollect(mt: MonitorTopic,
   }
 
   mt.sshCollectTopic.subscriber
-    .mapAsync(10)(queryForSSH)
     .map(flowLog("debug", "receive ssh collect", _))
+    .mapAsync(10)(queryForSSH)
     //    { p => println("debug: receive ssh collect"); p }
     //    .mapAsync(10)(addMonitorDepository)
     .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
