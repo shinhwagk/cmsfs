@@ -243,3 +243,43 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `oso_monitor`.`machine`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `oso_monitor`;
+INSERT INTO `oso_monitor`.`machine` (`id`, `name`, `tags`, `ip`, `state`) VALUES (1, 'yali2', '[]', '10.65.193.25', true);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `oso_monitor`.`connector_mode_ssh`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `oso_monitor`;
+INSERT INTO `oso_monitor`.`connector_mode_ssh` (`id`, `machine_id`, `user`, `password`, `private_key`, `port`, `name`, `tags`, `state`, `category`, `category_version`) VALUES (1, 1, 'oracle', NULL, NULL, 22, 'yali2', '[]', true, 'CENTOS', '6');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `oso_monitor`.`metric`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `oso_monitor`;
+INSERT INTO `oso_monitor`.`metric` (`id`, `state`, `name`, `mode`, `tags`, `cron`, `category`, `category_version`, `description`) VALUES (1, true, 'disk_space', 'SSH', '[]', '0/5 * * * * ?', 'CENTOS', '[]', '1111');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `oso_monitor`.`monitor_detail`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `oso_monitor`;
+INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (1, 1, 1, '0/5 * * * * ?', NULL, NULL, DEFAULT);
+
+COMMIT;
+
