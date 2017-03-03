@@ -74,6 +74,8 @@ services:
       - "3306"
     labels:
       - "traefik.backend=cmsfs-db"
+      - "traefik.frontend.rule=Host:db.cmsfs.org"
+      - "traefik.port=3306"
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
