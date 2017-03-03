@@ -16,7 +16,7 @@ before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
   - find $HOME/.sbt -name "*.lock" -delete
 script:
-   - cd cmsfs; sbt test
+   - cd cmsfs; sbt ++$TRAVIS_SCALA_VERSION test
 notifications:
   email:
     - 191631513@qq.com
