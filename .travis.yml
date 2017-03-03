@@ -1,4 +1,6 @@
 language: scala
+os:
+  - linux
 services:
   - mysql
   - cassandra
@@ -16,7 +18,11 @@ before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
   - find $HOME/.sbt -name "*.lock" -delete
 script:
-   - cd cmsfs; sbt ++$TRAVIS_SCALA_VERSION test
+   - cd cmsfs
+   - sbt ++$TRAVIS_SCALA_VERSION test
 notifications:
   email:
-    - 191631513@qq.com
+    recipients:
+      - 191631513@qq.com
+    on_success: always
+    on_failure: always
