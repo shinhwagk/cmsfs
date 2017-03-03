@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.monitor.api._
-
+import org.slf4j.{Logger, LoggerFactory}
 import scala.concurrent.{ExecutionContext, Future}
 
 class MonitorAction(mt: MonitorTopic,
@@ -17,11 +17,11 @@ class MonitorAction(mt: MonitorTopic,
                     qs: QueryService,
                     fs: FormatService)(implicit ec: ExecutionContext, mi: Materializer) {
 
-  private val log = LoggerFactory.getLogger(classOf[MonitorAction])
+  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   Future {
     while (true) {
-      println(s"debug: cron ${System.currentTimeMillis()}")
+      logger.info(s"${System.currentTimeMillis()}")
       val cDate = new Date()
       val monitorDetails: Future[Seq[MonitorDetail]] = cs.getMonitorDetails.invoke().map(_.filter(md => filterCron(md.cron, cDate)))
       monitorDetails.foreach(_.foreach(monitorCategory))
@@ -38,13 +38,13 @@ class MonitorAction(mt: MonitorTopic,
       mc.mode match {
         case "JDBC" =>
           cs.getConnectorJDBCById(md.ConnectorId).invoke().foreach { case ConnectorModeJDBC(_, _, _, _, url, user, password, _, _, _) =>
-            println(s"debug: push jdbc collect ${md.id}")
+            logger.info(s"debug: push jdbc collect ${md.id}")
             mt.jdbcCollectTopic.publish(MonitorActionForJDBC(md.id, mc.name, md.collectArgs, md.analyzeArgs, url, user, password))
           }
         case "SSH" =>
           cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
             cs.getMachineById(mId).invoke().foreach(m => {
-              println(s"debug: push ssh collect ${md.id}")
+              logger.info(s"debug: push ssh collect ${md.id}")
               mt.sshCollectTopic.publish(MonitorActionForSSH(md.id, mc.name, md.collectArgs, md.analyzeArgs, m.ip, port, user, password, privateKey))
             })
           }

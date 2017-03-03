@@ -4,6 +4,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
+import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.config.api.{ConfigService, MonitorDepository}
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.format.api.format.AnalyzeItem
@@ -19,8 +20,10 @@ class MonitorActionCollect(mt: MonitorTopic,
                            fs: FormatService,
                            qs: QueryService)(implicit ec: ExecutionContext, mi: Materializer) {
 
+  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   def flowLog[T](level: String, log: String, elem: T): T = {
-    println(s"${level}: $log")
+    logger.info(log)
     elem
   }
 

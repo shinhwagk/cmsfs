@@ -1,31 +1,28 @@
 package org.wex.cmsfs.format.impl
 
-import java.net.{URI, URISyntaxException}
-
-import com.lightbend.lagom.internal.client.CircuitBreakers
-import com.lightbend.lagom.scaladsl.api.Descriptor.Call
-import com.lightbend.lagom.scaladsl.api.ServiceLocator
-import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
-import com.lightbend.lagom.scaladsl.client.{CircuitBreakerComponents, CircuitBreakingServiceLocator, ConfigurationServiceLocatorComponents}
+import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
-import com.typesafe.config.ConfigException
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.format.impl.action.{AlarmAction, AnalyzeAction}
-import play.api.Configuration
+import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
-import scala.concurrent.{ExecutionContext, Future}
-
 class ServiceApplicationLoader extends LagomApplicationLoader {
-  override def loadDevMode(context: LagomApplicationContext): LagomApplication =
+  override def loadDevMode(context: LagomApplicationContext): LagomApplication = {
+    val environment = context.playContext.environment
+    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
     new ServiceApplication(context) with LagomDevModeComponents
+  }
 
-  override def load(context: LagomApplicationContext): LagomApplication =
+  override def load(context: LagomApplicationContext): LagomApplication = {
+    val environment = context.playContext.environment
+    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
     new ServiceApplication(context) with ConfigurationServiceLocatorComponents
+  }
 }
 
 abstract class ServiceApplication(context: LagomApplicationContext)

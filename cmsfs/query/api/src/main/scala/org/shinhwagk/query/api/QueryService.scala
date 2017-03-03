@@ -36,7 +36,14 @@ object QueryModeEnum extends Enumeration {
 
 case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)) {
   def exec: Future[String] = Future {
-    ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get)
+    val OSName = System.getProperty("os.name").toLowerCase();
+    if (OSName.startsWith("win")) {
+      ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get)
+    } else if (OSName == "linux") {
+      ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get)
+    } else {
+      throw new Exception("OS not match..")
+    }
   }
 
   def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int): String = {

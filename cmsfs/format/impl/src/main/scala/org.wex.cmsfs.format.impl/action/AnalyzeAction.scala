@@ -13,12 +13,12 @@ import scala.io.Source
 
 class AnalyzeAction(ft: FormatTopic)(implicit ex: ExecutionContext, mi: Materializer) {
 
-//  private val log = LoggerFactory.getLogger(classOf[AnalyzeAction])
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
-  ft.analyzeTopic.subscriber.mapAsync(2) { fi =>
+  ft.analyzeTopic.subscriber.mapAsync(20) { fi =>
     val url = genUrl(fi.metricName)
     actionFormat(url, fi.data)
-  }.runForeach(x => println("debug: analyze format success"))
+  }.runForeach(x => logger.info(s"analyze format success. data: ${x}"))
 
   def actionFormat(url: String, data: String): Future[String] = Future {
     val workDirName = executeFormatBefore(url, data)
@@ -46,9 +46,13 @@ class AnalyzeAction(ft: FormatTopic)(implicit ex: ExecutionContext, mi: Material
   def createWorkDir: String = {
     val dirName = s"workspace/${System.nanoTime().toString}"
     val file = new File(dirName)
-    file.exists() match {
-      case true => createWorkDir
-      case false => file.mkdir()
+    if (!file.exists()) {
+      file.mkdirs()
+    } else {
+      if (!file.isDirectory) {
+        file.deleteOnExit()
+        createWorkDir
+      }
     }
     dirName
   }

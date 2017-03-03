@@ -1,41 +1,15 @@
 <configuration>
 
-    <conversionRule conversionWord="coloredLevel" converterClass="com.lightbend.lagom.internal.logback.ColoredLevel"/>
-
-    <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="STDOUT"/>
-    </appender>
+    <conversionRule conversionWord="coloredLevel" converterClass="com.lightbend.lagom.internal.logback.ColoredLevel" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>xxxxxxxxxxxxxx %coloredLevel   jjjjj %message%n%xException{10}</pattern>
+            <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
         </encoder>
     </appender>
 
-    <appender class="ch.qos.logback.core.FileAppender">
-        <name>FILE</name>
-        <file>myApp.log</file>
-        <encoder>
-            <pattern>%coloredLevel %logger{15} - jjjjj %message%n%xException{10}</pattern>
-        </encoder>
-    </appender>
-
-    <!-- Set logging for all Play library classes to INFO -->
-    <logger name="play" level="WARN"/>
-    <!-- Set logging for all Akka library classes to WARN -->
-    <logger name="akka" level="WARN"/>
-    <!-- Set logging for all Lagom library classes to WARN -->
-    <logger name="com.lightbend.lagom" level="DEBUG"/>
-    <!-- Cassandra and the datasta driver are used by the Lagom event sourcing modules -->
-    <logger name="org.apache.cassandra" level="ERROR"/>
-    <logger name="com.datastax.driver" level="ERROR"/>
-    <!-- Turn down Kafka noise -->
-    <logger name="org.apache.kafka" level="WARN"/>
-    <logger name="javax.management" level="WARN"/>
-
-    <root level="DEBUG">
-        <appender-ref ref="ASYNCSTDOUT"/>
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
     </root>
 
 </configuration>

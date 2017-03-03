@@ -13,7 +13,7 @@ import scala.io.Source
 
 class AlarmAction(ft: FormatTopic)(implicit ex: ExecutionContext, mi: Materializer) {
 
-  private val log = LoggerFactory.getLogger(classOf[AlarmAction])
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
 //  ft.alarmItem.subscriber.mapAsync(2) { fi =>
 //    val url = genUrl(fi.metricName)
