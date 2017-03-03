@@ -30,6 +30,7 @@ class MonitorActionCollect(mt: MonitorTopic,
   Future {
     while (true) {
       logger.info("test collect running ")
+      Thread.sleep(1000)
     }
   }
 
@@ -39,7 +40,7 @@ class MonitorActionCollect(mt: MonitorTopic,
     //    //    { p => println("debug: receive ssh collect"); p }
     //    //    .mapAsync(10)(addMonitorDepository)
     //    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
-    .runWith(Sink.foreach(println))
+    .runWith(Sink.foreach(x=>logger.info(s"${x}, test")))
 
   mt.jdbcCollectTopic.subscriber
     .mapAsync(10)(queryForJDBC)
