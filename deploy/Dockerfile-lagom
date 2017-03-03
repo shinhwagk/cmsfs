@@ -2,15 +2,17 @@ FROM cmsfs/oraclejdk8
 
 ARG SVC_NAME
 
-LABEL traefik.backend=cmsfs-$SVC_NAME
-LABEL traefik.frontend.rule=Host:$SVC_NAME.cmsfs.org
+LABEL traefik.backend=cmsfs-${SVC_NAME}
+LABEL traefik.frontend.rule=Host:${SVC_NAME}.cmsfs.org
 LABEL traefik.port=9000
 
-ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/cmsfs
+ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/cmsfs/
 ADD logback.xml /opt/logback.xml
 
 EXPOSE 9000
 
-ENTRYPOINT ["/opt/cmsfs/bin/cmsfs-service"]
+RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
 
 CMD [-Dplay.crypto.secret=abcdefghijk, -Dlogger.file=/opt/logback.xml]

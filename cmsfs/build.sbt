@@ -27,7 +27,6 @@ lazy val `query-api` = (project in file("query/api"))
 
 lazy val `query-impl` = (project in file("query/impl"))
   .enablePlugins(LagomScala)
-  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       lagomScaladslTestKit,
@@ -44,7 +43,6 @@ lazy val `config-api` = (project in file("config/api"))
 
 lazy val `config-impl` = (project in file("config/impl"))
   .enablePlugins(LagomScala)
-  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       "mysql" % "mysql-connector-java" % "6.0.5",
@@ -83,7 +81,6 @@ lazy val `format-api` = (project in file("format/api"))
 
 lazy val `format-impl` = (project in file("format/impl"))
   .enablePlugins(LagomScala)
-  .settings(commonSettings)
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -107,7 +104,6 @@ lazy val `monitor-api` = (project in file("monitor/api"))
 
 lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
-  .settings(commonSettings)
   .settings(
     version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
@@ -123,10 +119,6 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
   )
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`monitor-api`, `config-api`, `query-api`, `format-api`)
-
-lazy val commonSettings = Seq(
-  executableScriptName := "cmsfs-service"
-)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 lagomCassandraEnabled in ThisBuild := false
