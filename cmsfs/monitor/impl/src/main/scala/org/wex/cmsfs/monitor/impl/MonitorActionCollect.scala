@@ -12,6 +12,7 @@ import org.wex.cmsfs.monitor.api.{MonitorActionDepository, MonitorActionForJDBC,
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
+import scala.util.{Failure, Success}
 
 case class QueryResult(monitorId: Long, metricName: String, mode: String, collectData: String)
 
@@ -28,17 +29,17 @@ class MonitorActionCollect(mt: MonitorTopic,
   }
 
   val decider: Supervision.Decider = {
-    case _                      => Supervision.Resume
+    case _ => Supervision.Resume
   }
 
   mt.sshCollectTopic.subscriber
     .map(flowLog("debug", "receive ssh collect", _))
-    .mapAsync(10)(x=>{
+    .mapAsync(10)(x => {
       logger.info("start ssh collect")
       queryForSSH(x)
     }).withAttributes(ActorAttributes.supervisionStrategy(decider))
     //    .mapAsync(10)(addMonitorDepository)
-//    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
+    //    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
     .runWith(Sink.foreach(x => logger.info(s"${x}, test")))
 
   mt.jdbcCollectTopic.subscriber
@@ -49,8 +50,13 @@ class MonitorActionCollect(mt: MonitorTopic,
     .runWith(Sink.ignore)
 
   def queryForSSH(m: MonitorActionForSSH): Future[QueryResult] = {
-    qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
+    val c = qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
       .map(QueryResult(m.id, m.metricName, "SSH", _))
+    c.onComplete {
+      case Success(rs) => println(rs)
+      case Failure(ex) => ex.getMessage
+    }
+    c
   }
 
   def queryForJDBC(m: MonitorActionForJDBC): Future[QueryResult] = {
