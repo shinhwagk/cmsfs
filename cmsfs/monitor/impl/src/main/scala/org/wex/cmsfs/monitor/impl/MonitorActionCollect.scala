@@ -54,7 +54,7 @@ class MonitorActionCollect(mt: MonitorTopic,
       .map(QueryResult(m.id, m.metricName, "SSH", _))
     c.onComplete {
       case Success(rs) => println(rs)
-      case Failure(ex) => ex.getMessage
+      case Failure(ex) => println(ex.getMessage)
     }
     c
   }
