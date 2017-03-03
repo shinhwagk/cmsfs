@@ -15,4 +15,4 @@ RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]
 
-CMD [-Dplay.crypto.secret=abcdefghijk, -Dlogger.file=/opt/logback.xml]
+CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
