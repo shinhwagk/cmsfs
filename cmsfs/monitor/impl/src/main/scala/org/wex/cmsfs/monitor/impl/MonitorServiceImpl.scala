@@ -2,15 +2,17 @@ package org.wex.cmsfs.monitor.impl
 
 import akka.Done
 import com.lightbend.lagom.scaladsl.api.ServiceCall
-import com.lightbend.lagom.scaladsl.pubsub.{PubSubRegistry, TopicId}
-import org.wex.cmsfs.monitor.api.{MonitorItem, MonitorService}
+import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MonitorServiceImpl(pubSub: PubSubRegistry)(implicit ec: ExecutionContext) extends MonitorService {
-  val topic = pubSub.refFor(TopicId[MonitorItem])
+class MonitorServiceImpl(mt: MonitorTopic)(implicit ec: ExecutionContext) extends MonitorService {
 
-  override def pushMonitorItem: ServiceCall[MonitorItem, Done] = ServiceCall { item =>
-    topic.publish(item); Future.successful(Done)
+  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  override def pushCollectResult: ServiceCall[CollectResult, Done] = ServiceCall { cr =>
+    logger.info(s"collect result receive: ${cr.id}")
+    mt.collectResultTopic.publish(cr); Future.successful(Done)
   }
 }

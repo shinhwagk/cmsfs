@@ -9,33 +9,34 @@ val slick = "com.typesafe.play" %% "play-slick" % "2.0.0"
 
 lazy val root = (project in file("."))
   .aggregate(
-    `query-api`, `query-impl`,
+    //    `query-api`, `query-impl`,
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
-    `format-api`, `format-impl`
+    `format-api`, `format-impl`,
+    `collect-ssh-api`, `collect-ssh-impl`
   )
 
-lazy val `query-api` = (project in file("query/api"))
-  .settings(
-    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
-    libraryDependencies ++= Seq(
-      "com.wingtech" % "ojdbc" % "7",
-      "com.jcraft" % "jsch" % "0.1.54",
-      lagomScaladslApi
-    )
-  )
-
-lazy val `query-impl` = (project in file("query/impl"))
-  .enablePlugins(LagomScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      lagomScaladslTestKit,
-      macwire,
-      scalaTest
-    ))
-  .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`query-api`)
+//lazy val `query-api` = (project in file("query/api"))
+//  .settings(
+//    resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"),
+//    libraryDependencies ++= Seq(
+//      "com.wingtech" % "ojdbc" % "7",
+//      "com.jcraft" % "jsch" % "0.1.54",
+//      lagomScaladslApi
+//    )
+//  )
 //
+//lazy val `query-impl` = (project in file("query/impl"))
+//  .enablePlugins(LagomScala)
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      lagomScaladslTestKit,
+//      macwire,
+//      scalaTest
+//    ))
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`query-api`)
+////
 lazy val `config-api` = (project in file("config/api"))
   .settings(
     libraryDependencies += lagomScaladslApi
@@ -74,15 +75,11 @@ lazy val `config-impl` = (project in file("config/impl"))
 //  .dependsOn(`alarm-api`)
 
 lazy val `format-api` = (project in file("format/api"))
-  .settings(
-    version := "1.0-SNAPSHOT",
-    libraryDependencies += lagomScaladslApi
-  )
+  .settings(libraryDependencies += lagomScaladslApi)
 
 lazy val `format-impl` = (project in file("format/impl"))
   .enablePlugins(LagomScala)
   .settings(
-    version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       lagomScaladslTestKit,
       lagomScaladslPubSub,
@@ -97,28 +94,56 @@ lazy val `format-impl` = (project in file("format/impl"))
 
 
 lazy val `monitor-api` = (project in file("monitor/api"))
-  .settings(
-    version := "1.0-SNAPSHOT",
-    libraryDependencies += lagomScaladslApi
-  )
+  .settings(libraryDependencies += lagomScaladslApi)
 
 lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
   .settings(
-    version := "1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      //      lagomScaladslPersistenceCassandra,
       lagomScaladslTestKit,
-      //      lagomScaladslKafkaBroker,
       lagomScaladslPubSub,
-      //      "com.datastax.cassandra" % "cassandra-driver-extras" % "3.0.0",
       "org.quartz-scheduler" % "quartz" % "2.2.3",
       macwire,
       scalaTest
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`monitor-api`, `config-api`, `query-api`, `format-api`)
+  .dependsOn(`monitor-api`, `config-api`, `format-api`, `collect-ssh-api`)
+
+lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
+  .settings(libraryDependencies += lagomScaladslApi)
+
+lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
+  .enablePlugins(LagomScala)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.jcraft" % "jsch" % "0.1.54",
+      lagomScaladslTestKit,
+      lagomScaladslPubSub,
+      macwire,
+      scalaTest
+    )
+  )
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`collect-ssh-api`, `monitor-api`)
+
+//lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
+//  .settings(libraryDependencies += lagomScaladslApi)
+//
+//lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
+//  .enablePlugins(LagomScala)
+//  .settings(resolvers ++= Seq("Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/"))
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      "com.jcraft" % "jsch" % "0.1.54",
+//      lagomScaladslTestKit,
+//      lagomScaladslPubSub,
+//      macwire,
+//      scalaTest
+//    )
+//  )
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`collect-jdbc-api`, `monitor-api`)
 
 //lagomCassandraCleanOnStart in ThisBuild := false
 lagomCassandraEnabled in ThisBuild := false

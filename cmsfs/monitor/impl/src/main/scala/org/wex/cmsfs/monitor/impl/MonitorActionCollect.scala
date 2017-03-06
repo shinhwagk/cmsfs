@@ -1,65 +1,65 @@
-package org.wex.cmsfs.monitor.impl
-
-import akka.stream._
-import akka.stream.scaladsl.Sink
-import com.typesafe.config.ConfigFactory
-import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
-import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.config.api.ConfigService
-import org.wex.cmsfs.format.api.FormatService
-import org.wex.cmsfs.format.api.format.AnalyzeItem
-import org.wex.cmsfs.monitor.api.{MonitorActionForJDBC, MonitorActionForSSH}
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.io.Source
-
-case class QueryResult(monitorId: Long, metricName: String, mode: String, collectData: String)
-
-class MonitorActionCollect(mt: MonitorTopic,
-                           cs: ConfigService,
-                           fs: FormatService,
-                           qs: QueryService)(implicit ec: ExecutionContext, mat: Materializer) {
-
-  private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
-  def flowLog[T](level: String, log: String, elem: T): T = {
-    logger.info(log)
-    elem
-  }
-
-  def decider(implicit log: Logger): Supervision.Decider = {
-    case ex: Exception =>
-      log.error(ex.getMessage + " XXXX")
-      Supervision.Resume
-  }
-
-  mt.sshCollectTopic.subscriber
-    .map(flowLog("debug", "receive ssh collect", _))
-    .mapAsync(10)(x => {
-      logger.info("start ssh collect")
-      queryForSSH(x)
-    }).withAttributes(ActorAttributes.supervisionStrategy(decider))
-    //    .mapAsync(10)(addMonitorDepository)
-    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil))).withAttributes(ActorAttributes.supervisionStrategy(decider))
-    .runWith(Sink.foreach(x => logger.info(s"${x}, test")))
-
-  mt.jdbcCollectTopic.subscriber
-    .mapAsync(10)(queryForJDBC).withAttributes(ActorAttributes.supervisionStrategy(decider))
-    .map(flowLog("debug", "receive jdbc oracle collect", _))
-    //    .mapAsync(10)(addMonitorDepository)
-    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
-    .runWith(Sink.ignore)
-
-  def queryForSSH(m: MonitorActionForSSH): Future[QueryResult] = {
-    qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
-      .map(QueryResult(m.id, m.metricName, "SSH", _))
-  }
-
-  def queryForJDBC(m: MonitorActionForJDBC): Future[QueryResult] = {
-    val sqlText = Source.fromURL(genUrl("JDBC", m.metricName)).mkString
-    qs.queryForOracle("ARRAY").invoke(QueryOracleMessage(m.url, m.user, m.password, sqlText, List()))
-      .map(QueryResult(m.id, m.metricName, "JDBC", _))
-  }
+//package org.wex.cmsfs.monitor.impl
+//
+//import akka.stream._
+//import akka.stream.scaladsl.Sink
+//import com.typesafe.config.ConfigFactory
+//import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
+//import org.slf4j.{Logger, LoggerFactory}
+//import org.wex.cmsfs.config.api.ConfigService
+//import org.wex.cmsfs.format.api.FormatService
+//import org.wex.cmsfs.format.api.format.AnalyzeItem
+//import org.wex.cmsfs.monitor.api.{MonitorActionForJDBC, MonitorActionForSSH}
+//
+//import scala.concurrent.{ExecutionContext, Future}
+//import scala.io.Source
+//
+//case class QueryResult(monitorId: Long, metricName: String, mode: String, collectData: String)
+//
+//class MonitorActionCollect(mt: MonitorTopic,
+//                           cs: ConfigService,
+//                           fs: FormatService,
+//                           qs: QueryService)(implicit ec: ExecutionContext, mat: Materializer) {
+//
+//  private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+//
+//  def flowLog[T](level: String, log: String, elem: T): T = {
+//    logger.info(log)
+//    elem
+//  }
+//
+//  def decider(implicit log: Logger): Supervision.Decider = {
+//    case ex: Exception =>
+//      log.error(ex.getMessage + " XXXX")
+//      Supervision.Resume
+//  }
+//
+//  mt.sshCollectTopic.subscriber
+//    .map(flowLog("debug", "receive ssh collect", _))
+//    .mapAsync(10)(x => {
+//      logger.info("start ssh collect")
+//      queryForSSH(x)
+//    }).withAttributes(ActorAttributes.supervisionStrategy(decider))
+//    //    .mapAsync(10)(addMonitorDepository)
+//    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil))).withAttributes(ActorAttributes.supervisionStrategy(decider))
+//    .runWith(Sink.foreach(x => logger.info(s"${x}, test")))
+//
+//  mt.jdbcCollectTopic.subscriber
+//    .mapAsync(10)(queryForJDBC).withAttributes(ActorAttributes.supervisionStrategy(decider))
+//    .map(flowLog("debug", "receive jdbc oracle collect", _))
+//    //    .mapAsync(10)(addMonitorDepository)
+//    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
+//    .runWith(Sink.ignore)
+//
+//  def queryForSSH(m: MonitorActionForSSH): Future[QueryResult] = {
+//    qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
+//      .map(QueryResult(m.id, m.metricName, "SSH", _))
+//  }
+//
+//  def queryForJDBC(m: MonitorActionForJDBC): Future[QueryResult] = {
+//    val sqlText = Source.fromURL(genUrl("JDBC", m.metricName)).mkString
+//    qs.queryForOracle("ARRAY").invoke(QueryOracleMessage(m.url, m.user, m.password, sqlText, List()))
+//      .map(QueryResult(m.id, m.metricName, "JDBC", _))
+//  }
 
   //  def addMonitorDepository(qr: QueryResult) = {
   //    val monitorDepository = MonitorDepository(None, qr.monitorId, qr.collectData)
@@ -68,13 +68,13 @@ class MonitorActionCollect(mt: MonitorTopic,
   //      .map(optionId => MonitorActionDepository(optionId, qr.monitorId, qr.metricName, qr.collectData))
   //  }
 
-  def genUrl(mode: String, name: String): String = {
-    val formatUrl = ConfigFactory.load().getString("format.url")
-    mode match {
-      case "SSH" => List(formatUrl, name, mode.toLowerCase, "collect.sh").mkString("/")
-      case "JDBC" => List(formatUrl, name, mode.toLowerCase, "collect.sql").mkString("/")
-    }
-  }
+//  def genUrl(mode: String, name: String): String = {
+//    val formatUrl = ConfigFactory.load().getString("format.url")
+//    mode match {
+//      case "SSH" => List(formatUrl, name, mode.toLowerCase, "collect.sh").mkString("/")
+//      case "JDBC" => List(formatUrl, name, mode.toLowerCase, "collect.sql").mkString("/")
+//    }
+//  }
 
   //    val a = Random.nextInt()
   //    println("收到ssh", a)
@@ -101,4 +101,4 @@ class MonitorActionCollect(mt: MonitorTopic,
   //        .invoke(QueryOSMessage(mh.ip, c.user, genUrl("COLLECT", "SSH", metric.name), Some(c.port)))
   //    } yield collectData
   //  }
-}
+//}

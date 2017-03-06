@@ -44,6 +44,7 @@ services:
       - proxy:config.cmsfs.org
       - proxy:query.cmsfs.org
       - proxy:format.cmsfs.org
+      - proxy:ssh.collect.cmsfs.org
       
   format:
     build:
@@ -57,19 +58,19 @@ services:
     links:
       - proxy:config.cmsfs.org
       
-  query:
+  collect-ssh:
     build:
       context: ./
       dockerfile: Dockerfile-lagom
       args:
-        SVC_NAME: query
-    image: cmsfs/query
-    volumes: 
+        SVC_NAME: collect-ssh
+    image: cmsfs/collect-ssh
+    volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
     depends_on:
-      - config
+      - monitor
     links:
-      - proxy:config.cmsfs.org
+      - proxy:monitor.cmsfs.org
 
   db:
     container_name: cmsfs_db

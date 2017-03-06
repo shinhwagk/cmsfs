@@ -6,12 +6,13 @@ import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
 
 trait MonitorService extends Service {
 
-  def pushMonitorItem: ServiceCall[MonitorItem, Done]
+  def pushCollectResult: ServiceCall[CollectResult, Done]
 
   override final def descriptor = {
     import Service._
     named("monitor").withCalls(
-      restCall(Method.POST, "/v1/monitor", pushMonitorItem)
+//      restCall(Method.POST, "/v1/monitor", pushMonitorItem),
+      restCall(Method.POST, "/v1/collect", pushCollectResult)
     )
   }
 }
