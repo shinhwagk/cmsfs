@@ -1,9 +1,10 @@
 FROM cmsfs/oraclejdk8
 
 ARG SVC_NAME
+ARG SVC_HOST_NAME
 
 LABEL traefik.backend=cmsfs-${SVC_NAME}
-LABEL traefik.frontend.rule=Host:${SVC_NAME}.cmsfs.org
+LABEL traefik.frontend.rule=Host:${SVC_HOST_NAME}.cmsfs.org
 LABEL traefik.port=9000
 
 ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/cmsfs/
