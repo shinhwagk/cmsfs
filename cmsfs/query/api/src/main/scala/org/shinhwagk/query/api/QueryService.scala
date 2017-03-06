@@ -38,12 +38,16 @@ case class QueryOSMessage(host: String, user: String, scriptUrl: String, port: O
   def exec: Future[String] = Future {
     val OSName = System.getProperty("os.name").toLowerCase();
     println(s"test ${OSName}")
-    if (OSName.startsWith("win")) {
-      ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get)
-    } else if (OSName == "linux") {
-      ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get)
-    } else {
-      throw new Exception("OS not match..")
+    try {
+      if (OSName.startsWith("win")) {
+        ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get)
+      } else if (OSName == "linux") {
+        ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get)
+      } else {
+        throw new Exception("OS not match..")
+      }
+    } catch {
+      case ex: Exception => println(ex.getMessage); throw new Exception(ex.getMessage)
     }
   }
 
