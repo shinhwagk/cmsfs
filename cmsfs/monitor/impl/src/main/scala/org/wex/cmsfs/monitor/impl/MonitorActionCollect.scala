@@ -30,7 +30,7 @@ class MonitorActionCollect(mt: MonitorTopic,
 
   def decider(implicit log: Logger): Supervision.Decider = {
     case ex: Exception =>
-      log.error(ex.getMessage)
+      log.error(ex.getMessage + " XXXX")
       Supervision.Resume
   }
 

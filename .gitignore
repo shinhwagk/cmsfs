@@ -4,3 +4,4 @@
 /cmsfs/project/project
 /cmsfs/**/target
 /cmsfs/**/*.log
+/cmsfs/logs
