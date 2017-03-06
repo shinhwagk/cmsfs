@@ -42,7 +42,7 @@ services:
     links:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
-      - proxy:query.comsfs.org
+      - proxy:query.cmsfs.org
       
   format:
     build:
