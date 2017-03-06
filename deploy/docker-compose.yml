@@ -42,8 +42,6 @@ services:
     links:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
-      - proxy:query.cmsfs.org
-      - proxy:format.cmsfs.org
       - proxy:ssh.collect.cmsfs.org
       
   format:
