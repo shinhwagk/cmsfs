@@ -5,7 +5,7 @@ services:
     container_name: cmsfs_proxy
     image: traefik
     restart: always
-    command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
+    command: --web --docker --docker.domain=docker.localhost --logLevel=INFO --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
     expose:
       - "9000"
     ports:
