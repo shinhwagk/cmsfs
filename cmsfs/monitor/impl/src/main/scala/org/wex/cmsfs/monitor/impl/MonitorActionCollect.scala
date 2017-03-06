@@ -20,7 +20,8 @@ case class QueryResult(monitorId: Long, metricName: String, mode: String, collec
 class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
                            fs: FormatService,
-                           qs: QueryService)(implicit ec: ExecutionContext, system: ActorSystem) {
+                           qs: QueryService,
+                           system: ActorSystem)(implicit ec: ExecutionContext) {
 
   implicit val materializer = ActorMaterializer(
     ActorMaterializerSettings(system).withSupervisionStrategy(decider))
