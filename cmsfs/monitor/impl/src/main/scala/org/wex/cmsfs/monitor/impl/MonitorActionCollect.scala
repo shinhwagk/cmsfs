@@ -21,15 +21,17 @@ class MonitorActionCollect(mt: MonitorTopic,
                            fs: FormatService,
                            qs: QueryService)(implicit ec: ExecutionContext, mi: Materializer) {
 
-  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def flowLog[T](level: String, log: String, elem: T): T = {
     logger.info(log)
     elem
   }
 
-  val decider: Supervision.Decider = {
-    case _ => Supervision.Resume
+  def decider(implicit log: Logger): Supervision.Decider = {
+    case ex: Exception =>
+      log.error(ex.getMessage)
+      Supervision.Resume
   }
 
   mt.sshCollectTopic.subscriber
@@ -43,20 +45,15 @@ class MonitorActionCollect(mt: MonitorTopic,
     .runWith(Sink.foreach(x => logger.info(s"${x}, test")))
 
   mt.jdbcCollectTopic.subscriber
-    .mapAsync(10)(queryForJDBC)
+    .mapAsync(10)(queryForJDBC).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .map(flowLog("debug", "receive jdbc oracle collect", _))
     //    .mapAsync(10)(addMonitorDepository)
     .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
     .runWith(Sink.ignore)
 
   def queryForSSH(m: MonitorActionForSSH): Future[QueryResult] = {
-    val c = qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
+    qs.queryForOSScript.invoke(QueryOSMessage(m.ip, m.user, genUrl("SSH", m.metricName), Some(m.port)))
       .map(QueryResult(m.id, m.metricName, "SSH", _))
-    c.onComplete {
-      case Success(rs) => println(rs)
-      case Failure(ex) => println(ex.getMessage)
-    }
-    c
   }
 
   def queryForJDBC(m: MonitorActionForJDBC): Future[QueryResult] = {
