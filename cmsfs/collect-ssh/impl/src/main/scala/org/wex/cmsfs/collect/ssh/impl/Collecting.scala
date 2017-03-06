@@ -55,7 +55,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
         None
       }
     } catch {
-      case ex: Exception => logger.error(ex.getMessage); None
+      case ex: Exception => logger.error(ex.getMessage + " collectionAction"); None
     }
   }
 

@@ -41,23 +41,24 @@ services:
     image: cmsfs/monitor
     depends_on:
       - config
+      - collect-ssh
     links:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
       - proxy:ssh.collect.cmsfs.org
       
-  format:
-    build:
-      context: ./
-      dockerfile: Dockerfile-lagom
-      args:
-        SVC_NAME: format
-        SVC_HOST_NAME: format
-    image: cmsfs/format
-    depends_on:
-      - config
-    links:
-      - proxy:config.cmsfs.org
+  # format:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile-lagom
+  #     args:
+  #       SVC_NAME: format
+  #       SVC_HOST_NAME: format
+  #   image: cmsfs/format
+  #   depends_on:
+  #     - config
+  #   links:
+  #     - proxy:config.cmsfs.org
       
   collect-ssh:
     build:
@@ -69,8 +70,6 @@ services:
     image: cmsfs/collect-ssh
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
-    depends_on:
-      - monitor
     links:
       - proxy:monitor.cmsfs.org
 
