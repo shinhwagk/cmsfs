@@ -43,6 +43,7 @@ services:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
       - proxy:query.cmsfs.org
+      - proxy:format.cmsfs.org
       
   format:
     build:
