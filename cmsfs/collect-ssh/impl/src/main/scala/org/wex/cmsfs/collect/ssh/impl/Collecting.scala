@@ -12,6 +12,7 @@ import play.api.libs.json.Json
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionContext, mat: Materializer) {
 
@@ -22,7 +23,12 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
   source.map(flowLog("debug", "receive ssh collect", _))
     .mapAsync(10)(x => {
       logger.info("start ssh collect")
-      collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, rs))
+      val c = collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, rs))
+      c.onComplete {
+        case Success(a) => logger.info(a.toString())
+        case Failure(ex) => logger.error(ex.getMessage)
+      }
+      c
     })
     .mapAsync(10) { case (id, rsOpt) => ms.pushCollectResult.invoke(CollectResult(id, rsOpt)).map(_ => id) }
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
