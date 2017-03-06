@@ -1,6 +1,7 @@
 package org.wex.cmsfs.monitor.impl
 
-import akka.stream.{ActorAttributes, Materializer, Supervision}
+import akka.actor.ActorSystem
+import akka.stream._
 import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
@@ -19,7 +20,10 @@ case class QueryResult(monitorId: Long, metricName: String, mode: String, collec
 class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
                            fs: FormatService,
-                           qs: QueryService)(implicit ec: ExecutionContext, mi: Materializer) {
+                           qs: QueryService)(implicit ec: ExecutionContext, system: ActorSystem) {
+
+  implicit val materializer = ActorMaterializer(
+    ActorMaterializerSettings(system).withSupervisionStrategy(decider))
 
   private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
