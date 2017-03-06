@@ -35,14 +35,14 @@ class MonitorAction(mt: MonitorTopic,
       mc.mode match {
         case "JDBC" =>
           cs.getConnectorJDBCById(md.ConnectorId).invoke().foreach { case ConnectorModeJDBC(_, _, _, _, url, user, password, _, _, _) =>
-            logger.info(s"debug: push jdbc collect ${md.id}")
+            logger.info(s"push jdbc collect ${md.id}")
 
-//            mt.jdbcCollectTopic.publish(MonitorActionForJDBC(md.id, mc.name, md.collectArgs, md.analyzeArgs, url, user, password))
+            //            mt.jdbcCollectTopic.publish(MonitorActionForJDBC(md.id, mc.name, md.collectArgs, md.analyzeArgs, url, user, password))
           }
         case "SSH" =>
           cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
             cs.getMachineById(mId).invoke().foreach(m => {
-              logger.info(s"debug: push ssh collect ${md.id}")
+              logger.info(s"push ssh collect ${md.id}")
               cSSHs.pushCollectItem.invoke(CollectItemSSH(mc.id.get, mc.name, md.collectArgs, m.ip, port, user, password, privateKey))
                 .onFailure { case ex => logger.error(ex.getMessage) }
             })
