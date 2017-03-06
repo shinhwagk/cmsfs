@@ -63,6 +63,8 @@ services:
       args:
         SVC_NAME: query
     image: cmsfs/query
+    volumes: 
+      - /root/.ssh/id_rsa:/root/.ssh/id_rsa
     depends_on:
       - config
     links:
