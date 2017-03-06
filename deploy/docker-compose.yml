@@ -107,8 +107,8 @@ services:
   #   environment: 
   #     - GF_SECURITY_ADMIN_PASSWORD=123456aA+ 
 
-  elasticsearch:
-    container_name: cmsfs_elasticsearch
-    image: elasticsearch
-    ports: 
-      - "9300:9300"
+  # elasticsearch:
+  #   container_name: cmsfs_elasticsearch
+  #   image: elasticsearch
+  #   ports: 
+  #     - "9300:9300"
