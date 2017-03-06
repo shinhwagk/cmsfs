@@ -41,7 +41,7 @@ class MonitorActionCollect(mt: MonitorTopic,
       queryForSSH(x)
     }).withAttributes(ActorAttributes.supervisionStrategy(decider))
     //    .mapAsync(10)(addMonitorDepository)
-    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil)))
+    .mapAsync(10)(d => fs.pushFormatAnalyze.invoke(AnalyzeItem(d.monitorId, d.metricName, d.collectData, Nil))).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.foreach(x => logger.info(s"${x}, test")))
 
   mt.jdbcCollectTopic.subscriber
