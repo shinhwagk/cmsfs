@@ -1,30 +1,24 @@
 package org.wex.cmsfs.monitor.impl
 
-import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.scaladsl.Sink
 import com.typesafe.config.ConfigFactory
 import org.shinhwagk.query.api.{QueryOSMessage, QueryOracleMessage, QueryService}
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.config.api.{ConfigService, MonitorDepository}
+import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.api.FormatService
 import org.wex.cmsfs.format.api.format.AnalyzeItem
-import org.wex.cmsfs.monitor.api.{MonitorActionDepository, MonitorActionForJDBC, MonitorActionForSSH}
+import org.wex.cmsfs.monitor.api.{MonitorActionForJDBC, MonitorActionForSSH}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
-import scala.util.{Failure, Success}
 
 case class QueryResult(monitorId: Long, metricName: String, mode: String, collectData: String)
 
 class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
                            fs: FormatService,
-                           qs: QueryService,
-                           system: ActorSystem)(implicit ec: ExecutionContext) {
-
-  implicit val materializer = ActorMaterializer(
-    ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+                           qs: QueryService)(implicit ec: ExecutionContext, mat: Materializer) {
 
   private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
