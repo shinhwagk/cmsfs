@@ -22,7 +22,6 @@ services:
       dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: config
-        SVC_HOST_NAME: config
     image: cmsfs/config
     depends_on:
       - proxy
@@ -39,7 +38,6 @@ services:
       dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: monitor
-        SVC_HOST_NAME: monitor
     image: cmsfs/monitor
     depends_on:
       - config
@@ -70,7 +68,6 @@ services:
       dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: collect-ssh
-        SVC_HOST_NAME: ssh.collect
     image: cmsfs/collect-ssh
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
