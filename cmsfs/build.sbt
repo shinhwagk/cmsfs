@@ -20,8 +20,9 @@ lazy val root = (project in file("."))
   .aggregate(
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
-    `collect-ssh-api`, `collect-ssh-impl`,
-    `collect-jdbc-api`, `collect-jdbc-impl`
+    `collect-ssh-api`, `collect-ssh-impl`
+    //    ,
+    //    `collect-jdbc-api`, `collect-jdbc-impl`
   )
 
 def implCommonSettings: Seq[Setting[_]] = Seq(
@@ -36,9 +37,6 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `monitor-api`)
-//  .settings(sampleStringTask := {
-//    println(baseDirectory)
-//  })
 
 //lazy val `format-api` = (project in file("format/api"))
 //  .settings(libraryDependencies += lagomScaladslApi)
@@ -69,16 +67,16 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`collect-ssh-api`, `monitor-api`)
 
-lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
-  .settings(libraryDependencies += lagomScaladslApi)
-lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
-  .enablePlugins(LagomScala)
-  //  .settings(resolvers += "Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/")
-  .settings(libraryDependencies += lagomScaladslPubSub)
-  .settings(libraryDependencies ++= Seq(mysqlJdbc))
-  .settings(libraryDependencies += "com.wingtech" % "ojdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
-  .settings(implCommonSettings: _*)
-  .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collect-jdbc-api`, `monitor-api`)
+//lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
+//  .settings(libraryDependencies += lagomScaladslApi)
+//lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
+//  .enablePlugins(LagomScala)
+//  //  .settings(resolvers += "Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/")
+//  .settings(libraryDependencies += lagomScaladslPubSub)
+//  .settings(libraryDependencies ++= Seq(mysqlJdbc))
+//  .settings(libraryDependencies += "com.wingtech" % "ojdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
+//  .settings(implCommonSettings: _*)
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`collect-jdbc-api`, `monitor-api`)
 
 fork in run := true

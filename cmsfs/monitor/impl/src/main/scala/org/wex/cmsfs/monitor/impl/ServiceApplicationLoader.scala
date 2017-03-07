@@ -12,9 +12,8 @@ import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
-  override def loadDevMode(context: LagomApplicationContext): LagomApplication = {
+  override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new ServiceApplication(context) with LagomDevModeComponents
-  }
 
   override def load(context: LagomApplicationContext): LagomApplication = {
     loaderEnvironment(context)
@@ -37,11 +36,11 @@ abstract class ServiceApplication(context: LagomApplicationContext)
   )
 
   val configService = serviceClient.implement[ConfigService]
-//  val queryService = serviceClient.implement[QueryService]
-//  val formatService = serviceClient.implement[FormatService]
+  //  val queryService = serviceClient.implement[QueryService]
+  //  val formatService = serviceClient.implement[FormatService]
   val collectSSHService = serviceClient.implement[CollectSSHService]
 
   val monitorTopic = wire[MonitorTopic]
   val monitorAction = wire[MonitorAction]
-//  val monitorActionAnalyze = wire[MonitorActionAnalyze]
+  //  val monitorActionAnalyze = wire[MonitorActionAnalyze]
 }
