@@ -29,8 +29,9 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
         case Failure(ex) => logger.error(ex.getMessage)
       }
       c
-    })
-    .mapAsync(10) { case (id, rsOpt) => ms.pushCollectResult.invoke(CollectResult(id, rsOpt)).map(_ => id) }
+    }).withAttributes(ActorAttributes.supervisionStrategy(decider))
+    .mapAsync(10) { case (id, rsOpt) => ms.pushCollectResult.invoke(CollectResult(id, rsOpt)).map(_ => id) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def flowLog[T](level: String, log: String, elem: T): T = {
