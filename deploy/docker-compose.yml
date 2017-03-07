@@ -16,7 +16,7 @@ services:
       - /dev/null:/traefik.toml
     labels: 
       - "traefik.enable=false" 
-      
+
   config:
     container_name: cmsfs_config
     build:
@@ -73,7 +73,7 @@ services:
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
     links:
-      - proxy:monitor.cmsfs.org
+      - monitor:monitor.cmsfs.org
     labels: 
       - "traefik.backend=cmsfs-collect-ssh"
       - "traefik.frontend.rule=Host:ssh.collect.cmsfs.org"
