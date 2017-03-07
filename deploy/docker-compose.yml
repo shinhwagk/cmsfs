@@ -43,25 +43,12 @@ services:
     image: cmsfs/monitor
     depends_on:
       - config
-      - collect-ssh
+      # - collect-ssh
     links:
       - config:config.cmsfs.org
       - proxy:ssh.collect.cmsfs.org
     labels: 
       - "traefik.enable=false" 
-      
-  # format:
-  #   build:
-  #     context: ./
-  #     dockerfile: Dockerfile-lagom
-  #     args:
-  #       SVC_NAME: format
-  #       SVC_HOST_NAME: format
-  #   image: cmsfs/format
-  #   depends_on:
-  #     - config
-  #   links:
-  #     - proxy:config.cmsfs.org
       
   collect-ssh:
     build:
