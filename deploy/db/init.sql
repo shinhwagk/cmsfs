@@ -252,6 +252,7 @@ START TRANSACTION;
 USE `oso_monitor`;
 INSERT INTO `oso_monitor`.`machine` (`id`, `name`, `tags`, `ip`, `state`) VALUES (1, 'yali2', '[]', '10.65.193.25', 1);
 INSERT INTO `oso_monitor`.`machine` (`id`, `name`, `tags`, `ip`, `state`) VALUES (2, 'yali3', '[]', '10.65.193.26', 1);
+INSERT INTO `oso_monitor`.`machine` (`id`, `name`, `tags`, `ip`, `state`) VALUES (3, 'yali1', '[]', '10.65.212.193', 1);
 COMMIT;
 
 
@@ -261,7 +262,8 @@ COMMIT;
 START TRANSACTION;
 USE `oso_monitor`;
 INSERT INTO `oso_monitor`.`connector_mode_ssh` (`id`, `machine_id`, `user`, `password`, `private_key`, `port`, `name`, `tags`, `state`, `category`, `category_version`) VALUES (1, 1, 'oracle', NULL, NULL, 22, 'yali2', '[]', 1, 'CENTOS', '6');
-INSERT INTO `oso_monitor`.`connector_mode_ssh` (`id`, `machine_id`, `user`, `password`, `private_key`, `port`, `name`, `tags`, `state`, `category`, `category_version`) VALUES (2, 2, 'oracle', NULL, NULL, 22, 'yali2', '[]', 1, 'CENTOS', '6');
+INSERT INTO `oso_monitor`.`connector_mode_ssh` (`id`, `machine_id`, `user`, `password`, `private_key`, `port`, `name`, `tags`, `state`, `category`, `category_version`) VALUES (2, 2, 'oracle', NULL, NULL, 22, 'yali3', '[]', 1, 'CENTOS', '6');
+INSERT INTO `oso_monitor`.`connector_mode_ssh` (`id`, `machine_id`, `user`, `password`, `private_key`, `port`, `name`, `tags`, `state`, `category`, `category_version`) VALUES (3, 3, 'oracle', NULL, NULL, 22, 'yali', '[]', 1, 'CENTOS', '6');
 COMMIT;
 
 
@@ -282,5 +284,6 @@ START TRANSACTION;
 USE `oso_monitor`;
 INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (1, 1, 1, '0/5 * * * * ?', NULL, NULL, 1);
 INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (2, 1, 2, '0/5 * * * * ?', NULL, NULL, 1);
+INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (3, 1, 3, '0/5 * * * * ?', NULL, NULL, 1);
 COMMIT;
 

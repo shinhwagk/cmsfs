@@ -43,7 +43,7 @@ services:
     image: cmsfs/monitor
     depends_on:
       - config
-      # - collect-ssh
+      - proxy
     links:
       - config:config.cmsfs.org
       - proxy:ssh.collect.cmsfs.org
