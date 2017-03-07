@@ -66,6 +66,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
   }
 
   def ssh(keyPath: String, user: String, host: String, scriptUrl: String, port: Int): String = {
+    logger.info("ssh 1")
     val jsch = new JSch();
     jsch.addIdentity(keyPath);
     val session = jsch.getSession(user, host, port);
@@ -75,7 +76,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
     val in = channelExec.getInputStream();
     channelExec.setCommand(s"curl -s ${scriptUrl} | sh");
     channelExec.connect();
-
+    logger.info("ssh 2")
     val reader = new BufferedReader(new InputStreamReader(in));
 
     val rs = new ArrayBuffer[String]()
@@ -86,12 +87,12 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
       rs += line.get
       line = Option(reader.readLine())
     }
-
+    logger.info("ssh 3")
     val exitStatus: Int = channelExec.getExitStatus();
 
     channelExec.disconnect();
     session.disconnect();
-
+    logger.info("ssh 4")
     if (exitStatus < 0) {
       // System.out.println("Done, but exit status not set!");
     } else if (exitStatus > 0) {
