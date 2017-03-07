@@ -21,6 +21,7 @@ script:
   - mysql --version
   - cd cmsfs
   - sbt ++$TRAVIS_SCALA_VERSION test
+  - sbt stage
 notifications:
   email:
     recipients:
