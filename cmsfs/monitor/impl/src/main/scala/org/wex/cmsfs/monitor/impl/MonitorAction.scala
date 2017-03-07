@@ -43,7 +43,7 @@ class MonitorAction(mt: MonitorTopic,
           cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
             cs.getMachineById(mId).invoke().foreach(m => {
               logger.info(s"push ssh collect ${md.id}")
-              cSSHs.pushCollectItem.invoke(CollectItemSSH(mc.id.get, mc.name, md.collectArgs, m.ip, port, user, password, privateKey))
+              cSSHs.pushCollectItem.invoke(CollectItemSSH(md.id, mc.name, md.collectArgs, m.ip, port, user, password, privateKey))
                 .onFailure { case ex => logger.error(ex.getMessage) }
             })
           }
