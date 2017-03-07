@@ -14,7 +14,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /dev/null:/traefik.toml
-
+    labels: 
+      - "traefik.enable=false" 
+      
   config:
     container_name: cmsfs_config
     build:
@@ -43,8 +45,7 @@ services:
       - config
       - collect-ssh
     links:
-      - db:db.cmsfs.org
-      - proxy:config.cmsfs.org
+      - config:config.cmsfs.org
       - proxy:ssh.collect.cmsfs.org
     labels: 
       - "traefik.enable=false" 
