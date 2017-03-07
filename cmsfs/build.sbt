@@ -4,6 +4,7 @@ scalaVersion in ThisBuild := "2.11.8"
 lagomCassandraEnabled in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false
 lagomCassandraCleanOnStart in ThisBuild := false
+parallelExecution in ThisBuild := true
 
 //val playJsonDerivedCodecs = "org.julienrf" %% "play-json-derived-codecs" % "3.3"
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
@@ -19,7 +20,8 @@ lazy val root = (project in file("."))
   .aggregate(
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
-    `collect-ssh-api`, `collect-ssh-impl`
+    `collect-ssh-api`, `collect-ssh-impl`,
+    `collect-jdbc-api`, `collect-jdbc-impl`
   )
 
 def implCommonSettings: Seq[Setting[_]] = Seq(

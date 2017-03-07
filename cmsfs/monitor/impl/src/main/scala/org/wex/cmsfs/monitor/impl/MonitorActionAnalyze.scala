@@ -1,15 +1,8 @@
 package org.wex.cmsfs.monitor.impl
 
-import akka.stream.Materializer
-import akka.stream.scaladsl.Sink
-import org.slf4j.LoggerFactory
-import org.wex.cmsfs.format.api.FormatService
-
-import scala.concurrent.ExecutionContext
-
-class MonitorActionAnalyze(mt: MonitorTopic, fs: FormatService)(implicit ec: ExecutionContext, mi: Materializer) {
-
-  private val log = LoggerFactory.getLogger(classOf[MonitorActionAnalyze])
+//class MonitorActionAnalyze(mt: MonitorTopic, fs: FormatService)(implicit ec: ExecutionContext, mi: Materializer) {
+//
+//  private val log = LoggerFactory.getLogger(classOf[MonitorActionAnalyze])
 
 //  mt.monitorDepositoryTopic
 //    .subscriber
@@ -28,4 +21,4 @@ class MonitorActionAnalyze(mt: MonitorTopic, fs: FormatService)(implicit ec: Exe
   //        .invoke(QueryOSMessage(mh.ip, c.user, genUrl("COLLECT", "SSH", metric.name), Some(c.port)))
   //    } yield collectData
   //  }
-}
+//}
