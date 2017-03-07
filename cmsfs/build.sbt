@@ -13,7 +13,7 @@ val mysqlJdbc = "mysql" % "mysql-connector-java" % "6.0.5"
 val commonIO = "commons-io" % "commons-io" % "2.5"
 val quartz = "org.quartz-scheduler" % "quartz" % "2.2.3"
 val jsch = "com.jcraft" % "jsch" % "0.1.54"
-val oracleJdbc = "oracle" % "oracle-connector-jdbc" % "7"
+
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -34,6 +34,9 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `monitor-api`)
+//  .settings(sampleStringTask := {
+//    println(baseDirectory)
+//  })
 
 //lazy val `format-api` = (project in file("format/api"))
 //  .settings(libraryDependencies += lagomScaladslApi)
@@ -70,8 +73,8 @@ lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
   .enablePlugins(LagomScala)
   //  .settings(resolvers += "Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/")
   .settings(libraryDependencies += lagomScaladslPubSub)
-  .settings(libraryDependencies += oracleJdbc from "file://jars/ojdbc7.jar")
   .settings(libraryDependencies ++= Seq(mysqlJdbc))
+  .settings(libraryDependencies += "com.wingtech" % "ojdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`collect-jdbc-api`, `monitor-api`)
