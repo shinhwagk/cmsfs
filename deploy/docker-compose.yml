@@ -29,6 +29,8 @@ services:
       - db
     links:
       - db:db.cmsfs.org
+    labels: 
+      - "traefik.enable=false" 
       
   monitor:
     container_name: cmsfs_monitor
@@ -46,6 +48,8 @@ services:
       - db:db.cmsfs.org
       - proxy:config.cmsfs.org
       - proxy:ssh.collect.cmsfs.org
+    labels: 
+      - "traefik.enable=false" 
       
   # format:
   #   build:
@@ -72,16 +76,16 @@ services:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
     links:
       - proxy:monitor.cmsfs.org
+    labels: 
+      - "traefik.backend=cmsfs-collect-ssh"
+      - "traefik.frontend.rule=Host:ssh.collect.cmsfs.org"
+      - "traefik.port=9000"
 
   db:
     container_name: cmsfs_db
     image: mysql
     expose:
       - "3306"
-    labels:
-      - "traefik.backend=cmsfs-db"
-      - "traefik.frontend.rule=Host:db.cmsfs.org"
-      - "traefik.port=3306"
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
@@ -106,7 +110,7 @@ services:
       db:
         condition: service_healthy
     labels: 
-      - "traefik.enable=false" 
+      - "traefik.enable=false"
 
   cadvisor:
     container_name: cmsfs_cadvisor
@@ -117,7 +121,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     ports: 
-      - "8081":"8080"
+      - "8081:8080"
     labels: 
       - "traefik.enable=false" 
 
