@@ -22,6 +22,8 @@ class ServiceNameServiceLocator(configuration: Configuration, circuitBreakers: C
   }
 
   override def locate(name: String, serviceCall: Call[_, _]) = {
-    Future.successful(getServicesByName(name))
+    val uriOpt = getServicesByName(name)
+    println(uriOpt,"request............")
+    Future.successful(uriOpt)
   }
 }

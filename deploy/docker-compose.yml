@@ -63,7 +63,7 @@ services:
       - monitor:monitor.cmsfs.org
     labels: 
       - "traefik.backend=cmsfs-collect-ssh"
-      - "traefik.frontend.rule=Host:ssh.collect.cmsfs.org"
+      - "traefik.frontend.rule=Host:collect-ssh.cmsfs.org"
       - "traefik.port=9000"
 
   db:
