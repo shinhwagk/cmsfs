@@ -10,7 +10,7 @@ trait CollectSSHService extends Service {
 
   override final def descriptor = {
     import Service._
-    named("collect-ssh").withCalls(
+    named("ssh.collect").withCalls(
       restCall(Method.POST, "/v1/collect", pushCollectItem)
     )
   }
