@@ -5,7 +5,6 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.config.api.ConfigService
-import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
@@ -27,8 +26,6 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
 abstract class ServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
     with AhcWSComponents {
-
-  val monitorService = serviceClient.implement[MonitorService]
 
   override lazy val lagomServer = LagomServer.forServices(
     bindService[ConfigService].to(wire[ConfigServiceImpl])
