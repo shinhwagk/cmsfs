@@ -10,6 +10,7 @@ val mysqlJdbc = "mysql" % "mysql-connector-java" % "6.0.5"
 val commonIO = "commons-io" % "commons-io" % "2.5"
 val quartz = "org.quartz-scheduler" % "quartz" % "2.2.3"
 val jsch = "com.jcraft" % "jsch" % "0.1.54"
+val consul = "com.ecwid.consul" % "consul-api" % "1.2.1"
 
 
 lazy val root = (project in file("."))
@@ -66,6 +67,7 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
 
 lazy val `lagom-service-locator-name` = (project in file("locator"))
   .enablePlugins(LagomScala)
+  .settings(libraryDependencies += consul)
 
 //lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
 //  .settings(libraryDependencies += lagomScaladslApi)
