@@ -1,10 +1,6 @@
 organization in ThisBuild := "org.wex"
 version in ThisBuild := "1.0-SNAPSHOT"
 scalaVersion in ThisBuild := "2.11.8"
-lagomCassandraEnabled in ThisBuild := false
-lagomKafkaEnabled in ThisBuild := false
-lagomCassandraCleanOnStart in ThisBuild := false
-parallelExecution in ThisBuild := true
 
 //val playJsonDerivedCodecs = "org.julienrf" %% "play-json-derived-codecs" % "3.3"
 val macwire = "com.softwaremill.macwire" %% "macros" % "2.2.5" % "provided"
@@ -78,5 +74,10 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
 //  .settings(implCommonSettings: _*)
 //  .settings(lagomForkedTestSettings: _*)
 //  .dependsOn(`collect-jdbc-api`, `monitor-api`)
+
+lagomCassandraEnabled in ThisBuild := false
+lagomKafkaEnabled in ThisBuild := false
+lagomCassandraCleanOnStart in ThisBuild := false
+parallelExecution in ThisBuild := true
 
 fork in run := true
