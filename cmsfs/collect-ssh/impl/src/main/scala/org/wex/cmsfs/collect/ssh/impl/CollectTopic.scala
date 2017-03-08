@@ -5,6 +5,6 @@ import org.wex.cmsfs.collect.ssh.api.CollectItemSSH
 
 class CollectTopic(pubSub: PubSubRegistry) {
 
-  val CollectTopicSSH = pubSub.refFor(TopicId[CollectItemSSH])
+  val CollectTopic = pubSub.refFor(TopicId[CollectItemSSH])
 
 }

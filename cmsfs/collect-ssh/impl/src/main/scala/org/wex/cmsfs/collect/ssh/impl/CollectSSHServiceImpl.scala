@@ -11,8 +11,8 @@ class CollectSSHServiceImpl(ct: CollectTopic)(implicit ec: ExecutionContext) ext
 
   private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  override def pushCollectItem: ServiceCall[CollectItemSSH, Done] = ServiceCall { cSSH =>
-    logger.info(s"collect ssh receive: ${cSSH.id}-${cSSH.metricName}")
-    ct.CollectTopicSSH.publish(cSSH); Future.successful(Done)
+  override def pushCollectItem: ServiceCall[CollectItemSSH, Done] = ServiceCall { ci =>
+    logger.info(s"collect ssh receive: ${ci.id}-${ci.metricName}")
+    ct.CollectTopic.publish(ci); Future.successful(Done)
   }
 }

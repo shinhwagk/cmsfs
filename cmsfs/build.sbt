@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
     `collect-ssh-api`, `collect-ssh-impl`,
-    `lagom-service-locator-name`
+    `lagom-service-locator`
     //    ,
     //    `collect-jdbc-api`, `collect-jdbc-impl`
   )
@@ -53,7 +53,7 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
   .settings(libraryDependencies ++= Seq(quartz))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`monitor-api`, `config-api`, `collect-ssh-api`, `lagom-service-locator-name`)
+  .dependsOn(`monitor-api`, `config-api`, `collect-ssh-api`, `collect-jdbc-api`, `lagom-service-locator`)
 
 lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -63,23 +63,22 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
   .settings(libraryDependencies ++= Seq(jsch))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collect-ssh-api`, `monitor-api`, `lagom-service-locator-name`)
+  .dependsOn(`collect-ssh-api`, `monitor-api`, `lagom-service-locator`)
 
-lazy val `lagom-service-locator-name` = (project in file("locator"))
+lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
+  .settings(libraryDependencies += lagomScaladslApi)
+lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
+  .enablePlugins(LagomScala)
+  .settings(libraryDependencies += lagomScaladslPubSub)
+  .settings(libraryDependencies ++= Seq(mysqlJdbc))
+  .settings(libraryDependencies += "com.wingtech" % "ojdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
+  .settings(implCommonSettings: _*)
+  .settings(lagomForkedTestSettings: _*)
+  .dependsOn(`collect-jdbc-api`, `monitor-api`, `lagom-service-locator`)
+
+lazy val `lagom-service-locator` = (project in file("locator"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += consul)
-
-//lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
-//  .settings(libraryDependencies += lagomScaladslApi)
-//lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
-//  .enablePlugins(LagomScala)
-//  //  .settings(resolvers += "Spray Repository" at "http://dev.rtmsoft.me/nexus/content/groups/public/")
-//  .settings(libraryDependencies += lagomScaladslPubSub)
-//  .settings(libraryDependencies ++= Seq(mysqlJdbc))
-//  .settings(libraryDependencies += "com.wingtech" % "ojdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
-//  .settings(implCommonSettings: _*)
-//  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(`collect-jdbc-api`, `monitor-api`)
 
 lagomCassandraEnabled in ThisBuild := false
 lagomKafkaEnabled in ThisBuild := false

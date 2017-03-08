@@ -1,20 +1,20 @@
-package org.wex.cmsfs.monitor.impl
+package org.wex.cmsfs.collect.jdbc.impl
 
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
-import org.wex.cmsfs.collect.ssh.api.CollectSSHService
-import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.lagom.service.discovery.name.ServiceNameServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
-  override def loadDevMode(context: LagomApplicationContext): LagomApplication =
+  override def loadDevMode(context: LagomApplicationContext): LagomApplication = {
+    loaderEnvironment(context)
     new ServiceApplication(context) with LagomDevModeComponents
+  }
 
   override def load(context: LagomApplicationContext): LagomApplication = {
     loaderEnvironment(context)
@@ -33,16 +33,11 @@ abstract class ServiceApplication(context: LagomApplicationContext)
     with PubSubComponents {
 
   override lazy val lagomServer = LagomServer.forServices(
-    bindService[MonitorService].to(wire[MonitorServiceImpl])
+    bindService[CollectJDBCService].to(wire[CollectJDBCServiceImpl])
   )
 
-  val configService = serviceClient.implement[ConfigService]
-  val collectSSHService = serviceClient.implement[CollectSSHService]
-  val collectJDBCService = serviceClient.implement[CollectJDBCService]
-  //  val queryService = serviceClient.implement[QueryService]
-  //  val formatService = serviceClient.implement[FormatService]
+  val monitorService = serviceClient.implement[MonitorService]
 
-  val monitorTopic = wire[MonitorTopic]
-  val monitorAction = wire[MonitorAction]
-  //  val monitorActionAnalyze = wire[MonitorActionAnalyze]
+  val collectTopic = wire[CollectTopic]
+  val collecting = wire[Collecting]
 }

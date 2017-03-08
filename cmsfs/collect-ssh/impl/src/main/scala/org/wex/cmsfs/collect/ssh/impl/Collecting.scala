@@ -18,7 +18,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionCon
 
   private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private final val source = ct.CollectTopicSSH.subscriber
+  private final val source = ct.CollectTopic.subscriber
 
   source.map(flowLog("debug", "receive ssh collect", _))
     .mapAsync(10)(x => {

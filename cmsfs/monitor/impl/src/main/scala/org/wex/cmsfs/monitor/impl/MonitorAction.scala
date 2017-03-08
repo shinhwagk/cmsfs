@@ -5,6 +5,7 @@ import java.util.Date
 import akka.stream.Materializer
 import org.quartz.CronExpression
 import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.collect.jdbc.api.{CollectItemJDBC, CollectJDBCService}
 import org.wex.cmsfs.collect.ssh.api.{CollectItemSSH, CollectSSHService}
 import org.wex.cmsfs.config.api._
 
@@ -12,7 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MonitorAction(mt: MonitorTopic,
                     cs: ConfigService,
-                    cSSHs: CollectSSHService)(implicit ec: ExecutionContext, mi: Materializer) {
+                    cSSHs: CollectSSHService,
+                    cJDBCs: CollectJDBCService)(implicit ec: ExecutionContext, mi: Materializer) {
 
   private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -36,8 +38,8 @@ class MonitorAction(mt: MonitorTopic,
         case "JDBC" =>
           cs.getConnectorJDBCById(md.ConnectorId).invoke().foreach { case ConnectorModeJDBC(_, _, _, _, url, user, password, _, _, _) =>
             logger.info(s"push jdbc collect ${md.id}")
-
-            //            mt.jdbcCollectTopic.publish(MonitorActionForJDBC(md.id, mc.name, md.collectArgs, md.analyzeArgs, url, user, password))
+            cJDBCs.pushCollectItem.invoke(CollectItemJDBC(md.id, mc.name, md.collectArgs, url, user, password))
+              .onFailure { case ex => logger.error(ex.getMessage) }
           }
         case "SSH" =>
           cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
