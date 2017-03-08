@@ -46,7 +46,7 @@ services:
       - proxy
     links:
       - config:config.cmsfs.org
-      - proxy:ssh.collect.cmsfs.org
+      - proxy:collect-ssh.cmsfs.org
     labels: 
       - "traefik.enable=false" 
       
