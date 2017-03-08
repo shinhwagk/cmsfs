@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom
 import com.ecwid.consul.v1.catalog.model.CatalogService
 import com.ecwid.consul.v1.{ConsulClient, QueryParams}
 import com.lightbend.lagom.internal.client.CircuitBreakers
+import com.lightbend.lagom.scaladsl.api.Descriptor.Call
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
 import com.lightbend.lagom.scaladsl.client.{CircuitBreakerComponents, CircuitBreakingServiceLocator}
 import org.slf4j.{Logger, LoggerFactory}
@@ -28,17 +29,17 @@ class ConsulServiceLocator(configuration: Configuration, circuitBreakers: Circui
 
   private val roundRobinIndexFor: Map[String, Int] = TrieMap.empty[String, Int]
 
-  private def locate(name: String): Future[Option[URI]] = Future {
+  override def locate(name: String, serviceCall: Call[_, _]): Future[Option[URI]] = Future {
     val instances = client.getCatalogService(name, QueryParams.DEFAULT).getValue.asScala.toList
     instances.size match {
       case 0 => None
       case 1 => toURIs(instances).headOption
-      case _ =>
-        config.routingPolicy match {
-          case First => Some(pickFirstInstance(instances))
-          case Random => Some(pickRandomInstance(instances))
-          case RoundRobin => Some(pickRoundRobinInstance(name, instances))
-        }
+      case _ => throw new Exception("NOTHING")
+      //        RoutingPolicy match {
+      //          case First => Some(pickFirstInstance(instances))
+      //          case Random => Some(pickRandomInstance(instances))
+      //          case RoundRobin => Some(pickRoundRobinInstance(name, instances))
+      //        }
     }
   }
 
@@ -70,6 +71,7 @@ class ConsulServiceLocator(configuration: Configuration, circuitBreakers: Circui
       val serviceAddress =
         if (address.trim.isEmpty || address == "localhost") InetAddress.getLoopbackAddress.getHostAddress
         else address
-      new URI(s"${config.scheme}://$serviceAddress:${service.getServicePort}")
+      //      new URI(s"${config.scheme}://$serviceAddress:${service.getServicePort}")
+      new URI(s"http://$serviceAddress:${service.getServicePort}")
     }
 }
