@@ -18,8 +18,8 @@ trait ServiceNameServiceLocatorComponents extends CircuitBreakerComponents {
 class ServiceNameServiceLocator(configuration: Configuration, circuitBreakers: CircuitBreakers)(implicit ec: ExecutionContext)
   extends CircuitBreakingServiceLocator(circuitBreakers) {
 
-  private def getServicesByName(name: String): URI = {
-    URI.create("http://" + name + ".cmsfs.org:9000")
+  private def getServicesByName(name: String): Option[URI] = {
+    Some(URI.create("http://" + name + ".cmsfs.org:9000"))
   }
 
   override def locate(name: String, serviceCall: Call[_, _]) = {
