@@ -16,7 +16,8 @@ lazy val root = (project in file("."))
   .aggregate(
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
-    `collect-ssh-api`, `collect-ssh-impl`
+    `collect-ssh-api`, `collect-ssh-impl`,
+    `service-locator-name`
     //    ,
     //    `collect-jdbc-api`, `collect-jdbc-impl`
   )
@@ -51,7 +52,7 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
   .settings(libraryDependencies ++= Seq(quartz))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`monitor-api`, `config-api`, `collect-ssh-api`)
+  .dependsOn(`monitor-api`, `config-api`, `collect-ssh-api`, `service-locator-name`)
 
 lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -61,7 +62,10 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
   .settings(libraryDependencies ++= Seq(jsch))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collect-ssh-api`, `monitor-api`)
+  .dependsOn(`collect-ssh-api`, `monitor-api`, `service-locator-name`)
+
+lazy val `lagom-service-locator-name` = (project in file("locator"))
+  .enablePlugins(LagomScala)
 
 //lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
 //  .settings(libraryDependencies += lagomScaladslApi)

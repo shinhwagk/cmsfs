@@ -1,4 +1,4 @@
-package org.wex.cmsfs.monitor.impl
+package org.wex.cmsfs.lagom.service.discovery.name
 
 import java.net.URI
 
