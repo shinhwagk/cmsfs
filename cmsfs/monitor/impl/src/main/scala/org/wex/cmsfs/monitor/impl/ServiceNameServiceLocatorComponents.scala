@@ -1,18 +1,17 @@
 package org.wex.cmsfs.monitor.impl
 
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 
 import com.lightbend.lagom.internal.client.CircuitBreakers
 import com.lightbend.lagom.scaladsl.api.Descriptor.Call
 import com.lightbend.lagom.scaladsl.api.ServiceLocator
-import com.lightbend.lagom.scaladsl.client.{CircuitBreakerComponents, CircuitBreakingServiceLocator, ConfigurationServiceLocator}
-import com.typesafe.config.ConfigException
+import com.lightbend.lagom.scaladsl.client.{CircuitBreakerComponents, CircuitBreakingServiceLocator}
 import play.api.Configuration
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ServiceNameServiceLocatorComponents extends CircuitBreakerComponents {
-  lazy val serviceLocator: ServiceLocator = new ConfigurationServiceLocator(configuration, circuitBreakers)(executionContext)
+  lazy val serviceLocator: ServiceLocator = new ServiceNameServiceLocator(configuration, circuitBreakers)(executionContext)
 }
 
 class ServiceNameServiceLocator(configuration: Configuration, circuitBreakers: CircuitBreakers)(implicit ec: ExecutionContext)
