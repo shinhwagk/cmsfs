@@ -1,9 +1,7 @@
 package org.wex.cmsfs.config.impl
 
-import com.lightbend.lagom.scaladsl.api.ServiceLocator
-import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
-import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.client.ConfigurationServiceLocatorComponents
+import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.config.api.ConfigService
@@ -16,9 +14,13 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
     new ServiceApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication = {
+    loaderEnvironment(context)
+    new ServiceApplication(context) with ConfigurationServiceLocatorComponents
+  }
+
+  def loaderEnvironment(context: LagomApplicationContext): Unit = {
     val environment = context.playContext.environment
     LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
-    new ServiceApplication(context) with ConfigurationServiceLocatorComponents
   }
 }
 
