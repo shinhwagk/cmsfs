@@ -1,4 +1,4 @@
-package org.wex.cmsfs.collect.ssh.impl
+package org.wex.cmsfs.collect.jdbc.impl
 
 import java.sql.{DriverManager, ResultSet}
 
@@ -6,7 +6,7 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.collection.immutable.Map
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object QueryModeEnum extends Enumeration {
   type QueryMode = Value
@@ -14,7 +14,9 @@ object QueryModeEnum extends Enumeration {
   val MAP = Value("MAP")
 }
 
-class CollectingOracle(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: Seq[String]) {
+class CollectingOracle(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: Seq[String])
+                      (implicit ec: ExecutionContext) {
+  
   Class.forName("oracle.jdbc.driver.OracleDriver");
 
   def mode(mode: String): Future[String] = {
