@@ -1,0 +1,5 @@
+[0m[[0minfo[0m] [0mPackaging /opt/cmsfs/locator/target/scala-2.11/lagom-service-locator-name_2.11-1.0-SNAPSHOT-sources.jar ...[0m
+[0m[[0mdebug[0m] [0mInput file mappings:[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocatorComponents.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/src/main/scala/org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocatorComponents.scala[0m
+[0m[[0minfo[0m] [0mDone packaging.[0m

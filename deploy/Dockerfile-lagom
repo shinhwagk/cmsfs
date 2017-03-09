@@ -11,6 +11,12 @@ EXPOSE 9000
 
 RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/app.sh
 
+RUN ls -l /usr/local/bin/
+RUN chmod +x /usr/local/bin/register.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+
 ENTRYPOINT ["entrypoint.sh"]
+
 
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]

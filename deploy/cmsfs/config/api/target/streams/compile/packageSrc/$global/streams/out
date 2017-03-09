@@ -1,0 +1,5 @@
+[0m[[0minfo[0m] [0mPackaging /opt/cmsfs/config/api/target/scala-2.11/config-api_2.11-1.0-SNAPSHOT-sources.jar ...[0m
+[0m[[0mdebug[0m] [0mInput file mappings:[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/api/ConfigService.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/api/src/main/scala/org/wex/cmsfs/config/api/ConfigService.scala[0m
+[0m[[0minfo[0m] [0mDone packaging.[0m

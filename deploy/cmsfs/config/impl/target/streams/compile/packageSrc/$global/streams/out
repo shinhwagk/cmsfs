@@ -1,0 +1,33 @@
+[0m[[0minfo[0m] [0mPackaging /opt/cmsfs/config/impl/target/scala-2.11/config-impl_2.11-1.0-SNAPSHOT-sources.jar ...[0m
+[0m[[0mdebug[0m] [0mInput file mappings:[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/Tables.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/Tables.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/impl/ServiceApplicationLoader.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/impl/ServiceApplicationLoader.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/ConnectorModeSSHs.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/ConnectorModeSSHs.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/ConnectorModeJdbcs.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/ConnectorModeJdbcs.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/FormatScripts.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/FormatScripts.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/MonitorDepositories.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/MonitorDepositories.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/MonitorDetails.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/MonitorDetails.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/Machines.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/Machines.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/Metrics.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/Metrics.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/JsonFormat.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/JsonFormat.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/impl/ConfigServiceImpl.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/impl/ConfigServiceImpl.scala[0m
+[0m[[0mdebug[0m] [0m	application.conf[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/resources/application.conf[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/DepositoryAnalyzes.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/DepositoryAnalyzes.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/impl/ConfigServiceAction.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/impl/ConfigServiceAction.scala[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/config/db/table/MonitorModeSSHs.scala[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/config/impl/src/main/scala/org/wex/cmsfs/config/db/table/MonitorModeSSHs.scala[0m
+[0m[[0minfo[0m] [0mDone packaging.[0m

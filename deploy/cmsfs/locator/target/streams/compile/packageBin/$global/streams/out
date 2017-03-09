@@ -1,0 +1,23 @@
+[0m[[0minfo[0m] [0mPackaging /opt/cmsfs/locator/target/scala-2.11/lagom-service-locator-name_2.11-1.0-SNAPSHOT.jar ...[0m
+[0m[[0mdebug[0m] [0mInput file mappings:[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service/discovery/name[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom/service/discovery/name[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs[0m
+[0m[[0mdebug[0m] [0m	org/wex[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocatorComponents.class[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocatorComponents.class[0m
+[0m[[0mdebug[0m] [0m	org[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocatorComponents$class.class[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocatorComponents$class.class[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service/discovery[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom/service/discovery[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocator.class[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom/service/discovery/name/ServiceNameServiceLocator.class[0m
+[0m[[0mdebug[0m] [0m	org/wex/cmsfs/lagom/service[0m
+[0m[[0mdebug[0m] [0m	  /opt/cmsfs/locator/target/scala-2.11/classes/org/wex/cmsfs/lagom/service[0m
+[0m[[0minfo[0m] [0mDone packaging.[0m
