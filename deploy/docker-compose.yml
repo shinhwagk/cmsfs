@@ -1,22 +1,6 @@
 version: "2.1"
 
 services:
-  proxy:
-    container_name: cmsfs_proxy
-    image: traefik
-    restart: always
-    command: --web --docker --docker.domain=docker.localhost --logLevel=INFO --entryPoints='Name:http Address::9000' --defaultEntryPoints='http'
-    expose:
-      - "9000"
-    ports:
-      - "80:80"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /dev/null:/traefik.toml
-    labels: 
-      - "traefik.enable=false" 
-
   config:
     container_name: cmsfs_config
     build:
@@ -28,11 +12,11 @@ services:
     depends_on:
       - proxy
       - db
-    links:
-      - db:db.cmsfs.org
-    labels: 
-      - "traefik.enable=false" 
-      
+    networks: 
+      cmsfs:
+        aliases: 
+          - config.cmsfs.org
+
   monitor:
     container_name: cmsfs_monitor
     build:
@@ -44,12 +28,11 @@ services:
     depends_on:
       - config
       - proxy
-    links:
-      - config:config.cmsfs.org
-      - proxy:collect-ssh.cmsfs.org
-    labels: 
-      - "traefik.enable=false" 
-      
+    networks: 
+      cmsfs:
+        aliases: 
+          - monitor.cmsfs.org
+
   collect-ssh:
     build:
       context: ./
@@ -59,12 +42,10 @@ services:
     image: cmsfs/collect-ssh
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
-    links:
-      - monitor:monitor.cmsfs.org
-    labels: 
-      - "traefik.backend=cmsfs-collect-ssh"
-      - "traefik.frontend.rule=Host:collect-ssh.cmsfs.org"
-      - "traefik.port=9000"
+    networks: 
+      cmsfs:
+        aliases:
+          - monitor.cmsfs.org
 
   db:
     container_name: cmsfs_db
@@ -80,22 +61,22 @@ services:
       interval: 3s
       timeout: 2s
       retries: 10
-    labels: 
-      - "traefik.enable=false" 
+    networks: 
+      cmsfs:
+        aliases:
+          - db.cmsfs.org
 
   db_data:
     container_name: cmsfs_db_data
     image: mysql
     volumes:
       - ./db/:/opt/
-    links:
-      - db:db.cmsfs.org
     command: sh -c "/bin/bash /opt/load.sh"
     depends_on:
       db:
         condition: service_healthy
-    labels: 
-      - "traefik.enable=false"
+    networks: 
+      - cmsfs
 
   cadvisor:
     container_name: cmsfs_cadvisor
@@ -107,8 +88,8 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     ports: 
       - "8081:8080"
-    labels: 
-      - "traefik.enable=false" 
+    networks: 
+      - cmsfs
 
   # grafana:
   #   container_name: cmsfs_grafana
@@ -123,3 +104,6 @@ services:
   #   image: elasticsearch
   #   ports: 
   #     - "9300:9300"
+
+networks: 
+  cmsfs:
