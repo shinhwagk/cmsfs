@@ -1,8 +1,17 @@
 version: "2.1"
 
 services:
+  consul:
+    container_name: cmsfs_consul
+    image: consul
+  ports:
+    - "8500:8500"
+
   config:
     container_name: cmsfs_config
+    environment: 
+      - SERVICE_NAME=config
+      - SERVICE_PORT=9000
     build:
       context: ./
       dockerfile: Dockerfile-lagom
@@ -10,12 +19,8 @@ services:
         SVC_NAME: config
     image: cmsfs/config
     depends_on:
-      - proxy
+      - consul
       - db
-    networks: 
-      cmsfs:
-        aliases: 
-          - config.cmsfs.org
 
   monitor:
     container_name: cmsfs_monitor
@@ -25,13 +30,12 @@ services:
       args:
         SVC_NAME: monitor
     image: cmsfs/monitor
+    environment: 
+      - SERVICE_NAME=monitor
+      - SERVICE_PORT=9000
     depends_on:
+      - consul
       - config
-      - proxy
-    networks: 
-      cmsfs:
-        aliases: 
-          - monitor.cmsfs.org
 
   collect-ssh:
     build:
@@ -40,12 +44,13 @@ services:
       args:
         SVC_NAME: collect-ssh
     image: cmsfs/collect-ssh
+    environment: 
+      - SERVICE_NAME=collect-ssh
+      - SERVICE_PORT=9000
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
-    networks: 
-      cmsfs:
-        aliases:
-          - monitor.cmsfs.org
+    depends_on: 
+      - consul
 
   db:
     container_name: cmsfs_db
@@ -56,15 +61,13 @@ services:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
       - /var/lib/mysql:/var/lib/mysql
+    depends_on: 
+      - consul
     healthcheck:
       test: ["CMD-SHELL", "ss -lt | grep mysql"]
       interval: 3s
       timeout: 2s
       retries: 10
-    networks: 
-      cmsfs:
-        aliases:
-          - db.cmsfs.org
 
   db_data:
     container_name: cmsfs_db_data
@@ -75,8 +78,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks: 
-      - cmsfs
 
   cadvisor:
     container_name: cmsfs_cadvisor
@@ -87,9 +88,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     ports: 
-      - "8081:8080"
-    networks: 
-      - cmsfs
+      - "8080:8080"
 
   # grafana:
   #   container_name: cmsfs_grafana
@@ -104,6 +103,3 @@ services:
   #   image: elasticsearch
   #   ports: 
   #     - "9300:9300"
-
-networks: 
-  cmsfs:
