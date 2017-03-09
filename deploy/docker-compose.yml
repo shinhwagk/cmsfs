@@ -4,8 +4,12 @@ services:
   consul:
     container_name: cmsfs_consul
     image: consul
-  ports:
-    - "8500:8500"
+    networks: 
+      cmsfs:
+        aliases: 
+          - consul.cmsfs.org
+    ports:
+      - "8500:8500"
 
   config:
     container_name: cmsfs_config
@@ -103,3 +107,6 @@ services:
   #   image: elasticsearch
   #   ports: 
   #     - "9300:9300"
+
+networks: 
+   cmsfs:
