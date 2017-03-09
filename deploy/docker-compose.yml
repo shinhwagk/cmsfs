@@ -74,7 +74,9 @@ services:
     depends_on: 
       - consul
     networks: 
-      - cmsfs
+      cmsfs:
+        aliases: 
+          - db.cmsfs.org
     healthcheck:
       test: ["CMD-SHELL", "ss -lt | grep mysql"]
       interval: 3s
