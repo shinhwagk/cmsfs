@@ -31,7 +31,7 @@ class ConsulServiceLocator(configuration: Configuration, circuitBreakers: Circui
 
   override def locate(name: String, serviceCall: Call[_, _]): Future[Option[URI]] = Future {
     val instances: List[CatalogService] = client.getCatalogService(name, QueryParams.DEFAULT).getValue.asScala.toList
-    instances.size match {
+    val uriOpt = instances.size match {
       case 0 => None
       case 1 => toURIs(instances).headOption
       case _ => Some(pickRoundRobinInstance(name, instances))
@@ -42,6 +42,8 @@ class ConsulServiceLocator(configuration: Configuration, circuitBreakers: Circui
       //          case RoundRobin => Some(pickRoundRobinInstance(name, instances))
       //        }
     }
+    logger.info(uriOpt.get.toString + "x .........................")
+    uriOpt
   }
 
   private[consul] def pickFirstInstance(services: List[CatalogService]): URI = {
@@ -57,7 +59,7 @@ class ConsulServiceLocator(configuration: Configuration, circuitBreakers: Circui
   private[consul] def pickRoundRobinInstance(name: String, services: List[CatalogService]): URI = {
     if (services.isEmpty) throw new IllegalStateException("List of services should not be empty")
     roundRobinIndexFor.putIfAbsent(name, 0)
-    val sortedServices = toURIs(services).sorted
+    val sortedServices: Seq[URI] = toURIs(services).sorted
     val currentIndex = roundRobinIndexFor(name)
     val nextIndex =
       if (sortedServices.size > currentIndex + 1) currentIndex + 1
