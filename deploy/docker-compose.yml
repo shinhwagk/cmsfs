@@ -23,7 +23,9 @@ services:
       args:
         SVC_NAME: config
     networks: 
-      - cmsfs
+      cmsfs:
+        aliases: 
+          - config.cmsfs.org
     depends_on:
       - consul
       - db
