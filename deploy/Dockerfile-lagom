@@ -5,7 +5,7 @@ ARG SVC_NAME
 ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/cmsfs/
 ADD logback.xml /opt/logback.xml
 ADD register.sh /usr/local/bin/register.sh
-add entrypoint.sh /usr/local/bin/entrypoint.sh
+ADD entrypoint.sh /usr/local/bin/entrypoint.sh
 
 EXPOSE 9000
 
