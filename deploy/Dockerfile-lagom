@@ -10,6 +10,6 @@ EXPOSE 9000
 
 RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh", "-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
+ENTRYPOINT ["entrypoint.sh", "-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
 
 CMD ["sh", "-c", "register.sh"]
