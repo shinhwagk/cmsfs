@@ -25,16 +25,17 @@ class ConsulServiceLocator(configuration: Configuration, circuitBreakers: Circui
 
   private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  lazy val client: ConsulClient = new ConsulClient("127.0.0.1", 8500)
+  lazy val client: ConsulClient = new ConsulClient("consul.cmsfs.org", 8500)
 
   private val roundRobinIndexFor: Map[String, Int] = TrieMap.empty[String, Int]
 
   override def locate(name: String, serviceCall: Call[_, _]): Future[Option[URI]] = Future {
-    val instances = client.getCatalogService(name, QueryParams.DEFAULT).getValue.asScala.toList
+    val instances: List[CatalogService] = client.getCatalogService(name, QueryParams.DEFAULT).getValue.asScala.toList
     instances.size match {
       case 0 => None
       case 1 => toURIs(instances).headOption
-      case _ => throw new Exception("NOTHING")
+      case _ => Some(pickRoundRobinInstance(name, instances))
+      //        throw new Exception("NOTHING")
       //        RoutingPolicy match {
       //          case First => Some(pickFirstInstance(instances))
       //          case Random => Some(pickRandomInstance(instances))

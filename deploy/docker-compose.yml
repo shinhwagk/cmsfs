@@ -10,7 +10,7 @@ services:
           - consul.cmsfs.org
     ports:
       - "8500:8500"
-
+  
   config:
     container_name: cmsfs_config
     image: cmsfs/config
