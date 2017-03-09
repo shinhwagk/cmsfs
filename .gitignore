@@ -5,3 +5,4 @@
 /cmsfs/**/target
 /cmsfs/**/*.log
 /cmsfs/logs
+/deploy/cmsfs
