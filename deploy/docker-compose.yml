@@ -13,6 +13,7 @@ services:
 
   config:
     container_name: cmsfs_config
+    image: cmsfs/config
     environment: 
       - SERVICE_NAME=config
       - SERVICE_PORT=9000
@@ -21,7 +22,8 @@ services:
       dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: config
-    image: cmsfs/config
+    networks: 
+      - cmsfs
     depends_on:
       - consul
       - db
@@ -37,6 +39,8 @@ services:
     environment: 
       - SERVICE_NAME=monitor
       - SERVICE_PORT=9000
+    networks: 
+      - cmsfs
     depends_on:
       - consul
       - config
@@ -53,6 +57,8 @@ services:
       - SERVICE_PORT=9000
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
+    networks: 
+      - cmsfs
     depends_on: 
       - consul
 
@@ -67,6 +73,8 @@ services:
       - /var/lib/mysql:/var/lib/mysql
     depends_on: 
       - consul
+    networks: 
+      - cmsfs
     healthcheck:
       test: ["CMD-SHELL", "ss -lt | grep mysql"]
       interval: 3s
@@ -91,6 +99,8 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    networks: 
+      - cmsfs
     ports: 
       - "8080:8080"
 
