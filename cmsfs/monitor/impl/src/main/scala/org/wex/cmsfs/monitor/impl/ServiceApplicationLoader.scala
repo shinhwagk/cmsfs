@@ -46,5 +46,5 @@ abstract class ServiceApplication(context: LagomApplicationContext)
 
   val monitorTopic = wire[MonitorTopic]
   val monitorAction = wire[MonitorActionCollect]
-  //  val monitorActionAnalyze = wire[MonitorActionAnalyze]
+  val monitorActionAnalyze = wire[MonitorActionAnalyze]
 }
