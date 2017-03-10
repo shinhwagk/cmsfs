@@ -62,6 +62,21 @@ services:
     depends_on: 
       - consul
 
+  format-analyze:
+    build:
+      context: ./
+      dockerfile: Dockerfile-lagom
+      args:
+        SVC_NAME: format-analyze
+    image: cmsfs/format-analyze
+    environment: 
+      - SERVICE_NAME=format-analyze
+      - SERVICE_PORT=9000
+    networks: 
+      - cmsfs
+    depends_on: 
+      - consul
+
   db:
     container_name: cmsfs_db
     image: mysql
