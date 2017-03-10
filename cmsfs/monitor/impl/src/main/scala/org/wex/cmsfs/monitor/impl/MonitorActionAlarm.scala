@@ -13,6 +13,6 @@ class MonitorActionAlarm(mt: MonitorTopic, fas: FormatAlarmService)(implicit ec:
 
   mt.collectResultTopic.subscriber
     .filter(_.rs.isDefined)
-        .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, "xx", x.rs.get, "xx")))
+//        .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, "xx", x.rs.get, "xx")))
     .runWith(Sink.ignore)
 }
