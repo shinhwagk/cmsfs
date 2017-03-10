@@ -8,6 +8,7 @@ import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.alarm.api.FormatAlarmService
+import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
@@ -40,9 +41,7 @@ abstract class ServiceApplication(context: LagomApplicationContext)
   val configService = serviceClient.implement[ConfigService]
   val collectSSHService = serviceClient.implement[CollectSSHService]
   val collectJDBCService = serviceClient.implement[CollectJDBCService]
-  val formatAlarmService = serviceClient.implement[FormatAlarmService]
-  //  val queryService = serviceClient.implement[QueryService]
-  //  val formatService = serviceClient.implement[FormatService]
+  val formatAnalyzeService = serviceClient.implement[FormatAnalyzeService]
 
   val monitorTopic = wire[MonitorTopic]
   val monitorAction = wire[MonitorActionCollect]
