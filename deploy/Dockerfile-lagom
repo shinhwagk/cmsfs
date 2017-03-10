@@ -6,12 +6,12 @@ ADD logback.xml /opt/logback.xml
 ADD register.sh /usr/local/bin/register.sh
 ADD entrypoint.sh /usr/local/bin/entrypoint.sh
 
-EXPOSE 9000
-
-ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/cmsfs/
-
 RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/app.sh
+
+EXPOSE 9000
 
 ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
+
+ADD cmsfs/${SVC_NAME}/impl/target/universal/stage /opt/cmsfs/
