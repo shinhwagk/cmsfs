@@ -12,37 +12,31 @@ services:
       - "8500:8500"
   
   config:
-    container_name: cmsfs_config
-    image: cmsfs/config
-    environment: 
-      - SERVICE_NAME=config
-      - SERVICE_PORT=9000
     build:
       context: ./
       dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: config
-    networks: 
-      cmsfs:
-        aliases: 
-          - config.cmsfs.org
+    image: cmsfs/config
+    container_name: cmsfs_config
+    environment: 
+      - SERVICE_NAME=config
+      - SERVICE_PORT=9000
     depends_on:
       - consul
       - db
 
   monitor:
-    container_name: cmsfs_monitor
     build:
       context: ./
       dockerfile: Dockerfile-lagom
       args:
         SVC_NAME: monitor
     image: cmsfs/monitor
+    container_name: cmsfs_monitor
     environment: 
       - SERVICE_NAME=monitor
       - SERVICE_PORT=9000
-    networks: 
-      - cmsfs
     depends_on:
       - consul
       - config
@@ -90,7 +84,7 @@ services:
     image: mysql
     volumes:
       - ./db/:/opt/
-    command: sh -c "/bin/bash /opt/load.sh"
+    command: sh -c "/opt/load.sh"
     networks: 
       - cmsfs
     depends_on:
@@ -126,3 +120,4 @@ services:
 
 networks: 
    cmsfs:
+    driver: bridge

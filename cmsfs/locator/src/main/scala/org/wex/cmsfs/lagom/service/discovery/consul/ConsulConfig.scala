@@ -1,25 +1,17 @@
 package org.wex.cmsfs.lagom.service.discovery.consul
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import com.typesafe.config.ConfigException.BadValue
-
 import play.api.Configuration
 
-trait ConsulConfig {
-  def agentHostname: String
-  def agentPort: Int
-  def scheme: String
-  def routingPolicy: RoutingPolicy
-}
+case class ConsulConfig(agentHostname: String, agentPort: Int, scheme: String, routingPolicy: RoutingPolicy)
 
 object ConsulConfig {
-  @Singleton
-  class ConsulConfigImpl @Inject() (config: Configuration) extends ConsulConfig {
-    override val agentHostname = config.getString("lagom.discovery.consul.agent-hostname").get
-    override val agentPort = config.getInt("lagom.discovery.consul.agent-port").get
-    override val scheme = config.getString("lagom.discovery.consul.uri-scheme").get
-    override val routingPolicy = RoutingPolicy(config.getString("lagom.discovery.consul.routing-policy").get)
+  def apply(config: Configuration): ConsulConfig = {
+    val agentHostname = config.getString("lagom.discovery.consul.agent-hostname").get
+    val agentPort = config.getInt("lagom.discovery.consul.agent-port").get
+    val scheme = config.getString("lagom.discovery.consul.uri-scheme").get
+    val routingPolicy = RoutingPolicy(config.getString("lagom.discovery.consul.routing-policy").get)
+    new ConsulConfig(agentHostname, agentPort, scheme, routingPolicy)
   }
 }
 
@@ -33,6 +25,9 @@ object RoutingPolicy {
 }
 
 sealed trait RoutingPolicy
+
 case object First extends RoutingPolicy
+
 case object Random extends RoutingPolicy
+
 case object RoundRobin extends RoutingPolicy
