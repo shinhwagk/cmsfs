@@ -18,6 +18,7 @@ lazy val root = (project in file("."))
     `config-api`, `config-impl`,
     `monitor-api`, `monitor-impl`,
     `collect-ssh-api`, `collect-ssh-impl`,
+    `format-analyze-api`, `format-analyze-impl`,
     `lagom-service-locator`
     //    ,
     //    `collect-jdbc-api`, `collect-jdbc-impl`

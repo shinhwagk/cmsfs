@@ -10,10 +10,10 @@ import java.util.concurrent.ThreadLocalRandom
 import akka.stream.scaladsl.Sink
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 
-class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration) {
+class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(implicit ec: ExecutionContext) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -21,12 +21,12 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration) {
 
   private val subscriber = topic.formatTopic.subscriber
 
-//  subscriber
-//    //    .mapAsync(10)(fai => actionFormat(fai.metricName, fai.data, fai.args))
-//    .map(streamLog("start format analyze", _))
-//    .mapAsync(10)(actionFormat)
-//    .map(streamLog("end format analyze", _))
-//    .runWith(Sink.ignore)
+  //  subscriber
+  //    //    .mapAsync(10)(fai => actionFormat(fai.metricName, fai.data, fai.args))
+  //    .map(streamLog("start format analyze", _))
+  //    .mapAsync(10)(actionFormat)
+  //    .map(streamLog("end format analyze", _))
+  //    .runWith(Sink.ignore)
 
   def genUrl(name: String): String = {
     List(formatUrl, name, "analyze.sh").mkString("/")
