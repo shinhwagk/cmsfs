@@ -1,14 +1,25 @@
 package org.wex.cmsfs.monitor.impl
 
-//class MonitorActionAnalyze(mt: MonitorTopic, fs: FormatService)(implicit ec: ExecutionContext, mi: Materializer) {
-//
-//  private val log = LoggerFactory.getLogger(classOf[MonitorActionAnalyze])
+import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
+import org.slf4j.LoggerFactory
+import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 
-//  mt.monitorDepositoryTopic
-//    .subscriber
-//    .map { p => log.info("fasong  anglay "); p }
-//    .mapAsync(10)(md => fs.pushFormatAnalyze(md.metricName, md.collectData).invoke())
-//    .runWith(Sink.ignore)
+import scala.concurrent.ExecutionContext
+
+class MonitorActionAnalyze(mt: MonitorTopic, fas: FormatAnalyzeService)(implicit ec: ExecutionContext, mi: Materializer) {
+
+  private val logger = LoggerFactory.getLogger(this.getClass)
+
+  mt.collectResultTopic.subscriber
+    .filter(_.rs.isDefined)
+    .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, "xx", x.rs.get, "xx")))
+    .runWith(Sink.ignore)
+
+  //    .subscriber
+  //    .map { p => log.info("fasong  anglay "); p }
+  //    .mapAsync(10)(md => fs.pushFormatAnalyze(md.metricName, md.collectData).invoke())
+  //    .runWith(Sink.ignore)
 
   //  def executeMonitorForAnalyze(md: MonitorActionDepository): Future[String] = {
   //    for {
@@ -21,4 +32,4 @@ package org.wex.cmsfs.monitor.impl
   //        .invoke(QueryOSMessage(mh.ip, c.user, genUrl("COLLECT", "SSH", metric.name), Some(c.port)))
   //    } yield collectData
   //  }
-//}
+}

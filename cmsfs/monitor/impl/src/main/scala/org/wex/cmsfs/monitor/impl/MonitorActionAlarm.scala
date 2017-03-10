@@ -1,21 +1,18 @@
 package org.wex.cmsfs.monitor.impl
 
-import com.lightbend.lagom.scaladsl.pubsub.PubSubRef
-import org.wex.cmsfs.config.api.MonitorDepository
+import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
+import org.slf4j.LoggerFactory
+import org.wex.cmsfs.format.alarm.api.FormatAlarmService
 
-class MonitorActionAlarm {
-  def start(topic:PubSubRef[MonitorDepository]): Unit ={
-  }
+import scala.concurrent.ExecutionContext
 
+class MonitorActionAlarm(mt: MonitorTopic, fas: FormatAlarmService)(implicit ec: ExecutionContext, mi: Materializer) {
 
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
-//  def executeMonitorForAnalyze(md: MonitorDepository): Future[String] = {
-//    for {
-//      metric <- cs.getMetricById(md.monitorId).invoke()
-//      c <- cs.getConnectorSSHById(md.ConnectorId).invoke()
-//      mh <- cs.getMachineById(c.machineId).invoke()
-//      collectData <- qs.queryForOSScript
-//        .invoke(QueryOSMessage(mh.ip, c.user, genUrl("COLLECT", "SSH", metric.name), Some(c.port)))
-//    } yield collectData
-//  }
+  mt.collectResultTopic.subscriber
+    .filter(_.rs.isDefined)
+        .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, "xx", x.rs.get, "xx")))
+    .runWith(Sink.ignore)
 }
