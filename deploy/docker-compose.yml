@@ -75,6 +75,7 @@ services:
     networks: 
       - cmsfs
     depends_on: 
+      - monitor
       - consul
 
   db:
