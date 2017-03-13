@@ -143,8 +143,7 @@ services:
       - SERVICE_PORT=9200
     volumes:
       - ./register.sh:/register.sh
-    entrypoint: sh -c "/register.sh"
-    command: /docker-entrypoint.sh elasticsearch
+    entrypoint: sh -c "/register.sh && /docker-entrypoint.sh elasticsearch"
     ports: 
       - "9200:9200"
     depends_on: 
