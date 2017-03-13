@@ -21,6 +21,8 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
 
   private val subscriber = topic.formatTopic.subscriber
 
+  logger.info("FormatAnalyzeAction start.")
+
   subscriber
     .map(streamLog("start format analyze", _))
     //    .mapAsync(10)(fai => actionFormat(fai.metricName, fai.data, fai.args))
