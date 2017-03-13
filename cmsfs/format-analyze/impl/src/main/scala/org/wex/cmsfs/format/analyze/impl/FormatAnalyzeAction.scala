@@ -45,7 +45,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
   }
 
   def actionFormat(fai: FormatAnalyzeItem): Future[String] = Future {
-    val (id, name, data, args) = fai
+    val FormatAnalyzeItem(id, name, data, args) = fai
     val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, data, args)
