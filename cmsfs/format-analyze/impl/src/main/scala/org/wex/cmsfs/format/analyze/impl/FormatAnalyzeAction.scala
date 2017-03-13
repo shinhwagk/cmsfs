@@ -15,7 +15,7 @@ import scala.io.Source
 
 class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(implicit ec: ExecutionContext, mi: Materializer) {
 
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val formatUrl = config.getString("format.url")
 
