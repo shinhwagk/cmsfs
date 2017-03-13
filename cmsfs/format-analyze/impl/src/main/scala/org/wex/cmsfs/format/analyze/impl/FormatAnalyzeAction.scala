@@ -3,6 +3,7 @@ package org.wex.cmsfs.format.analyze.impl
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
 
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
@@ -12,7 +13,7 @@ import play.api.Configuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 
-class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(implicit ec: ExecutionContext) {
+class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(implicit ec: ExecutionContext, mi: Materializer) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
