@@ -72,7 +72,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
     val dirName = s"workspace/${ThreadLocalRandom.current.nextLong(100000000).toString}"
     val file = new File(dirName)
     file.exists() match {
-      case false => file.mkdir()
+      case false => file.mkdirs()
       case true => throw new Exception(s"dirName:${dirName} exists.")
     }
     dirName
