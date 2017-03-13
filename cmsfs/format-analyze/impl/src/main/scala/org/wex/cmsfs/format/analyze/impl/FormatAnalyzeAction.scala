@@ -17,7 +17,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private val formatUrl = config.getString("format.url")
+  private val formatUrl: String = config.getString("format.url").get
 
   private val subscriber = topic.formatTopic.subscriber
 
@@ -44,7 +44,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
   }
 
   def actionFormat(fai: FormatAnalyzeItem): Future[String] = Future {
-    val url = genUrl(fai.metricName)
+    val url: String = genUrl(fai.metricName)
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, fai.data, fai.args)
     val rs = execScript(workDirName)
