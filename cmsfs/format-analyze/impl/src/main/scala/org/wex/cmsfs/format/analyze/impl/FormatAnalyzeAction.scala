@@ -45,27 +45,28 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
   }
 
   def actionFormat(fai: FormatAnalyzeItem): Future[String] = Future {
-    val url: String = genUrl(fai.metricName)
+    val (id, name, data, args) = fai
+    val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
-    val workDirName = executeFormatBefore(url, fai.data, fai.args)
+    val workDirName = executeFormatBefore(url, data, args)
     val rs = execScript(workDirName)
-//    executeFormatAfter(workDirName)
+    //    executeFormatAfter(workDirName)
     rs
   }
 
-//  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
-//    val url = genUrl(name)
-//    val workDirName = executeFormatBefore(url, data, args)
-//    val rs = execScript(workDirName)
-////    executeFormatAfter(workDirName)
-//    rs
-//  }
+  //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
+  //    val url = genUrl(name)
+  //    val workDirName = executeFormatBefore(url, data, args)
+  //    val rs = execScript(workDirName)
+  ////    executeFormatAfter(workDirName)
+  //    rs
+  //  }
 
   def executeFormatBefore(url: String, data: String, args: String): String = {
     val workDirName: String = createWorkDir
     downAndWriteScript(url, workDirName)
     writeData(data, workDirName)
-    writeData(args, workDirName)
+    writeArgs(args, workDirName)
     workDirName
   }
 
@@ -106,13 +107,13 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
 
   def execScript(workDirName: String): String = {
     import sys.process._
-//    try {
-      Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
-//    } catch {
-//      case e: Exception => {
-//        logger.error(e.getMessage)
-//        "[]"
-//      }
-//    }
+    //    try {
+    Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
+    //    } catch {
+    //      case e: Exception => {
+    //        logger.error(e.getMessage)
+    //        "[]"
+    //      }
+    //    }
   }
 }
