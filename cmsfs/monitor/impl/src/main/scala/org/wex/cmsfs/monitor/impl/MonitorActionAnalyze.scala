@@ -12,6 +12,7 @@ class MonitorActionAnalyze(mt: MonitorTopic, fas: FormatAnalyzeService)(implicit
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   mt.collectResultTopic.subscriber
+    .map { elem => logger.info("analyze action " + elem.id); elem }
     .filter(_.rs.isDefined)
     .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, "xx", x.rs.get, "xx")))
     .runWith(Sink.ignore)

@@ -12,7 +12,7 @@ class FormatAnalyzeServiceImpl(topic: FormatAnalyzeTopic)(implicit ec: Execution
   private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def pushFormatAnalyze: ServiceCall[FormatAnalyzeItem, Done] = ServiceCall { fai =>
-    logger.info(s"format alarmreceive: ${fai.id}-${fai.metricName}")
+    logger.info(s"format alarm receive: ${fai.id}-${fai.metricName}")
     topic.formatTopic.publish(fai);
     Future.successful(Done)
     //    ct.CollectTopic.publish(ci);
