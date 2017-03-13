@@ -90,6 +90,7 @@ lazy val `format-analyze-impl` = (project in file("format-analyze/impl"))
 lazy val `elasticsearch-api` = (project in file("elasticsearch/api"))
   .settings(libraryDependencies += lagomScaladslApi)
 lagomUnmanagedServices in ThisBuild += ("elastic-search" -> "http://elasticsearch.cmsfs.org:9200")
+lagomServiceLocatorEnabled in ThisBuild := false
 
 lazy val `format-alarm-api` = (project in file("format-alarm/api"))
   .settings(libraryDependencies += lagomScaladslApi)
