@@ -45,6 +45,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
 
   def actionFormat(fai: FormatAnalyzeItem): Future[String] = Future {
     val url = genUrl(fai.metricName)
+    logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, fai.data, fai.args)
     val rs = execScript(workDirName)
     executeFormatAfter(workDirName)
