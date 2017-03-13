@@ -12,7 +12,6 @@ val quartz = "org.quartz-scheduler" % "quartz" % "2.2.3"
 val jsch = "com.jcraft" % "jsch" % "0.1.54"
 val consul = "com.ecwid.consul" % "consul-api" % "1.2.1"
 
-
 lazy val root = (project in file("."))
   .aggregate(
     `config-api`, `config-impl`,
