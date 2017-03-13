@@ -8,6 +8,7 @@ import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService
 import scala.concurrent.ExecutionContext
 
 class MonitorActionAnalyze(mt: MonitorTopic, fas: FormatAnalyzeService)(implicit ec: ExecutionContext, mi: Materializer) {
+  logger.info(s"${this.getClass} start.")
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
