@@ -105,13 +105,13 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
 
   def execScript(workDirName: String): String = {
     import sys.process._
-    try {
+//    try {
       Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
-    } catch {
-      case e: Exception => {
-        logger.error(e.getMessage)
-        "[]"
-      }
-    }
+//    } catch {
+//      case e: Exception => {
+//        logger.error(e.getMessage)
+//        "[]"
+//      }
+//    }
   }
 }
