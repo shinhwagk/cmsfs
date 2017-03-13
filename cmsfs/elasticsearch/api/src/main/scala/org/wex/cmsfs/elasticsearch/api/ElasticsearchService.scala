@@ -16,7 +16,7 @@ trait ElasticsearchService extends Service {
     import ElasticsearchService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      restCall(Method.PUT, "/v1/elasticsearch/:_index/:_type", pushElasticsearchItem _)
+      restCall(Method.PUT, "/:_index/:_type", pushElasticsearchItem _)
         .withCircuitBreaker(CircuitBreaker.identifiedBy("elasticsearch-circuitbreaker"))
     )
   }
