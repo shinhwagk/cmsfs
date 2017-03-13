@@ -3,7 +3,7 @@ package org.wex.cmsfs.format.analyze.impl
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
 
-import akka.stream.Materializer
+import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
@@ -24,9 +24,15 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
   subscriber
     .map(streamLog("start format analyze", _))
     //    .mapAsync(10)(fai => actionFormat(fai.metricName, fai.data, fai.args))
-    .mapAsync(10)(actionFormat)
+    .mapAsync(10)(actionFormat).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .map(streamLog("end format analyze", _))
     .runWith(Sink.ignore)
+
+  def decider(implicit log: Logger): Supervision.Decider = {
+    case ex: Exception =>
+      log.error(ex.getMessage + " XXXX")
+      Supervision.Resume
+  }
 
   def genUrl(name: String): String = {
     List(formatUrl, name, "analyze.sh").mkString("/")
