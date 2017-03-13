@@ -1,4 +1,4 @@
-package org.wex.cmsfs.format.analyze.impl.api
+package org.wex.cmsfs.format.analyze.api
 
 import play.api.libs.json.{Format, Json}
 

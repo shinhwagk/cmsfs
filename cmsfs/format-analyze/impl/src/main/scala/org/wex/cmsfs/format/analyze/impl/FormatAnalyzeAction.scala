@@ -7,7 +7,7 @@ import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.format.analyze.impl.api.FormatAnalyzeItem
+import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
 
 import scala.concurrent.{ExecutionContext, Future}

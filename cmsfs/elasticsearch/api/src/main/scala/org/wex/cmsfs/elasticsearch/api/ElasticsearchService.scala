@@ -1,14 +1,9 @@
-package org.wex.cmsfs.format.analyze.impl.api
+package org.wex.cmsfs.elasticsearch.api
 
 import akka.Done
-import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
+import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
 
-object FormatAnalyzeService {
-  val SERVICE_NAME = "format-analyze"
-}
-
-trait FormatAnalyzeService extends Service {
-
+trait ElasticsearchService extends Service{
   def pushFormatAnalyze: ServiceCall[FormatAnalyzeItem, Done]
 
   override final def descriptor = {

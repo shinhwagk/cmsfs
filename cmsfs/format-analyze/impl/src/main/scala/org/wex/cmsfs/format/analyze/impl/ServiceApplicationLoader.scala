@@ -6,7 +6,7 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
-import org.wex.cmsfs.format.analyze.impl.api.FormatAnalyzeService
+import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 

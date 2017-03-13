@@ -8,7 +8,7 @@ import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.alarm.api.FormatAlarmService
-import org.wex.cmsfs.format.analyze.impl.api.FormatAnalyzeService
+import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
