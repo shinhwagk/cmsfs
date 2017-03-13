@@ -140,7 +140,7 @@ services:
         aliases: 
           - elasticsearch.cmsfs.org
     ports: 
-      - "9300:9300"
+      - "9200:9200"
 
 networks: 
    cmsfs:
