@@ -39,7 +39,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
   }
 
   def streamLog[T](log: String, elem: T): T = {
-    logger.info(log);
+    logger.info(log + s" ${elem.toString}");
     elem
   }
 
