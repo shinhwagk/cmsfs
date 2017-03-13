@@ -1,10 +1,10 @@
 package org.wex.cmsfs.elasticsearch.api
 
 import akka.Done
-import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
+import com.lightbend.lagom.scaladsl.api.{CircuitBreaker, Service, ServiceCall}
 
 object ElasticsearchService {
-  val SERVICE_NAME = "elasticsearch"
+  val SERVICE_NAME = "elastic-search"
 }
 
 trait ElasticsearchService extends Service {
@@ -15,8 +15,10 @@ trait ElasticsearchService extends Service {
     import ElasticsearchService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      pathCall("/v1/elasticsearch/:_index/:_type/:_id", pushElasticsearchItem _),
+      pathCall("/v1/elasticsearch/:_index/:_type/:_id", pushElasticsearchItem _)
+        .withCircuitBreaker(CircuitBreaker.identifiedBy("elasticsearch-circuitbreaker")),
       pathCall("/v1/elasticsearch/:_index/:_type", pushElasticsearchItem _)
+        .withCircuitBreaker(CircuitBreaker.identifiedBy("elasticsearch-circuitbreaker"))
     )
   }
 }
