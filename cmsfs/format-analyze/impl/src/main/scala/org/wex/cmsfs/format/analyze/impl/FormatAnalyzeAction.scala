@@ -35,7 +35,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
   }
 
   def genUrl(name: String): String = {
-    List(formatUrl, name, "analyze.sh").mkString("/")
+    List(formatUrl, name, "analyze.py").mkString("/")
   }
 
   def streamLog[T](log: String, elem: T): T = {
