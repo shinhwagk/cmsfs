@@ -14,7 +14,7 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication =
     new ServiceApplication(context) with LagomDevModeComponents
 
-  override def load(context: LagomApplicationContext): LagomApplication = {{
+  override def load(context: LagomApplicationContext): LagomApplication = {
     loaderEnvironment(context)
     new ServiceApplication(context) with ConsulServiceLocatorComponents
   }
