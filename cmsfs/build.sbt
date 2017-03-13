@@ -119,4 +119,6 @@ lagomKafkaEnabled in ThisBuild := false
 lagomCassandraCleanOnStart in ThisBuild := false
 parallelExecution in ThisBuild := true
 
+mappings in (Compile, packageDoc) := Seq()
+
 fork in run := true

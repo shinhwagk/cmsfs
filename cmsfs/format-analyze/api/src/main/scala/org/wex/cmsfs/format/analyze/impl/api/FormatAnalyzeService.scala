@@ -1,4 +1,4 @@
-package org.wex.cmsfs.format.analyze.api
+package org.wex.cmsfs.format.analyze.impl.api
 
 import akka.Done
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
