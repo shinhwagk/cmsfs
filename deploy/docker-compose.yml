@@ -44,6 +44,7 @@ services:
     depends_on:
       - consul
       - config
+      - elasticsearch
 
   collect-ssh:
     build:
