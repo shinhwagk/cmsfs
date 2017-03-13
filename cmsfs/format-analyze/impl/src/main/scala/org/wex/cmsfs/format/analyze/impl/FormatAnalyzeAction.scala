@@ -25,7 +25,6 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
 
   subscriber
     .map(streamLog("start format analyze", _))
-    //    .mapAsync(10)(fai => actionFormat(fai.metricName, fai.data, fai.args))
     .mapAsync(10)(actionFormat).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .map(streamLog("end format analyze", _))
     .runWith(Sink.ignore)
@@ -50,17 +49,17 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, fai.data, fai.args)
     val rs = execScript(workDirName)
-    executeFormatAfter(workDirName)
-    rs
-  }
-
-  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
-    val url = genUrl(name)
-    val workDirName = executeFormatBefore(url, data, args)
-    val rs = execScript(workDirName)
 //    executeFormatAfter(workDirName)
     rs
   }
+
+//  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
+//    val url = genUrl(name)
+//    val workDirName = executeFormatBefore(url, data, args)
+//    val rs = execScript(workDirName)
+////    executeFormatAfter(workDirName)
+//    rs
+//  }
 
   def executeFormatBefore(url: String, data: String, args: String): String = {
     val workDirName: String = createWorkDir
