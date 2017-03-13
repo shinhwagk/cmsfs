@@ -141,10 +141,14 @@ services:
     environment: 
       - SERVICE_NAME=elastic-search
       - SERVICE_PORT=9200
-    entrypoint: "/docker-entrypoint.sh elasticsearch"
-    command: sh -c "/opt/load.sh"
+    volumes:
+      - ./register.sh:/register.sh
+    entrypoint: sh -c "/register.sh"
+    command: /docker-entrypoint.sh elasticsearch
     ports: 
       - "9200:9200"
+    depends_on: 
+      - consul
 
 networks: 
    cmsfs:
