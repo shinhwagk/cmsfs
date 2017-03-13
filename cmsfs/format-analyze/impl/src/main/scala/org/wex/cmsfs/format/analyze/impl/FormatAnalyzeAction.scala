@@ -108,7 +108,10 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
     try {
       Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
     } catch {
-      case e: Exception => "[]"
+      case e: Exception => {
+        logger.error(e.getMessage)
+        "[]"
+      }
     }
   }
 }
