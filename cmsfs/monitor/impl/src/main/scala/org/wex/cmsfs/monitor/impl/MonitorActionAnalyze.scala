@@ -3,7 +3,6 @@ package org.wex.cmsfs.monitor.impl
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.slf4j.LoggerFactory
-import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.format.analyze.impl.api.{FormatAnalyzeItem, FormatAnalyzeService}
 
 import scala.concurrent.ExecutionContext
