@@ -56,7 +56,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
     val url = genUrl(name)
     val workDirName = executeFormatBefore(url, data, args)
     val rs = execScript(workDirName)
-    executeFormatAfter(workDirName)
+//    executeFormatAfter(workDirName)
     rs
   }
 
