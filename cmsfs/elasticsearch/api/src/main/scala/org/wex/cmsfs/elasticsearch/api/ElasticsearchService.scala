@@ -11,6 +11,8 @@ trait ElasticsearchService extends Service {
 
   def pushElasticsearchItem(_index: String, _type: String, _id: Option[String] = None): ServiceCall[String, Done]
 
+  def pushElasticsearchItem(_index: String, _type: String): ServiceCall[String, Done]
+  
   override final def descriptor = {
     import ElasticsearchService._
     import Service._
