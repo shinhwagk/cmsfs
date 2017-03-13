@@ -7,13 +7,16 @@ import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 
-class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(implicit ec: ExecutionContext, mi: Materializer) {
+class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
+                          config: Configuration,
+                          es: ElasticsearchService)(implicit ec: ExecutionContext, mi: Materializer) {
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -27,6 +30,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
     .map(streamLog("start format analyze", _))
     .mapAsync(10)(actionFormat).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .map(streamLog("end format analyze", _))
+    .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index, _type).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.ignore)
 
   def decider(implicit log: Logger): Supervision.Decider = {
@@ -44,14 +48,14 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic, config: Configuration)(impl
     elem
   }
 
-  def actionFormat(fai: FormatAnalyzeItem): Future[String] = Future {
+  def actionFormat(fai: FormatAnalyzeItem) = Future {
     val FormatAnalyzeItem(id, name, data, args) = fai
     val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, data, args)
     val rs = execScript(workDirName)
     //    executeFormatAfter(workDirName)
-    rs
+    ("OS", name, rs)
   }
 
   //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {

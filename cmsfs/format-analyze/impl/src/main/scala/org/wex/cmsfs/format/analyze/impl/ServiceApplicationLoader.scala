@@ -6,6 +6,7 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
+import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
@@ -35,6 +36,8 @@ abstract class ServiceApplication(context: LagomApplicationContext)
   override lazy val lagomServer = LagomServer.forServices(
     bindService[FormatAnalyzeService].to(wire[FormatAnalyzeServiceImpl])
   )
+
+  val elasticsearchService = serviceClient.implement[ElasticsearchService]
 
   val topic = wire[FormatAnalyzeTopic]
   val action = wire[FormatAnalyzeAction]
