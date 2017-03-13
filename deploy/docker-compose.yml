@@ -137,11 +137,9 @@ services:
     container_name: cmsfs_elasticsearch
     image: elasticsearch
     networks: 
-      cmsfs:
-        aliases: 
-          - elasticsearch.cmsfs.org
+      - cmsfs
     environment: 
-      - SERVICE_NAME=elasticsearch
+      - SERVICE_NAME=elastic-search
       - SERVICE_PORT=9200
     entrypoint: "/docker-entrypoint.sh elasticsearch"
     command: sh -c "/opt/load.sh"
