@@ -58,6 +58,7 @@ services:
       - SERVICE_PORT=9000
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
+      - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
     depends_on: 
@@ -73,6 +74,8 @@ services:
     environment: 
       - SERVICE_NAME=format-analyze
       - SERVICE_PORT=9000
+    volumes: 
+      - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
     depends_on: 
@@ -130,6 +133,8 @@ services:
     image: grafana/grafana
     networks: 
      - cmsfs
+    volumes: 
+      - /etc/localtime:/etc/localtime
     ports: 
       - "3000:3000"
     environment: 
