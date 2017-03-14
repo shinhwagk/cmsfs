@@ -10,6 +10,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
+import play.api.libs.json.{JsArray, JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
@@ -30,8 +31,15 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .map(streamLog("start format analyze", _))
     .mapAsync(10)(actionFormat).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .map(streamLog("end format analyze", _))
+    .mapConcat(rs => splitAnalyzeResult(rs).toList)
     .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index, _type).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.ignore)
+
+  def splitAnalyzeResult(elem: (String, String, String)): Seq[(String, String, String)] = {
+    val rs = elem._3
+    val arr: Seq[JsValue] = Json.toJson(rs).as[JsArray].value
+    arr.map(row => (elem._1, elem._2, row.toString()))
+  }
 
   def decider(implicit log: Logger): Supervision.Decider = {
     case ex: Exception =>
@@ -48,7 +56,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     elem
   }
 
-  def actionFormat(fai: FormatAnalyzeItem) = Future {
+  def actionFormat(fai: FormatAnalyzeItem): Future[(String, String, String)] = Future {
     val FormatAnalyzeItem(id, name, data, args) = fai
     val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
