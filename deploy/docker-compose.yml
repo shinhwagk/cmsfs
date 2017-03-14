@@ -147,6 +147,7 @@ services:
       - SERVICE_PORT=9200
     volumes:
       - ./register.sh:/register.sh
+      - /etc/localtime:/etc/localtime
     entrypoint: sh -c "/register.sh && /docker-entrypoint.sh elasticsearch"
     ports: 
       - "9200:9200"
