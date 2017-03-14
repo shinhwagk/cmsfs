@@ -139,7 +139,9 @@ services:
     container_name: cmsfs_elasticsearch
     image: elasticsearch
     networks: 
-      - cmsfs
+      cmsfs:
+        aliases: 
+          - elasticsearch.cmsfs.org
     environment: 
       - SERVICE_NAME=elastic-search
       - SERVICE_PORT=9200
