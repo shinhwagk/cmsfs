@@ -119,13 +119,13 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   def execScript(workDirName: String): String = {
     import sys.process._
-    //    try {
-    Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
-    //    } catch {
-    //      case e: Exception => {
-    //        logger.error(e.getMessage)
-    //        "[]"
-    //      }
-    //    }
+    try {
+      Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
+    } catch {
+      case e: Exception => {
+        logger.error(e.getMessage)
+        "[]"
+      }
+    }
   }
 }
