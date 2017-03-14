@@ -33,7 +33,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .map(streamLog("end format analyze", _))
     .mapConcat(rs => splitAnalyzeResult(rs).toList)
     .map(streamLog("view format rs s", _))
-    .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index, _type).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index.toLowerCase, _type.toLowerCase).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.ignore)
 
   def splitAnalyzeResult(elem: (String, String, String)): Seq[(String, String, String)] = {

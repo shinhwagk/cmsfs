@@ -112,18 +112,18 @@ services:
       db:
         condition: service_healthy
 
-  cadvisor:
-    container_name: cmsfs_cadvisor
-    image: google/cadvisor:latest
-    volumes: 
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks: 
-      - cmsfs
-    ports: 
-      - "8080:8080"
+  # cadvisor:
+  #   container_name: cmsfs_cadvisor
+  #   image: google/cadvisor:latest
+  #   volumes: 
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   networks: 
+  #     - cmsfs
+  #   ports: 
+  #     - "8080:8080"
 
   # grafana:
   #   container_name: cmsfs_grafana
