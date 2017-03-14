@@ -36,9 +36,16 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .runWith(Sink.ignore)
 
   def splitAnalyzeResult(elem: (String, String, String)): Seq[(String, String, String)] = {
-    val rs = elem._3
-    val arr: Seq[JsValue] = Json.toJson(rs).as[JsArray].value
-    arr.map(row => (elem._1, elem._2, row.toString()))
+    try {
+      val rs = elem._3
+      val arr: Seq[JsValue] = Json.toJson(rs).as[JsArray].value
+      arr.map(row => (elem._1, elem._2, row.toString()))
+    } catch {
+      case ex: Exception => {
+        logger.error(ex.getMessage)
+        Seq()
+      }
+    }
   }
 
   def decider(implicit log: Logger): Supervision.Decider = {
