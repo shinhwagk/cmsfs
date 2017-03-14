@@ -38,7 +38,9 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
   def splitAnalyzeResult(elem: (String, String, String)): Seq[(String, String, String)] = {
     try {
       val rs = elem._3
+      logger.info(rs)
       val arr: Seq[JsValue] = Json.toJson(rs).as[JsArray].value
+      logger.info(arr.toString())
       arr.map(row => (elem._1, elem._2, row.toString()))
     } catch {
       case ex: Exception => {
