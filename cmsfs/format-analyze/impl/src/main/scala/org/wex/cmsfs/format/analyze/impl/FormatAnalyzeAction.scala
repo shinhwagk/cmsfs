@@ -39,7 +39,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     try {
       val rs = elem._3
       logger.info(rs)
-      val arr: Seq[JsValue] = Json.toJson(rs).as[JsArray].value
+      val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
       logger.info(arr.toString())
       arr.map(row => (elem._1, elem._2, row.toString()))
     } catch {
