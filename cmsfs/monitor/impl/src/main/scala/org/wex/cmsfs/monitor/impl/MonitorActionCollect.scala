@@ -2,6 +2,7 @@ package org.wex.cmsfs.monitor.impl
 
 import java.util.Date
 
+import akka.actor.ActorSystem
 import akka.stream.Materializer
 import org.quartz.CronExpression
 import org.slf4j.{Logger, LoggerFactory}
@@ -14,16 +15,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
                            cSSHs: CollectSSHService,
-                           cJDBCs: CollectJDBCService)(implicit ec: ExecutionContext, mi: Materializer) {
+                           cJDBCs: CollectJDBCService,
+                           system: ActorSystem)(implicit mat: Materializer) {
 
   private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  private implicit val executionContext = system.dispatcher
 
   Future {
     while (true) {
       logger.info(s"${System.currentTimeMillis()}")
       val cDate = new Date()
+      val utcDate = cDate.toInstant.toString
       val monitorDetails: Future[Seq[MonitorDetail]] = cs.getMonitorDetails.invoke().map(_.filter(md => filterCron(md.cron, cDate)))
-      monitorDetails.foreach(_.foreach(monitorCategory))
+      val dispatcher = monitorCategory(utcDate)
+      monitorDetails.foreach(_.foreach(dispatcher))
       Thread.sleep(1000)
     }
   }
@@ -32,7 +38,7 @@ class MonitorActionCollect(mt: MonitorTopic,
     new CronExpression(cron).isSatisfiedBy(cDate)
   }
 
-  def monitorCategory(md: MonitorDetail): Unit = {
+  def monitorCategory(utcDate: String)(md: MonitorDetail): Unit = {
     cs.getMetricById(md.metricId).invoke().foreach(mc =>
       mc.mode match {
         case "JDBC" =>
@@ -45,7 +51,7 @@ class MonitorActionCollect(mt: MonitorTopic,
           cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
             cs.getMachineById(mId).invoke().foreach(m => {
               logger.info(s"push ssh collect ${md.id}")
-              cSSHs.pushCollectItem.invoke(CollectItemSSH(md.id, mc.name, md.collectArgs, m.ip, port, user, password, privateKey))
+              cSSHs.pushCollectItem.invoke(CollectItemSSH(md.id, mc.name, md.collectArgs, m.ip, port, user, password, privateKey, utcDate))
                 .onFailure { case ex => logger.error(ex.getMessage) }
             })
           }

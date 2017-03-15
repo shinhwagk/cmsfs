@@ -10,7 +10,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json, JsString}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
@@ -36,17 +36,21 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index.toLowerCase, _type.toLowerCase).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.ignore)
 
-  def splitAnalyzeResult(elem: (String, String, String)): Seq[(String, String, String)] = {
+  def splitAnalyzeResult(elem: (String, String, String, String)): Seq[(String, String, String)] = {
     try {
       val rs = elem._3
       val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
-      arr.map(row => (elem._1, elem._2, row.toString()))
+      arr.map(row => (elem._1, elem._2, jsonObjectAddUtcDateField(row, elem._4).toString()))
     } catch {
       case ex: Exception => {
         logger.error(ex.getMessage)
         Seq()
       }
     }
+  }
+
+  def jsonObjectAddUtcDateField(json: JsValue, utcDate: String): JsValue = {
+    json.as[JsObject] + ("@timestamp" -> JsString(utcDate))
   }
 
   def decider(implicit log: Logger): Supervision.Decider = {
@@ -64,14 +68,14 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     elem
   }
 
-  def actionFormat(fai: FormatAnalyzeItem): Future[(String, String, String)] = Future {
-    val FormatAnalyzeItem(id, name, data, args) = fai
+  def actionFormat(fai: FormatAnalyzeItem): Future[(String, String, String, String)] = Future {
+    val FormatAnalyzeItem(id, name, data, args, fai.utcDate) = fai
     val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, data, args)
     val rs = execScript(workDirName)
     //    executeFormatAfter(workDirName)
-    ("OS", name, rs)
+    ("OS", name, rs, fai.utcDate)
   }
 
   //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {

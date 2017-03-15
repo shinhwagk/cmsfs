@@ -26,14 +26,17 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
   source.map(flowLog("debug", "receive ssh collect", _))
     .mapAsync(10)(x => {
       logger.info("start ssh collect")
-      val c = collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, x.metricName, rs))
+      val c = collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, x.metricName, rs, x.utcDate))
       c.onComplete {
         case Success(a) => logger.info(a.toString())
         case Failure(ex) => logger.error(ex.getMessage)
       }
       c
     }).withAttributes(ActorAttributes.supervisionStrategy(decider))
-    .mapAsync(10) { case (id, name, rsOpt) => ms.pushCollectResult.invoke(CollectResult(id, name, rsOpt)).map(_ => id) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    .mapAsync(10) {
+      case (id, name, rsOpt, utcDate) =>
+        ms.pushCollectResult.invoke(CollectResult(id, name, rsOpt, utcDate)).map(_ => id)
+    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def flowLog[T](level: String, log: String, elem: T): T = {
@@ -56,9 +59,9 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
     val OSName = System.getProperty("os.name").toLowerCase();
     try {
       if (OSName.startsWith("win")) {
-        Some(ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get))
+        Some(ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get));
       } else if (OSName == "linux") {
-        Some(ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get))
+        Some(ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get));
       } else {
         logger.error("OS not match..");
         None
