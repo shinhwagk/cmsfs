@@ -268,12 +268,21 @@ COMMIT;
 
 
 -- -----------------------------------------------------
+-- Data for table `oso_monitor`.`connector_mode_jdbc`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `oso_monitor`;
+INSERT INTO `oso_monitor`.`connector_mode_jdbc` (`id`, `machine_id`, `url`, `user`, `password`, `name`, `tags`, `state`, `category`, `category_version`) VALUES (1, 1, 'jdbc:oracle:thin:@10.65.193.25:1521/orayali2', 'system', 'oracle', 'yali2', '[]', 1, 'DATABASE', 'ORACLE');
+COMMIT;
+
+
+-- -----------------------------------------------------
 -- Data for table `oso_monitor`.`metric`
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `oso_monitor`;
 INSERT INTO `oso_monitor`.`metric` (`id`, `state`, `name`, `mode`, `tags`, `cron`, `category`, `category_version`, `description`) VALUES (1, 1, 'disk_space', 'SSH', '[]', '0/5 * * * * ?', 'CENTOS', '[]', '1111');
-
+INSERT INTO `oso_monitor`.`metric` (`id`, `state`, `name`, `mode`, `tags`, `cron`, `category`, `category_version`, `description`) VALUES (2, 1, 'tablespace_space', 'JDBC', '[]', '0/5 * * * * ?', 'DATABASE', '[]', '1111');
 COMMIT;
 
 
@@ -285,5 +294,6 @@ USE `oso_monitor`;
 INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (1, 1, 1, '0/5 * * * * ?', NULL, NULL, 1);
 INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (2, 1, 2, '0/5 * * * * ?', NULL, NULL, 1);
 INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (3, 1, 3, '0/5 * * * * ?', NULL, NULL, 1);
+INSERT INTO `oso_monitor`.`monitor_detail` (`id`, `metric_id`, `connector_id`, `cron`, `collect_args`, `analyze_args`, `alarm`) VALUES (4, 2, 1, '0/5 * * * * ?', NULL, NULL, 1);
 COMMIT;
 

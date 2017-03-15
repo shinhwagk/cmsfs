@@ -6,7 +6,6 @@ import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
-import org.wex.cmsfs.lagom.service.discovery.name.ServiceNameServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
