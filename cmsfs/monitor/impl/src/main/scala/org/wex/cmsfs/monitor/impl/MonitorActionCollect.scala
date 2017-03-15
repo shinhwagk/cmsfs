@@ -10,7 +10,7 @@ import org.wex.cmsfs.collect.jdbc.api.{CollectItemJDBC, CollectJDBCService}
 import org.wex.cmsfs.collect.ssh.api.{CollectItemSSH, CollectSSHService}
 import org.wex.cmsfs.config.api._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
@@ -48,10 +48,10 @@ class MonitorActionCollect(mt: MonitorTopic,
               .onFailure { case ex => logger.error(ex.getMessage) }
           }
         case "SSH" =>
-          cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, _, port, user, password, privateKey, _, _, _) =>
+          cs.getConnectorSSHById(md.ConnectorId).invoke().foreach { case ConnectorModeSSH(_, mId, _, name, port, user, password, privateKey, _, _, _) =>
             cs.getMachineById(mId).invoke().foreach(m => {
               logger.info(s"push ssh collect ${md.id}")
-              cSSHs.pushCollectItem.invoke(CollectItemSSH(md.id, mc.name, md.collectArgs, m.ip, port, user, password, privateKey, utcDate))
+              cSSHs.pushCollectItem.invoke(CollectItemSSH(md.id, mc.name, md.collectArgs, m.ip, port, user, password, privateKey, utcDate, name))
                 .onFailure { case ex => logger.error(ex.getMessage) }
             })
           }

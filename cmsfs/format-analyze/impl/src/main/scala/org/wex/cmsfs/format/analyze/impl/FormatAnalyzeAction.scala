@@ -36,11 +36,12 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index.toLowerCase, _type.toLowerCase).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.ignore)
 
-  def splitAnalyzeResult(elem: (String, String, String, String)): Seq[(String, String, String)] = {
+  def splitAnalyzeResult(elem: (String, String, String, String, String)): Seq[(String, String, String)] = {
     try {
       val rs = elem._3
       val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
-      arr.map(row => (elem._1, elem._2, jsonObjectAddUtcDateField(row, elem._4).toString()))
+      arr.map(row => (elem._1, elem._2,
+        jsonObjectAddUtcDateField(jsonObjectAddUtcDateField(row, "@timestamp", elem._4), "name", elem._5).toString))
     } catch {
       case ex: Exception => {
         logger.error(ex.getMessage)
@@ -49,8 +50,8 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def jsonObjectAddUtcDateField(json: JsValue, utcDate: String): JsValue = {
-    json.as[JsObject] + ("@timestamp" -> JsString(utcDate))
+  def jsonObjectAddUtcDateField(json: JsValue, key: String, utcDate: String): JsValue = {
+    json.as[JsObject] + (key -> JsString(utcDate))
   }
 
   def decider(implicit log: Logger): Supervision.Decider = {
@@ -68,14 +69,14 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     elem
   }
 
-  def actionFormat(fai: FormatAnalyzeItem): Future[(String, String, String, String)] = Future {
-    val FormatAnalyzeItem(id, name, data, args, fai.utcDate) = fai
+  def actionFormat(fai: FormatAnalyzeItem): Future[(String, String, String, String, String)] = Future {
+    val FormatAnalyzeItem(id, name, data, args, fai.utcDate, fai.name) = fai
     val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, data, args)
     val rs = execScript(workDirName)
     //    executeFormatAfter(workDirName)
-    ("OS", name, rs, fai.utcDate)
+    ("OS", name, rs, fai.utcDate, name)
   }
 
   //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {

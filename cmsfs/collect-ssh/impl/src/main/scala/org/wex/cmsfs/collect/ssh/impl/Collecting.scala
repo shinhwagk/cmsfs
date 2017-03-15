@@ -26,7 +26,8 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
   source.map(flowLog("debug", "receive ssh collect", _))
     .mapAsync(10)(x => {
       logger.info("start ssh collect")
-      val c = collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, x.metricName, rs, x.utcDate))
+      val c: Future[(Int, String, Option[String], String, String)] =
+        collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, x.metricName, rs, x.utcDate, x.name))
       c.onComplete {
         case Success(a) => logger.info(a.toString())
         case Failure(ex) => logger.error(ex.getMessage)
@@ -34,8 +35,8 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
       c
     }).withAttributes(ActorAttributes.supervisionStrategy(decider))
     .mapAsync(10) {
-      case (id, name, rsOpt, utcDate) =>
-        ms.pushCollectResult.invoke(CollectResult(id, name, rsOpt, utcDate)).map(_ => id)
+      case (id, metricName, rsOpt, utcDate, name) =>
+        ms.pushCollectResult.invoke(CollectResult(id, metricName, rsOpt, utcDate, name)).map(_ => id)
     }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 

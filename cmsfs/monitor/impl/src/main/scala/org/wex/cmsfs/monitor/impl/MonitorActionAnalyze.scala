@@ -16,7 +16,7 @@ class MonitorActionAnalyze(mt: MonitorTopic, fas: FormatAnalyzeService)(implicit
   mt.collectResultTopic.subscriber
     .map { elem => logger.info("analyze action " + elem.id); elem }
     .filter(_.rs.isDefined)
-    .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, x.metricName, x.rs.get, "[]", x.utcDate)))
+    .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, x.metricName, x.rs.get, "[]", x.utcDate, x.name)))
     .runWith(Sink.ignore)
 
   //    .subscriber

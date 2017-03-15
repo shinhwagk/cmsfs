@@ -10,7 +10,8 @@ case class CollectItemSSH(id: Int,
                           user: String,
                           password: Option[String],
                           privateKey: Option[String],
-                          utcDate: String)
+                          utcDate: String,
+                          name: String)
 
 object CollectItemSSH {
   implicit val format: Format[CollectItemSSH] = Json.format
