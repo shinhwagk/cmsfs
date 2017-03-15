@@ -1,16 +1,11 @@
 package org.wex.cmsfs.collect.jdbc.impl
 
-import java.io.{BufferedReader, InputStreamReader}
-
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
-import com.typesafe.config.ConfigFactory
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
-import play.api.libs.json.Json
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -23,14 +18,17 @@ class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(im
   source.map(flowLog("debug", "receive jdbc collect", _))
     .mapAsync(10)(x => {
       logger.info("start jdbc collect")
-      val c = collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, rs))
+      val c = collectAction(x.url, x.user, x.password, genUrl(x.metricName), Nil).map(rs => (x.id, x.metricName, rs, x.utcDate, x.name))
       c.onComplete {
         case Success(a) => logger.info(a.toString())
         case Failure(ex) => logger.error(ex.getMessage)
       }
       c
     }).withAttributes(ActorAttributes.supervisionStrategy(decider))
-    .mapAsync(10) { case (id, rsOpt) => ms.pushCollectResult.invoke(CollectResult(id, rsOpt)).map(_ => id) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    .mapAsync(10) {
+      case (id, metricName, rsOpt, utcDate, name) =>
+        ms.pushCollectResult.invoke(CollectResult(id, metricName, rsOpt, utcDate, name)).map(_ => id)
+    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def flowLog[T](level: String, log: String, elem: T): T = {
@@ -46,16 +44,18 @@ class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(im
 
   def genUrl(name: String): String = {
     val formatUrl = config.getString("collect.url")
-    List(formatUrl, name, "jdbc", "collect.sql").mkString("/")
+    val url = List(formatUrl, name, "jdbc", "collect.sql").mkString("/")
+    scala.io.Source.fromURL(url).mkString
   }
 
-  def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
+  def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = Future {
     val DBTYPE = "oracle"
     try {
       if (DBTYPE == "oracle") {
+        val collectOracle = new CollectingOracle(jdbcUrl, user, password, sqlText, parameters).mode("MAP")
       } else if (DBTYPE == "linux") {
       } else {
-        logger.error("OS not match..");
+        logger.error("DBTYPE not match..");
         None
       }
     } catch {

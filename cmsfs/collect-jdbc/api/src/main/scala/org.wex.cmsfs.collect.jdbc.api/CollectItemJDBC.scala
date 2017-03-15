@@ -7,7 +7,9 @@ case class CollectItemJDBC(id: Int,
                            args: Option[Seq[String]],
                            url: String,
                            user: String,
-                           password: String)
+                           password: String,
+                           utcDate: String,
+                           name: String)
 
 object CollectItemJDBC {
   implicit val format: Format[CollectItemJDBC] = Json.format

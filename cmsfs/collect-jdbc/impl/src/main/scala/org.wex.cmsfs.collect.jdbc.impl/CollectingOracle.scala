@@ -56,7 +56,6 @@ class CollectingOracle(jdbcUrl: String, username: String, password: String, sqlT
     Json.toJson(rows.toList)
   }
 
-
   def queryToAarry(rs: ResultSet): JsValue = {
     val meta = rs.getMetaData
     val rows: ArrayBuffer[List[String]] = new ArrayBuffer[List[String]]()

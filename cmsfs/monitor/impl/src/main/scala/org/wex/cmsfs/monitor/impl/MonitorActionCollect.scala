@@ -42,9 +42,9 @@ class MonitorActionCollect(mt: MonitorTopic,
     cs.getMetricById(md.metricId).invoke().foreach(mc =>
       mc.mode match {
         case "JDBC" =>
-          cs.getConnectorJDBCById(md.ConnectorId).invoke().foreach { case ConnectorModeJDBC(_, _, _, _, url, user, password, _, _, _) =>
+          cs.getConnectorJDBCById(md.ConnectorId).invoke().foreach { case ConnectorModeJDBC(_, _, _, name, url, user, password, _, _, _) =>
             logger.info(s"push jdbc collect ${md.id}")
-            cJDBCs.pushCollectItem.invoke(CollectItemJDBC(md.id, mc.name, md.collectArgs, url, user, password))
+            cJDBCs.pushCollectItem.invoke(CollectItemJDBC(md.id, mc.name, md.collectArgs, url, user, password, utcDate, name))
               .onFailure { case ex => logger.error(ex.getMessage) }
           }
         case "SSH" =>
