@@ -48,15 +48,16 @@ class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(im
     scala.io.Source.fromURL(url).mkString
   }
 
-  def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = Future {
+  def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = {
     val DBTYPE = "oracle"
     try {
       if (DBTYPE == "oracle") {
-        val collectOracle = new CollectingOracle(jdbcUrl, user, password, sqlText, parameters).mode("MAP")
-      } else if (DBTYPE == "linux") {
+        new CollectingOracle(jdbcUrl, user, password, sqlText, parameters).mode("MAP").map(Some(_))
+      } else if (DBTYPE == "mysql") {
+        Future.successful(None)
       } else {
         logger.error("DBTYPE not match..");
-        None
+        Future.successful(None)
       }
     } catch {
       case ex: Exception => logger.error(ex.getMessage + " collectionAction"); None
