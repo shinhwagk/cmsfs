@@ -64,6 +64,24 @@ services:
     depends_on: 
       - consul
 
+  collect-jdbc:
+    build:
+      context: ./
+      dockerfile: Dockerfile-lagom
+      args:
+        SVC_NAME: collect-jdbc
+    image: cmsfs/collect-jdbc
+    environment: 
+      - SERVICE_NAME=collect-jdbc
+      - SERVICE_PORT=9000
+    volumes:
+      - /etc/localtime:/etc/localtime
+    networks: 
+      - cmsfs
+    depends_on: 
+      - consul
+
+
   format-analyze:
     build:
       context: ./
