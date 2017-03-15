@@ -28,7 +28,7 @@ class MonitorActionCollect(mt: MonitorTopic,
       val cDate = new Date()
       val utcDate = cDate.toInstant.toString
       val monitorDetails: Future[Seq[MonitorDetail]] = cs.getMonitorDetails.invoke().map(_.filter(md => filterCron(md.cron, cDate)))
-      val dispatcher = monitorCategory(utcDate)
+      val dispatcher = monitorCategory(utcDate)(_)
       monitorDetails.foreach(_.foreach(dispatcher))
       Thread.sleep(1000)
     }
