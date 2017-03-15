@@ -2,6 +2,7 @@ package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
 
+import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
 import com.jcraft.jsch.{ChannelExec, JSch}
@@ -11,14 +12,16 @@ import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.libs.json.Json
 
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Collecting(ct: CollectTopic, ms: MonitorService)(implicit ec: ExecutionContext, mat: Materializer) {
+class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(implicit mat: Materializer) {
 
-  private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private final val source = ct.CollectTopic.subscriber
+  private implicit val executionContext = system.dispatcher
+
+  private val source = ct.CollectTopic.subscriber
 
   source.map(flowLog("debug", "receive ssh collect", _))
     .mapAsync(10)(x => {
