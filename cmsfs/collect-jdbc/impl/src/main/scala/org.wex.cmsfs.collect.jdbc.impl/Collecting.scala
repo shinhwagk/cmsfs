@@ -60,7 +60,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(im
         Future.successful(None)
       }
     } catch {
-      case ex: Exception => logger.error(ex.getMessage + " collectionAction"); None
+      case ex: Exception => logger.error(ex.getMessage + " collectionAction"); Future.successful(None)
     }
   }
 
