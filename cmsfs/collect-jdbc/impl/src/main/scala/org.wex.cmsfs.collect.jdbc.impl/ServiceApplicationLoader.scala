@@ -5,6 +5,7 @@ import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
+import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import org.wex.cmsfs.lagom.service.discovery.name.ServiceNameServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.LoggerConfigurator
@@ -18,7 +19,7 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
 
   override def load(context: LagomApplicationContext): LagomApplication = {
     loaderEnvironment(context)
-    new ServiceApplication(context) with ServiceNameServiceLocatorComponents
+    new ServiceApplication(context) with ConsulServiceLocatorComponents
   }
 
   def loaderEnvironment(context: LagomApplicationContext): Unit = {
