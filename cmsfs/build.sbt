@@ -21,8 +21,6 @@ lazy val root = (project in file("."))
     `format-analyze-api`, `format-analyze-impl`,
     `lagom-service-locator`,
     `elasticsearch-api`
-    //    ,
-    //    `collect-jdbc-api`, `collect-jdbc-impl`
   )
 
 def implCommonSettings: Seq[Setting[_]] = Seq(
