@@ -76,7 +76,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     val workDirName = executeFormatBefore(url, data, args)
     val rs = execScript(workDirName)
     //    executeFormatAfter(workDirName)
-    ("OS", name, rs, fai.utcDate, name)
+    ("OS", name, rs, fai.utcDate, fai.name)
   }
 
   //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
