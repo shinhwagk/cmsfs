@@ -53,7 +53,10 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
   .settings(libraryDependencies ++= Seq(quartz))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`monitor-api`, `config-api`, `collect-ssh-api`, `collect-jdbc-api`, `format-analyze-api`, `format-alarm-api`, `lagom-service-locator`)
+  .dependsOn(`monitor-api`, `config-api`,
+    `collect-ssh-api`, `collect-jdbc-api`,
+    `format-analyze-api`, `format-alarm-api`,
+    `lagom-service-locator`)
 
 lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .settings(libraryDependencies += lagomScaladslApi)
