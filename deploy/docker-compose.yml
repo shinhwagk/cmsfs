@@ -44,6 +44,8 @@ services:
     depends_on:
       - consul
       - config
+      - collect-ssh
+      - collect-jdbc
       - elasticsearch
 
   collect-ssh:
@@ -107,7 +109,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
+      # - /var/lib/mysql:/var/lib/mysql
+      - /etc/localtime:/etc/localtime
     depends_on: 
       - consul
     networks: 
