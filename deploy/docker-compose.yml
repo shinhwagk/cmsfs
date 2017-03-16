@@ -81,7 +81,6 @@ services:
     depends_on: 
       - consul
 
-
   format-analyze:
     build:
       context: ./
