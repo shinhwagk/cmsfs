@@ -41,7 +41,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
       val rs = elem._3
       val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
       arr.map(row => (elem._1, elem._2,
-        jsonObjectAddUtcDateField(jsonObjectAddUtcDateField(row, "@timestamp", elem._4), "name", elem._5).toString))
+        jsonObjectAddUtcDateField(jsonObjectAddUtcDateField(row, "@timestamp", elem._4), "@metric", elem._5).toString))
     } catch {
       case ex: Exception => {
         logger.error(ex.getMessage)
