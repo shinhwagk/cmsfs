@@ -52,7 +52,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
   }
 
   def genUrl(name: String): String = {
-    val formatUrl = ConfigFactory.load().getString("format.url")
+    val formatUrl = ConfigFactory.load().getString("collect.url")
     List(formatUrl, name, "ssh", "collect.sh").mkString("/")
   }
 
