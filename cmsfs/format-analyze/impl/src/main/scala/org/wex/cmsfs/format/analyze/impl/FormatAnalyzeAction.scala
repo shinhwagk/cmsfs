@@ -45,7 +45,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
       val rs = elem._3
       val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
       arr.map(row => (elem._1, elem._2,
-        jsonObjectAddUtcDateField(jsonObjectAddUtcDateField(row, "@timestamp", elem._4), "name", elem._5).toString))
+        jsonObjectAddField(jsonObjectAddField(row, "@timestamp", elem._4), "name", elem._5).toString))
     } catch {
       case ex: Exception => {
         logger.error(ex.getMessage)
@@ -54,8 +54,8 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def jsonObjectAddUtcDateField(json: JsValue, key: String, utcDate: String): JsValue = {
-    json.as[JsObject] + (key -> JsString(utcDate))
+  def jsonObjectAddField(json: JsValue, key: String, fieldVal: String): JsValue = {
+    json.as[JsObject] + (key -> JsString(fieldVal))
   }
 
   def decider(implicit log: Logger): Supervision.Decider = {
