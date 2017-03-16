@@ -45,6 +45,7 @@ class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(im
   def genUrl(name: String): String = {
     val formatUrl = config.getString("collect.url")
     val url = List(formatUrl, name, "jdbc", "collect.sql").mkString("/")
+    logger.info(s"jdbc collect ${url}")
     scala.io.Source.fromURL(url).mkString
   }
 
