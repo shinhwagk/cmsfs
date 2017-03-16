@@ -3,23 +3,27 @@ package org.wex.cmsfs.format.analyze.impl
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
 
-import akka.stream.{ActorAttributes, Materializer, Supervision}
+import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
+import akka.stream.{ActorAttributes, Materializer, Supervision}
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
-import play.api.libs.json.{JsArray, JsObject, JsValue, Json, JsString}
+import play.api.libs.json._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.io.Source
 
 class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
                           config: Configuration,
-                          es: ElasticsearchService)(implicit ec: ExecutionContext, mi: Materializer) {
+                          es: ElasticsearchService,
+                          system: ActorSystem)(implicit mat: Materializer) {
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  private implicit val executionContext = system.dispatcher
 
   private val formatUrl: String = config.getString("format.url").get
 
@@ -41,7 +45,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
       val rs = elem._3
       val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
       arr.map(row => (elem._1, elem._2,
-        jsonObjectAddUtcDateField(jsonObjectAddUtcDateField(row, "@timestamp", elem._4), "@metric", elem._5).toString))
+        jsonObjectAddUtcDateField(jsonObjectAddUtcDateField(row, "@timestamp", elem._4), "name", elem._5).toString))
     } catch {
       case ex: Exception => {
         logger.error(ex.getMessage)
@@ -74,7 +78,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     val url: String = genUrl(name)
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, data, args)
-    val rs = execScript(workDirName)
+    val rs: String = execScript(workDirName)
     //    executeFormatAfter(workDirName)
     ("OS", name, rs, fai.utcDate, fai.name)
   }
