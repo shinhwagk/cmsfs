@@ -12,7 +12,6 @@ import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
   override def loadDevMode(context: LagomApplicationContext): LagomApplication = {
-    loaderEnvironment(context)
     new ServiceApplication(context) with LagomDevModeComponents
   }
 
