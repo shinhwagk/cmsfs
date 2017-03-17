@@ -137,7 +137,7 @@ trait ConfigService extends Service {
       restCall(Method.GET, "/v1/core/format/analyze/:id", getCoreFormatAnalyzesById _),
       restCall(Method.POST, "/v1/core/format/analyze", addCoreFormatAnalyze),
       restCall(Method.GET, "/v1/core/format/alarm/:id", getCoreFormatAlarmsById _),
-      restCall(Method.POST, "/v1/core/format/analalarmyze", addCoreFormatAlarm)
+      restCall(Method.POST, "/v1/core/format/alarm", addCoreFormatAlarm)
     )
   }
 }

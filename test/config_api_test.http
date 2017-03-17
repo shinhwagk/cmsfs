@@ -1,0 +1,17 @@
+GET http://10.65.103.60:9000/v1/core/monitor/details HTTP/1.1
+content-type: application/json
+
+{
+
+}
+
+###
+POST http://10.65.103.60:9000/v1/core/connector/jdbc HTTP/1.1
+content-type: application/json
+
+{
+  "name":"yali",
+  "url":"aaa",
+  "user":"oracle",
+  "password":"xxx"
+}
