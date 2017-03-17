@@ -1,7 +1,7 @@
 package org.wex.cmsfs.config.db.table
 
 import org.wex.cmsfs.config.api.DepositoryAnalyze
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
 class DepositoryAnalyzes (tag: Tag) extends Table[DepositoryAnalyze](tag, "depository_analyze") {
 

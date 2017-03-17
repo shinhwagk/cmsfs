@@ -2,9 +2,9 @@ package org.wex.cmsfs.config.db.table
 
 import org.wex.cmsfs.config.db.Tables._
 import org.wex.cmsfs.config.api.ConnectorModeJDBC
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
-class ConnectorModeJdbcs(tag: Tag) extends Table[ConnectorModeJDBC](tag, "connector_mode_jdbc") {
+class ConnectorModeJdbcs(tag: Tag) extends Table[ConnectorModeJDBC](tag, "connector_jdbc") {
 
   def id = column[Option[Int]]("ID")
 

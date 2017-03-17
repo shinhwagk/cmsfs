@@ -1,6 +1,6 @@
 package org.wex.cmsfs.config.api
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
@@ -61,6 +61,24 @@ trait ConfigService extends Service {
 
   //  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
 
+  def getCoreMonitorDetails: ServiceCall[NotUsed, Seq[CoreMonitorDetail]]
+  def addCoreMonitorDetail: ServiceCall[CoreMonitorDetail, Done]
+
+  def getCoreConnectorJdbcById(id: Int): ServiceCall[NotUsed, CoreConnectorJdbc]
+  def addCoreConnectorJdbc: ServiceCall[CoreConnectorJdbc, Done]
+
+  def getCoreConnectorSshById(id: Int): ServiceCall[NotUsed, CoreConnectorSsh]
+  def addCoreConnectorSsh: ServiceCall[CoreConnectorSsh, Done]
+
+  def getCoreCollectById(id: Int): ServiceCall[NotUsed, CoreCollect]
+  def addCoreCollect: ServiceCall[CoreCollect, Done]
+
+  def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]]
+  def addCoreFormatAnalyze: ServiceCall[CoreFormatAnalyze, Done]
+
+  def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAlarm]]
+  def addCoreFormatAlarm: ServiceCall[CoreFormatAlarm, Done]
+
   override final def descriptor = {
     named("config").withCalls(
       //      restCall(Method.GET, "/v1/node/:id", getHost _),
@@ -103,9 +121,23 @@ trait ConfigService extends Service {
 
       restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
 
-      restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _)
+      restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _),
 
       //      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorById _)
+
+
+      restCall(Method.GET, "/v1/core/monitor/details", getCoreMonitorDetails),
+      restCall(Method.POST, "/v1/core/monitor/detail", addCoreMonitorDetail),
+      restCall(Method.GET, "/v1/core/connector/jdbc/:id", getCoreConnectorJdbcById _),
+      restCall(Method.POST, "/v1/core/connector/jdbc", addCoreConnectorJdbc),
+      restCall(Method.GET, "/v1/core/connector/ssh/:id", getCoreConnectorSshById _),
+      restCall(Method.POST, "/v1/core/connector/ssh", addCoreConnectorSsh),
+      restCall(Method.GET, "/v1/core/collect/:id", getCoreCollectById _),
+      restCall(Method.POST, "/v1/core/collect", addCoreCollect),
+      restCall(Method.GET, "/v1/core/format/analyze/:id", getCoreFormatAnalyzesById _),
+      restCall(Method.POST, "/v1/core/format/analyze", addCoreFormatAnalyze),
+      restCall(Method.GET, "/v1/core/format/alarm/:id", getCoreFormatAlarmsById _),
+      restCall(Method.POST, "/v1/core/format/analalarmyze", addCoreFormatAlarm)
     )
   }
 }

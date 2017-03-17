@@ -2,9 +2,9 @@ package org.wex.cmsfs.config.db.table
 
 import org.wex.cmsfs.config.db.Tables._
 import org.wex.cmsfs.config.api.ConnectorModeSSH
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
-class ConnectorModeSSHs(tag: Tag) extends Table[ConnectorModeSSH](tag, "connector_mode_ssh") {
+class ConnectorModeSSHs(tag: Tag) extends Table[ConnectorModeSSH](tag, "connector_ssh") {
 
   def id = column[Option[Int]]("ID")
 

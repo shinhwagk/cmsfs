@@ -1,7 +1,7 @@
 package org.wex.cmsfs.config.db.table
 
 import org.wex.cmsfs.config.api.Machine
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
 class Machines(tag: Tag) extends Table[Machine](tag, "machine") {
 

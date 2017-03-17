@@ -2,9 +2,9 @@ package org.wex.cmsfs.config.db
 
 import org.wex.cmsfs.config.api.MonitorCategoryEnum.MonitorCategoryEnum
 import org.wex.cmsfs.config.api.{MonitorAlarm, MonitorAlarmDetail, MonitorCategoryEnum}
-import org.wex.cmsfs.config.db.table._
+import org.wex.cmsfs.config.db.table.{CoreFormatAlarms, _}
 import play.api.libs.json.Json
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
 object Tables {
 
@@ -69,6 +69,13 @@ object Tables {
   val depositoryAnalyzes = TableQuery[DepositoryAnalyzes]
 
   val formatScripts = TableQuery[FormatScripts]
+
+  val coreMonitorDetails = TableQuery[CoreMonitorDetails]
+  val coreCollectorJdbcs = TableQuery[CoreConnectorJdbcs]
+  val coreCollectorSshs = TableQuery[CoreConnectorSshs]
+  val coreCollects = TableQuery[CoreCollects]
+  val coreFormatAlarms = TableQuery[CoreFormatAlarms]
+  val coreFormatAnalyzes = TableQuery[CoreFormatAnalyzes]
 
   //  val monitorDetails = TableQuery[MonitorDetails]
 

@@ -2,7 +2,7 @@ package org.wex.cmsfs.config.db.table
 
 import org.wex.cmsfs.config.api.Metric
 import org.wex.cmsfs.config.db.Tables._
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
 class Metrics(tag: Tag) extends Table[Metric](tag, "metric") {
 
