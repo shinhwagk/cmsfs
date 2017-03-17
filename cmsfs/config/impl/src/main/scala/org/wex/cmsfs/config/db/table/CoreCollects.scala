@@ -11,7 +11,7 @@ class CoreCollects(tag: Tag) extends Table[CoreCollect](tag, "core_collect") {
 
   def name = column[String]("NAME")
 
-  def args = column[String]("ARGS")
+  def args = column[Option[String]]("ARGS")
 
   override def * = (id, path, name, args) <> (CoreCollect.tupled, CoreCollect.unapply)
 }

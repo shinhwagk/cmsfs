@@ -53,7 +53,7 @@ trait ConfigService extends Service {
   /**
     * alarm
     */
-  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]]
+  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, Seq[MonitorAlarmDetail]]
 
   def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm]
 

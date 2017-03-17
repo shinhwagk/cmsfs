@@ -1,30 +1,47 @@
 package org.wex.cmsfs.collect.jdbc.impl
 
+import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
+import play.api.libs.json.Json
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(implicit ec: ExecutionContext, mat: Materializer) {
+class Collecting(ct: CollectTopic,
+                 ms: MonitorService,
+                 config: Configuration,
+                 system: ActorSystem)(implicit mat: Materializer) {
 
-  private implicit final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  private implicit val executionContext = system.dispatcher
 
   private final val source = ct.CollectTopic.subscriber
 
   source.map(flowLog("debug", "receive jdbc collect", _))
-    .mapAsync(10)(x => {
+    .mapAsync(10) { cis =>
       logger.info("start jdbc collect")
-      val c = collectAction(x.url, x.user, x.password, genUrl(x.metricName), Nil).map(rs => (x.id, x.metricName, rs, x.utcDate, x.name))
+
+      val monitorDetailId = cis.monitorDetailId
+      val url = cis.connector.url
+      val user = cis.connector.user
+      val password = cis.connector.password
+      val metricName = cis.collect.name
+      val name = cis.connector.name
+      val utcDate = cis.utcDate
+      val path = cis.collect.path
+
+      val c = collectAction(url, user, password, genUrl(path, metricName), Nil).map(rs => (monitorDetailId, metricName, rs, utcDate, name))
       c.onComplete {
         case Success(a) => logger.info(a.toString())
         case Failure(ex) => logger.error(ex.getMessage)
       }
       c
-    }).withAttributes(ActorAttributes.supervisionStrategy(decider))
+    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .mapAsync(10) {
       case (id, metricName, rsOpt, utcDate, name) =>
         ms.pushCollectResult.invoke(CollectResult(id, metricName, rsOpt, utcDate, name)).map(_ => id)
@@ -42,11 +59,9 @@ class Collecting(ct: CollectTopic, ms: MonitorService, config: Configuration)(im
       Supervision.Resume
   }
 
-  def genUrl(name: String): String = {
+  def genUrl(path: String, name: String): String = {
     val formatUrl = config.getString("collect.url").get
-    val url = List(formatUrl, name, "jdbc", "collect.sql").mkString("/")
-    logger.info(s"jdbc collect ${url}")
-    scala.io.Source.fromURL(url).mkString
+    Json.parse(path).as[Seq[String]].+:(formatUrl).:+("collect.sql").mkString("/")
   }
 
   def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = {

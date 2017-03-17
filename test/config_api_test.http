@@ -15,3 +15,6 @@ content-type: application/json
   "user":"oracle",
   "password":"xxx"
 }
+
+###
+GET http://10.65.103.60:9000/v1/core/connector/jdbc/1 HTTP/1.1

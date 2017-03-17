@@ -6,7 +6,7 @@ import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
 
 trait CollectSSHService extends Service {
 
-  def pushCollectItem: ServiceCall[CollectItemSSH, Done]
+  def pushCollectItem: ServiceCall[CollectItemSsh, Done]
 
   override final def descriptor = {
     import Service._

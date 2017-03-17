@@ -2,9 +2,6 @@ package org.wex.cmsfs.config
 
 import play.api.libs.json._
 
-/**
-  * Created by shinhwagk on 2017/2/3.
-  */
 object JsonFormat {
   def toJsArray(ls: Seq[Any]): Seq[JsValue] = {
     ls.map(

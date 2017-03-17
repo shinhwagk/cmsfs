@@ -10,7 +10,7 @@ object CollectJDBCService {
 
 trait CollectJDBCService extends Service {
 
-  def pushCollectItem: ServiceCall[CollectItemJDBC, Done]
+  def pushCollectItem: ServiceCall[CollectItemJdbc, Done]
 
   override final def descriptor = {
     import Service._

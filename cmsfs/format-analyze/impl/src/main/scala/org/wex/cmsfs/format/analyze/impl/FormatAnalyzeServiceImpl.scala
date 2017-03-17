@@ -15,6 +15,5 @@ class FormatAnalyzeServiceImpl(topic: FormatAnalyzeTopic)(implicit ec: Execution
     logger.info(s"format alarm receive: ${fai.id}-${fai.metricName}")
     topic.formatTopic.publish(fai);
     Future.successful(Done)
-    //    ct.CollectTopic.publish(ci);
   }
 }

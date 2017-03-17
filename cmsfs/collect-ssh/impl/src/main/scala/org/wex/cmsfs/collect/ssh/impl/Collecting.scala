@@ -6,16 +6,19 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
 import com.jcraft.jsch.{ChannelExec, JSch}
-import com.typesafe.config.ConfigFactory
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
+import play.api.Configuration
 import play.api.libs.json.Json
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(implicit mat: Materializer) {
+class Collecting(ct: CollectTopic,
+                 ms: MonitorService,
+                 config: Configuration,
+                 system: ActorSystem)(implicit mat: Materializer) {
 
   private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -24,19 +27,30 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
   private val source = ct.CollectTopic.subscriber
 
   source.map(flowLog("debug", "receive ssh collect", _))
-    .mapAsync(10)(x => {
+    .mapAsync(10) { cis =>
       logger.info("start ssh collect")
+
+      val monitorDetailId = cis.monitorDetailId
+      val ip = cis.connector.ip
+      val user = cis.connector.user
+      val metricName = cis.collect.name
+      val port = cis.connector.port
+      val dbName = cis.connector.name
+      val utcDate = cis.utcDate
+      val path = cis.collect.path
+
       val c: Future[(Int, String, Option[String], String, String)] =
-        collectAction(x.host, x.user, genUrl(x.metricName), Some(x.port)).map(rs => (x.id, x.metricName, rs, x.utcDate, x.name))
+        collectAction(ip, user, genUrl(path, metricName), Some(port))
+          .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
       c.onComplete {
         case Success(a) => logger.info(a.toString())
         case Failure(ex) => logger.error(ex.getMessage)
       }
       c
-    }).withAttributes(ActorAttributes.supervisionStrategy(decider))
+    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .mapAsync(10) {
-      case (id, metricName, rsOpt, utcDate, name) =>
-        ms.pushCollectResult.invoke(CollectResult(id, metricName, rsOpt, utcDate, name)).map(_ => id)
+      case (monitorDetailId, metricName, rsOpt, utcDate, dbName) =>
+        ms.pushCollectResult.invoke(CollectResult(monitorDetailId, metricName, rsOpt, utcDate, dbName)).map(_ => monitorDetailId)
     }.withAttributes(ActorAttributes.supervisionStrategy(decider))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
@@ -51,9 +65,9 @@ class Collecting(ct: CollectTopic, ms: MonitorService, system: ActorSystem)(impl
       Supervision.Resume
   }
 
-  def genUrl(name: String): String = {
-    val formatUrl = ConfigFactory.load().getString("collect.url")
-    List(formatUrl, name, "ssh", "collect.sh").mkString("/")
+  def genUrl(path: String, metricName: String): String = {
+    val formatUrl = config.getString("collect.url").get
+    Json.parse(path).as[Seq[String]].+:(formatUrl).:+(metricName).:+("collect.sh").mkString("/")
   }
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
