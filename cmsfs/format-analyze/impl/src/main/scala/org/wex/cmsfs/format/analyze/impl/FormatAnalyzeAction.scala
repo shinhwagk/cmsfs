@@ -46,7 +46,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
         jsonObjectAddField(jsonObjectAddField(row, "@timestamp", elem._2.utcDate), "@metric", elem._1._metric).toString))
     } catch {
       case ex: Exception => {
-        logger.error(ex.getMessage)
+        logger.error("splitAnalyzeResult " + ex.getMessage)
         Seq()
       }
     }
