@@ -15,7 +15,7 @@ class MonitorActionAnalyze(mt: MonitorTopic,
                            cs: ConfigService,
                            system: ActorSystem)(implicit mi: Materializer) {
 
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private implicit val logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
