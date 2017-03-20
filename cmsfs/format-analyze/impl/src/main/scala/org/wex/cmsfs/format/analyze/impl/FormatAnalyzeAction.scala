@@ -2,26 +2,28 @@ package org.wex.cmsfs.format.analyze.impl
 
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
+
 import akka.actor.ActorSystem
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import akka.stream.{ActorAttributes, Materializer, Supervision}
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.config.api.CoreFormatAnalyze
+import org.wex.cmsfs.common.{CmsfsAkka, CmsfsPlayJson}
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
-import org.wex.cmsfs.monitor.api.CollectResult
+import org.wex.cmsfs.fotmer.core.FormatCore
 import play.api.Configuration
 import play.api.libs.json._
 import scala.concurrent.Future
 import scala.io.Source
 
 class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
-                          config: Configuration,
+                          override val config: Configuration,
                           es: ElasticsearchService,
-                          system: ActorSystem)(implicit mat: Materializer) {
+                          system: ActorSystem)(implicit mat: Materializer)
+  extends CmsfsAkka with CmsfsPlayJson with FormatCore {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
@@ -30,20 +32,26 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
   logger.info(s"${this.getClass.getName} start.")
 
   subscriber
-    .map(streamLog("start format analyze", _))
-    .mapAsync(10)(actionFormat).withAttributes(ActorAttributes.supervisionStrategy(decider))
-    .map(streamLog("end format analyze", _))
-    .mapConcat(rs => splitAnalyzeResult(rs).toList)
-    .map(streamLog("view format rs s", _))
-    .mapAsync(10) { case (_index, _type, rs) => es.pushElasticsearchItem(_index.toLowerCase, _type.toLowerCase).invoke(rs) }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    .map(elem => loggerFlow(elem, s"start format analyze ${elem}"))
+    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .map(elem => loggerFlow(elem, s"send format analyze ${elem}"))
+    .mapConcat(fai => splitAnalyzeResult(fai).toList)
+    .map(elem => loggerFlow(elem, "sview format rs s"))
+    .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }
+    .withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
-  def splitAnalyzeResult(elem: (CoreFormatAnalyze, CollectResult, String)) = {
+  def splitAnalyzeResult(fai: FormatAnalyzeItem) = {
     try {
-      val rs = elem._3
-      val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
-      arr.map(row => (elem._1._index, elem._2.connectorName,
-        jsonObjectAddField(jsonObjectAddField(row, "@timestamp", elem._2.utcDate), "@metric", elem._1._metric).toString))
+      val formatResult: String = fai.formatResult.get
+      val _type = fai._type
+      val _index = fai._index
+      val _metric = fai._metric
+      val utcDate = fai.utcDate
+      val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
+      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
+      arr.map(jsonObjectAddField(_, "@metric", _metric))
+      arr.map(row => (_index, _type, row.toString))
     } catch {
       case ex: Exception => {
         logger.error("splitAnalyzeResult " + ex.getMessage)
@@ -52,34 +60,13 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def jsonObjectAddField(json: JsValue, key: String, fieldVal: String): JsValue = {
-    json.as[JsObject] + (key -> JsString(fieldVal))
-  }
-
-  def decider(implicit log: Logger): Supervision.Decider = {
-    case ex: Exception =>
-      log.error(ex.getMessage + " XXXX")
-      Supervision.Resume
-  }
-
-  def genUrl(path: String): String = {
-    val formatUrl = config.getString("collect.url").get
-    formatUrl :: Json.parse(path).as[Seq[String]] :: Nil mkString "/"
-  }
-
-  def streamLog[T](log: String, elem: T): T = {
-    logger.info(log + s" ${elem.toString}");
-    elem
-  }
-
-  def actionFormat(fai: FormatAnalyzeItem): Future[(CoreFormatAnalyze, CollectResult, String)] = Future {
-    val FormatAnalyzeItem(coreFormatAnalyze, collectResult) = fai
-    val url: String = genUrl(coreFormatAnalyze.path)
+  def actionFormat(fai: FormatAnalyzeItem): Future[FormatAnalyzeItem] = Future {
+    val url: String = genUrl(fai.path)
     logger.info(s"analyze ${url}")
-    val workDirName = executeFormatBefore(url, collectResult.rs.get, coreFormatAnalyze.args)
+    val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
     val rs: String = execScript(workDirName)
     //    executeFormatAfter(workDirName)
-    (coreFormatAnalyze, collectResult, rs)
+    fai.copy(formatResult = Some(rs))
   }
 
   //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {

@@ -1,10 +1,11 @@
 package org.wex.cmsfs.format.analyze.api
 
-import org.wex.cmsfs.config.api.CoreFormatAnalyze
-import org.wex.cmsfs.monitor.api.CollectResult
 import play.api.libs.json.{Format, Json}
 
-case class FormatAnalyzeItem(coreFormatAnalyze: CoreFormatAnalyze, collectResult: CollectResult)
+case class FormatAnalyzeItem(_type: String, _index: String,
+                             _metric: String, utcDate: String,
+                             collectResult: String, path: String,
+                             args: String, formatResult: Option[String] = None)
 
 object FormatAnalyzeItem {
   implicit val format: Format[FormatAnalyzeItem] = Json.format

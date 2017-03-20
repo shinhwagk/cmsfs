@@ -4,9 +4,11 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
 import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
@@ -21,10 +23,13 @@ class Collecting(ct: CollectTopic,
 
   private val source = ct.CollectTopic.subscriber
 
-  source.map(flowLog("debug", "receive jdbc collect", _))
-    .mapAsync(10) { cis =>
-      logger.info("start jdbc collect")
+  private val supervisionStrategyFun = CmsfsAkkaStream.supervisionStrategy(logger)(_)
 
+  private def loggerFlowFun[T](elem: T, message: String) = CmsfsAkkaStream.loggerFlow(logger)(elem, message)
+
+  source
+    .map(elem => loggerFlowFun(elem, s"receive jdbc collect ${elem.connector.id}"))
+    .mapAsync(10) { cis =>
       val monitorDetailId = cis.monitorDetailId
       val url = cis.connector.url
       val user = cis.connector.user
@@ -34,29 +39,14 @@ class Collecting(ct: CollectTopic,
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
-      val c = collectAction(url, user, password, genUrl(path, metricName), Nil).map(rs => (monitorDetailId, metricName, rs, utcDate, name))
-      c.onComplete {
-        case Success(a) => logger.info(a.toString())
-        case Failure(ex) => logger.error(ex.getMessage)
-      }
-      c
-    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+      collectAction(url, user, password, genUrl(path, metricName), Nil)
+        .map(rs => (monitorDetailId, metricName, rs, utcDate, name))
+    }.withAttributes(supervisionStrategyFun((em) => em + " xx"))
     .mapAsync(10) {
       case (id, metricName, rsOpt, utcDate, name) =>
         ms.pushCollectResult.invoke(CollectResult(id, metricName, rsOpt, utcDate, name)).map(_ => id)
-    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    }.withAttributes(supervisionStrategyFun((em) => em + " xx"))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
-
-  def flowLog[T](level: String, log: String, elem: T): T = {
-    logger.info(log)
-    elem
-  }
-
-  def decider(implicit log: Logger): Supervision.Decider = {
-    case ex: Exception =>
-      log.error(ex.getMessage + " XXXX")
-      Supervision.Resume
-  }
 
   def genUrl(path: String, name: String): String = {
     val formatUrl = config.getString("collect.url").get

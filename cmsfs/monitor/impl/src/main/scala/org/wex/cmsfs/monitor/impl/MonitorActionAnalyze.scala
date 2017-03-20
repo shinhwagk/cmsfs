@@ -1,10 +1,10 @@
 package org.wex.cmsfs.monitor.impl
 
-import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.{ActorAttributes, Materializer, Supervision}
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.LoggerFactory
+import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.config.api.{ConfigService, CoreFormatAnalyze}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 
@@ -19,30 +19,38 @@ class MonitorActionAnalyze(mt: MonitorTopic,
 
   private implicit val executionContext = system.dispatcher
 
+  private val supervisionStrategyFun = CmsfsAkkaStream.supervisionStrategy(logger)(_)
+
+  private def loggerFlowFun[T](elem: T, message: String) = CmsfsAkkaStream.loggerFlow(logger)(elem, message)
+
   logger.info(s"${this.getClass} start.")
 
   /**
     * analyze format
     */
   mt.collectResultTopic.subscriber
-    .map { elem => logger.info("analyze action " + elem.id); elem }
+    .map { elem => loggerFlowFun(elem, "analyze action " + elem.id) }
     .filter(_.rs.isDefined)
     .mapAsync(10) { i =>
       val coreFormatAnalyzesFuture: Future[Seq[CoreFormatAnalyze]] = cs.getCoreFormatAnalyzesByCollectId(i.id).invoke();
       for {
         coreFormatAnalyzes <- coreFormatAnalyzesFuture
         seqDone <- Future.sequence {
-          coreFormatAnalyzes.map(p => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(p, i)))
+          coreFormatAnalyzes.map { p =>
+            val formatAnalyzeItem =
+              FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, p.args)
+            fas.pushFormatAnalyze.invoke()
+          }
         }
       } yield seqDone
-    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    }.withAttributes(supervisionStrategyFun((x) => x + "xx"))
     .runWith(Sink.ignore)
 
   /**
     * alarm format
     */
   mt.collectResultTopic.subscriber
-    .map { elem => logger.info("alarm action " + elem.id); elem }
+    .map { elem => loggerFlowFun(elem, "alarm action " + elem.id) }
     .filter(_.rs.isDefined)
     //    .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, x.metricName, x.rs.get, "[]", x.utcDate, x.name)))
     .runWith(Sink.ignore)
@@ -63,9 +71,5 @@ class MonitorActionAnalyze(mt: MonitorTopic,
   //        .invoke(QueryOSMessage(mh.ip, c.user, genUrl("COLLECT", "SSH", metric.name), Some(c.port)))
   //    } yield collectData
   //  }
-  def decider(implicit log: Logger): Supervision.Decider = {
-    case ex: Exception =>
-      log.error(ex.getMessage + " XXXX")
-      Supervision.Resume
-  }
+
 }
