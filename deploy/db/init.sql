@@ -151,7 +151,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `cmsfs`;
-INSERT INTO `cmsfs`.`core_connector_jdbc` (`id`, `category`, `name`, `url`, `user`, `password`) VALUES (1, DEFAULT, 'yali2', 'jdbc:oracle:thin:@10.65.193.25:1521/orayali', 'system', 'oracle');
+INSERT INTO `cmsfs`.`core_connector_jdbc` (`id`, `category`, `name`, `url`, `user`, `password`) VALUES (1, 'oracle', 'yali2', 'jdbc:oracle:thin:@10.65.193.25:1521/orayali', 'system', 'oracle');
 
 COMMIT;
 
