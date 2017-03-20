@@ -53,31 +53,38 @@ trait ConfigService extends Service {
   /**
     * alarm
     */
-//  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, Seq[MonitorAlarmDetail]]
+  //  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, Seq[MonitorAlarmDetail]]
 
-  def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm]
+  //  def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm]
 
   //  def getMonitorById(id: Int): ServiceCall[NotUsed, MonitorModeJDBC]
 
   //  def test(id: Long, version: Long): ServiceCall[NotUsed, String]
 
   def getCoreMonitorDetails: ServiceCall[NotUsed, Seq[CoreMonitorDetail]]
+
   def addCoreMonitorDetail: ServiceCall[CoreMonitorDetail, Done]
 
   def getCoreConnectorJdbcById(id: Int): ServiceCall[NotUsed, CoreConnectorJdbc]
+
   def addCoreConnectorJdbc: ServiceCall[CoreConnectorJdbc, Done]
 
   def getCoreConnectorSshById(id: Int): ServiceCall[NotUsed, CoreConnectorSsh]
+
   def addCoreConnectorSsh: ServiceCall[CoreConnectorSsh, Done]
 
   def getCoreCollectById(id: Int): ServiceCall[NotUsed, CoreCollect]
+
   def addCoreCollect: ServiceCall[CoreCollect, Done]
 
   def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, CoreFormatAnalyze]
+
   def getCoreFormatAnalyzesByCollectId(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]]
+
   def addCoreFormatAnalyze: ServiceCall[CoreFormatAnalyze, Done]
 
   def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, CoreFormatAlarm]
+
   def addCoreFormatAlarm: ServiceCall[CoreFormatAlarm, Done]
 
   override final def descriptor = {
@@ -120,12 +127,11 @@ trait ConfigService extends Service {
 
       //      restCall(Method.POST, "/v1/monitor/list", getMonitorList),
 
-//      restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
+      //      restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
 
-      restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _),
+      //      restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _),
 
       //      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorById _)
-
 
       restCall(Method.GET, "/v1/core/monitor/details", getCoreMonitorDetails),
       restCall(Method.POST, "/v1/core/monitor/detail", addCoreMonitorDetail),

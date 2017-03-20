@@ -79,33 +79,33 @@ object Tables {
 
   //  val monitorDetails = TableQuery[MonitorDetails]
 
-  case class MonitorModeJDBC(id: Option[Int], category: String, categoryVersion: Seq[String], code: String, args: List[Any])
+//  case class MonitorModeJDBC(id: Option[Int], category: String, categoryVersion: Seq[String], code: String, args: List[Any])
 
-  class MonitorAlarmDetails(tag: Tag) extends Table[MonitorAlarmDetail](tag, "alarm_details") {
-    def id = column[Option[Int]]("ID")
+//  class MonitorAlarmDetails(tag: Tag) extends Table[MonitorAlarmDetail](tag, "alarm_details") {
+//    def id = column[Option[Int]]("ID")
+//
+//    def alarmId = column[Int]("ALARM_ID")
+//
+//    def args = column[Seq[String]]("ARGS")
+//
+//    def mode = column[String]("MODE")
+//
+//    override def * = (id, alarmId, args, mode) <> (MonitorAlarmDetail.tupled, MonitorAlarmDetail.unapply)
+//  }
+//
+//  val monitorAlarmDetails = TableQuery[MonitorAlarmDetails]
+//
+//  class MonitorAlarms(tag: Tag) extends Table[MonitorAlarm](tag, "alarms") {
+//    def id = column[Option[Int]]("ID")
+//
+//    def script = column[String]("SCRIPT")
+//
+//    def state = column[Boolean]("STATE")
+//
+//    def args = column[String]("ARGS")
+//
+//    override def * = (id, script, state, args) <> (MonitorAlarm.tupled, MonitorAlarm.unapply)
+//  }
 
-    def alarmId = column[Int]("ALARM_ID")
-
-    def args = column[Seq[String]]("ARGS")
-
-    def mode = column[String]("MODE")
-
-    override def * = (id, alarmId, args, mode) <> (MonitorAlarmDetail.tupled, MonitorAlarmDetail.unapply)
-  }
-
-  val monitorAlarmDetails = TableQuery[MonitorAlarmDetails]
-
-  class MonitorAlarms(tag: Tag) extends Table[MonitorAlarm](tag, "alarms") {
-    def id = column[Option[Int]]("ID")
-
-    def script = column[String]("SCRIPT")
-
-    def state = column[Boolean]("STATE")
-
-    def args = column[String]("ARGS")
-
-    override def * = (id, script, state, args) <> (MonitorAlarm.tupled, MonitorAlarm.unapply)
-  }
-
-  val monitorAlarms = TableQuery[MonitorAlarms]
+//  val monitorAlarms = TableQuery[MonitorAlarms]
 }

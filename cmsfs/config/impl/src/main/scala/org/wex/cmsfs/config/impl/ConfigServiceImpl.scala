@@ -5,8 +5,7 @@ import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.config.db.Tables
 import slick.jdbc.MySQLProfile.api._
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
 
@@ -82,9 +81,7 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   //    db.run(Tables.monitorAlarmDetails.filter(_.alarmId === aId).result).map(_.toList)
   //  }
 
-  override def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm] = ServiceCall { _ =>
-    db.run(Tables.monitorAlarms.filter(_.id === id).result.head)
-  }
+
 
   //  override def getMonitorById(id: Int): ServiceCall[NotUsed, api.MonitorModeJDBC] = ServiceCall { _ =>
   //    db.run(Tables.monitorModeJDBCs.filter(_.id === id).result.head).map(f = mmj => {
