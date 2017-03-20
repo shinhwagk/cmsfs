@@ -25,8 +25,6 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  private val formatUrl: String = config.getString("format.url").get
-
   private val subscriber = topic.formatTopic.subscriber
 
   logger.info(s"${this.getClass.getName} start.")
@@ -44,7 +42,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     try {
       val rs = elem._3
       val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
-      arr.map(row => (elem._1._index, elem._1._type,
+      arr.map(row => (elem._1._index, elem._2.connectorName,
         jsonObjectAddField(jsonObjectAddField(row, "@timestamp", elem._2.utcDate), "@metric", elem._1._metric).toString))
     } catch {
       case ex: Exception => {

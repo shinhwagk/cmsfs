@@ -27,13 +27,26 @@ class MonitorActionCollect(mt: MonitorTopic,
   Future {
     while (true) {
       logger.info(s"${System.currentTimeMillis()}")
-      val cDate = new Date()
-      val utcDate = cDate.toInstant.toString
-      val monitorDetails: Future[Seq[CoreMonitorDetail]] = cs.getCoreMonitorDetails.invoke().map(_.filter(cmd => filterCron(cmd.cron, cDate)))
-      val dispatcher = monitorDistributor(utcDate)(_)
-      monitorDetails.foreach(_.foreach(dispatcher))
+      schedulerMonitor
       Thread.sleep(1000)
     }
+  }
+
+  def schedulerMonitor = {
+    val cDate = new Date()
+    val filterMonitorDetailsFunByCron = filterMonitorDetails(cDate)(_)
+
+    val utcDate = cDate.toInstant.toString
+    val dispatcherFun = monitorDistributor(utcDate)(_)
+
+    cs.getCoreMonitorDetails.invoke().map(filterMonitorDetailsFunByCron) onComplete {
+      case Success(monitorDetails) => monitorDetails.foreach(dispatcherFun)
+      case Failure(ex) => logger.error(s"schedulerMonitor ${ex.getMessage}")
+    }
+  }
+
+  def filterMonitorDetails(cDate: Date)(monitorDetails: Seq[CoreMonitorDetail]): Seq[CoreMonitorDetail] = {
+    monitorDetails.filter(cmd => filterCron(cmd.cron, cDate))
   }
 
   def filterCron(cron: String, cDate: Date): Boolean = {

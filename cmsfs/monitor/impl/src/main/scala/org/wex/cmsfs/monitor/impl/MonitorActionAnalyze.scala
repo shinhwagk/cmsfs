@@ -2,9 +2,9 @@ package org.wex.cmsfs.monitor.impl
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.Materializer
+import akka.stream.{ActorAttributes, Materializer, Supervision}
 import akka.stream.scaladsl.Sink
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.config.api.{ConfigService, CoreFormatAnalyze}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 
@@ -35,7 +35,8 @@ class MonitorActionAnalyze(mt: MonitorTopic,
           coreFormatAnalyzes.map(p => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(p, i)))
         }
       } yield seqDone
-    }.runWith(Sink.ignore)
+    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    .runWith(Sink.ignore)
 
   /**
     * alarm format
@@ -62,4 +63,9 @@ class MonitorActionAnalyze(mt: MonitorTopic,
   //        .invoke(QueryOSMessage(mh.ip, c.user, genUrl("COLLECT", "SSH", metric.name), Some(c.port)))
   //    } yield collectData
   //  }
+  def decider(implicit log: Logger): Supervision.Decider = {
+    case ex: Exception =>
+      log.error(ex.getMessage + " XXXX")
+      Supervision.Resume
+  }
 }
