@@ -53,7 +53,7 @@ trait ConfigService extends Service {
   /**
     * alarm
     */
-  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, Seq[MonitorAlarmDetail]]
+//  def getAlarmDetails(aId: Int): ServiceCall[NotUsed, Seq[MonitorAlarmDetail]]
 
   def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm]
 
@@ -73,10 +73,11 @@ trait ConfigService extends Service {
   def getCoreCollectById(id: Int): ServiceCall[NotUsed, CoreCollect]
   def addCoreCollect: ServiceCall[CoreCollect, Done]
 
-  def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]]
+  def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, CoreFormatAnalyze]
+  def getCoreFormatAnalyzesByCollectId(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]]
   def addCoreFormatAnalyze: ServiceCall[CoreFormatAnalyze, Done]
 
-  def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAlarm]]
+  def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, CoreFormatAlarm]
   def addCoreFormatAlarm: ServiceCall[CoreFormatAlarm, Done]
 
   override final def descriptor = {
@@ -119,7 +120,7 @@ trait ConfigService extends Service {
 
       //      restCall(Method.POST, "/v1/monitor/list", getMonitorList),
 
-      restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
+//      restCall(Method.GET, "/v1/monitor/alarm/detail/:mid", getAlarmDetails _),
 
       restCall(Method.GET, "/v1/monitor/alarm/:id", getAlarm _),
 
@@ -135,6 +136,7 @@ trait ConfigService extends Service {
       restCall(Method.GET, "/v1/core/collect/:id", getCoreCollectById _),
       restCall(Method.POST, "/v1/core/collect", addCoreCollect),
       restCall(Method.GET, "/v1/core/format/analyze/:id", getCoreFormatAnalyzesById _),
+      restCall(Method.GET, "/v1/core/format/analyze/collect/:id", getCoreFormatAnalyzesByCollectId _),
       restCall(Method.POST, "/v1/core/format/analyze", addCoreFormatAnalyze),
       restCall(Method.GET, "/v1/core/format/alarm/:id", getCoreFormatAlarmsById _),
       restCall(Method.POST, "/v1/core/format/alarm", addCoreFormatAlarm)

@@ -7,7 +7,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
-
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
@@ -20,7 +19,7 @@ class Collecting(ct: CollectTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  private final val source = ct.CollectTopic.subscriber
+  private val source = ct.CollectTopic.subscriber
 
   source.map(flowLog("debug", "receive jdbc collect", _))
     .mapAsync(10) { cis =>
@@ -61,7 +60,7 @@ class Collecting(ct: CollectTopic,
 
   def genUrl(path: String, name: String): String = {
     val formatUrl = config.getString("collect.url").get
-    Json.parse(path).as[Seq[String]].+:(formatUrl).:+("collect.sql").mkString("/")
+    formatUrl :: Json.parse(path).as[Seq[String]] :: "collect.sql" :: Nil mkString "/"
   }
 
   def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = {

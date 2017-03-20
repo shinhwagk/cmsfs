@@ -8,9 +8,6 @@ import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * Implementation of the LagomhelloService.
-  */
 class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
 
   val db = Database.forConfig("oso-config")
@@ -81,9 +78,9 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   //  }
 
 
-  override def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]] = ServiceCall { _ =>
-    db.run(Tables.monitorAlarmDetails.filter(_.alarmId === aId).result).map(_.toList)
-  }
+  //  override def getAlarmDetails(aId: Int): ServiceCall[NotUsed, List[MonitorAlarmDetail]] = ServiceCall { _ =>
+  //    db.run(Tables.monitorAlarmDetails.filter(_.alarmId === aId).result).map(_.toList)
+  //  }
 
   override def getAlarm(id: Int): ServiceCall[NotUsed, MonitorAlarm] = ServiceCall { _ =>
     db.run(Tables.monitorAlarms.filter(_.id === id).result.head)
@@ -144,12 +141,16 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.coreCollects.filter(_.id === id).result.head)
   }
 
-  override def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]] = ServiceCall { _ =>
-    db.run(Tables.coreFormatAnalyzes.filter(_.id === id).result)
+  override def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, CoreFormatAnalyze] = ServiceCall { _ =>
+    db.run(Tables.coreFormatAnalyzes.filter(_.id === id).result.head)
   }
 
-  override def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAlarm]] = ServiceCall { _ =>
-    db.run(Tables.coreFormatAlarms.filter(_.id === id).result)
+  override def getCoreFormatAnalyzesByCollectId(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]] = ServiceCall { _ =>
+    db.run(Tables.coreFormatAnalyzes.filter(_.collectId === id).result)
+  }
+
+  override def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, CoreFormatAlarm] = ServiceCall { _ =>
+    db.run(Tables.coreFormatAlarms.filter(_.id === id).result.head)
   }
 
   override def addCoreMonitorDetail: ServiceCall[CoreMonitorDetail, Done] = ServiceCall { cmd =>
@@ -175,4 +176,5 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   override def addCoreFormatAlarm: ServiceCall[CoreFormatAlarm, Done] = ServiceCall { cfa =>
     db.run(Tables.coreFormatAlarms += cfa).map(_ => Done)
   }
+
 }

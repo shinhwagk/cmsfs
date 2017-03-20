@@ -1,7 +1,6 @@
 package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
-
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
@@ -10,7 +9,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
-
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -40,7 +38,7 @@ class Collecting(ct: CollectTopic,
       val path = cis.collect.path
 
       val c: Future[(Int, String, Option[String], String, String)] =
-        collectAction(ip, user, genUrl(path, metricName), Some(port))
+        collectAction(ip, user, genUrl(path), Some(port))
           .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
       c.onComplete {
         case Success(a) => logger.info(a.toString())
@@ -65,15 +63,16 @@ class Collecting(ct: CollectTopic,
       Supervision.Resume
   }
 
-  def genUrl(path: String, metricName: String): String = {
+  def genUrl(path: String): String = {
     val formatUrl = config.getString("collect.url").get
-    Json.parse(path).as[Seq[String]].+:(formatUrl).:+(metricName).:+("collect.sh").mkString("/")
+    formatUrl :: Json.parse(path).as[Seq[String]] :: Nil mkString "/"
   }
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
     val OSName = System.getProperty("os.name").toLowerCase();
     try {
       if (OSName.startsWith("win")) {
+        // test
         Some(ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port.get));
       } else if (OSName == "linux") {
         Some(ssh("~/.ssh/id_rsa", user, host, scriptUrl, port.get));

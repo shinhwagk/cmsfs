@@ -2,15 +2,16 @@ package org.wex.cmsfs.monitor.impl
 
 import java.util.Date
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import org.quartz.CronExpression
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.collect.jdbc.api.{CollectItemJdbc, CollectJDBCService}
-import org.wex.cmsfs.collect.ssh.api.CollectSSHService
+import org.wex.cmsfs.collect.ssh.api.{CollectItemSsh, CollectSSHService}
 import org.wex.cmsfs.config.api._
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
 class MonitorActionCollect(mt: MonitorTopic,
@@ -40,20 +41,34 @@ class MonitorActionCollect(mt: MonitorTopic,
   }
 
   def monitorDistributor(utcDate: String)(cmd: CoreMonitorDetail): Unit = {
-    val coreCollect: Future[CoreCollect] = cs.getCoreCollectById(cmd.collectId).invoke()
+    val coreCollectFuture: Future[CoreCollect] = cs.getCoreCollectById(cmd.collectId).invoke()
+
+    val p: Promise[Done] = Promise[Done]
+    val f: Future[Done] = p.future
+
     cmd.category.toUpperCase match {
       case "RDB" =>
-        val coreConnector: Future[CoreConnectorJdbc] = cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
-        Future.sequence(List(coreCollect, coreConnector)).onComplete {
-          case Success((collect, connector)) => cJDBCs.pushCollectItem.invoke(CollectItemJdbc(cmd.id.get, collect, connector, utcDate))
-          case Failure(ex) => logger.error(ex.getMessage)
+        p completeWith {
+          for {
+            coreCollect <- coreCollectFuture
+            coreConnectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
+            done <- cJDBCs.pushCollectItem.invoke(CollectItemJdbc(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
+          } yield done
         }
       case "SSH" =>
-        val coreConnector: Future[CoreConnectorSsh] = cs.getCoreConnectorSshById(cmd.connectorId).invoke()
-        Future.sequence(List(coreCollect, coreConnector)).onComplete {
-          case Success((collect, connector)) => cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, collect, connector, utcDate))
-          case Failure(ex) => logger.error(ex.getMessage)
+        p completeWith {
+          for {
+            coreCollect <- coreCollectFuture
+            coreConnectorJdbc <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
+            done <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
+          } yield done
         }
     }
+
+    f.onComplete {
+      case Success(_) => logger.info("send collect " + cmd.collectId.toString)
+      case Failure(ex) => logger.error(ex.getMessage)
+    }
+
   }
 }
