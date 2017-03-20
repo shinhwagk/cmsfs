@@ -46,7 +46,7 @@ services:
       - config
       - collect-ssh
       - collect-jdbc
-      - elasticsearch
+      - format-analyze
 
   collect-ssh:
     build:
@@ -98,7 +98,6 @@ services:
     networks: 
       - cmsfs
     depends_on: 
-      - monitor
       - consul
 
   db:
