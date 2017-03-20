@@ -9,11 +9,11 @@ class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_m
 
   def cron = column[String]("CRON")
 
-  def category = column[String]("CATEGORY")
+  def connectorMode = column[String]("CONNECTOR_MODE")
 
   def connectorId = column[Int]("CONNECTOR_ID")
 
   def collectId = column[Int]("COLLECT_ID")
 
-  override def * = (id, cron, category, connectorId, collectId) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
+  override def * = (id, cron, connectorMode, connectorId, collectId) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
 }
