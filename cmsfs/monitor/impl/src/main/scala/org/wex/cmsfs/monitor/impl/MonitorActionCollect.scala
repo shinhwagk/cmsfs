@@ -80,7 +80,7 @@ class MonitorActionCollect(mt: MonitorTopic,
 
     f.onComplete {
       case Success(_) => logger.info("send collect " + cmd.collectId.toString)
-      case Failure(ex) => logger.error(ex.getMessage)
+      case Failure(ex) => logger.error("send collect " + ex.getMessage)
     }
 
   }

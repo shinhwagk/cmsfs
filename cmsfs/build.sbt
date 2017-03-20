@@ -72,6 +72,8 @@ lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`collect-jdbc-api`, `monitor-api`, `lagom-service-locator`)
 
+lazy val `format-core` = (project in file("format-core"))
+
 lazy val `format-analyze-api` = (project in file("format-analyze/api"))
   .settings(libraryDependencies += lagomScaladslApi)
   .dependsOn(`config-api`, `monitor-api`)
@@ -81,7 +83,7 @@ lazy val `format-analyze-impl` = (project in file("format-analyze/impl"))
   .settings(libraryDependencies ++= Seq(commonIO))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`format-analyze-api`, `elasticsearch-api`, `lagom-service-locator`)
+  .dependsOn(`format-core`, `format-analyze-api`, `elasticsearch-api`, `lagom-service-locator`)
 
 lazy val `elasticsearch-api` = (project in file("elasticsearch/api"))
   .settings(libraryDependencies += lagomScaladslApi)
