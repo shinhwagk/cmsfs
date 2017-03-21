@@ -173,8 +173,6 @@ services:
     entrypoint: sh -c "/register.sh && /docker-entrypoint.sh elasticsearch"
     ports: 
       - "9200:9200"
-    depends_on: 
-      - consul
 
   # kibana:
   #   container_name: cmsfs_kibana
