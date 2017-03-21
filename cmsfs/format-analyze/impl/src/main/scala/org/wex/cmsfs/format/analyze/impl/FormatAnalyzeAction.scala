@@ -37,7 +37,6 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .map(elem => loggerFlow(elem, s"send format analyze ${elem}"))
     .mapConcat(fai => splitAnalyzeResult(fai).toList)
     .map(elem => loggerFlow(elem, "sview format rs s"))
-    .map(elem => loggerFlow(elem, s"add field ${elem}"))
     .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
@@ -49,8 +48,10 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
       val _metric = fai._metric
       val utcDate = fai.utcDate
       val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
-      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
-      arr.map(jsonObjectAddField(_, "@metric", _metric))
+      logger.info("a" + arr.toString())
+      arr.map(elem => jsonObjectAddField(elem, "@timestamp", utcDate))
+      logger.info("b" + arr.toString())
+      arr.map(elem => jsonObjectAddField(elem, "@metric", _metric))
       arr.map(row => (_index, _type, row.toString))
     } catch {
       case ex: Exception => {
