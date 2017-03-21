@@ -4,14 +4,14 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.slf4j.LoggerFactory
-import org.wex.cmsfs.common.CmsfsAkka
+import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.config.api.ConfigService
 import org.wex.cmsfs.format.alarm.api.FormatAlarmService
 
 class MonitorActionAlarm(mt: MonitorTopic,
                          fas: FormatAlarmService,
                          cs: ConfigService,
-                         system: ActorSystem)(implicit mi: Materializer) extends CmsfsAkka {
+                         system: ActorSystem)(implicit mi: Materializer) extends CmsfsAkkaStream {
 
   implicit val logger = LoggerFactory.getLogger(this.getClass)
 

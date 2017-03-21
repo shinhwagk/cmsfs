@@ -1,34 +1,30 @@
 package org.wex.cmsfs.collect.jdbc.impl
 
 import akka.actor.ActorSystem
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import akka.stream.{ActorAttributes, Materializer, Supervision}
 import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.collect.core.CollectCore
 import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
                  config: Configuration,
-                 system: ActorSystem)(implicit mat: Materializer) {
+                 system: ActorSystem)(implicit mat: Materializer)
+  extends CmsfsAkkaStream with CollectCore {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
   private val source = ct.CollectTopic.subscriber
 
-  private val supervisionStrategyFun = CmsfsAkkaStream.supervisionStrategy(logger)(_)
-
-  private def loggerFlowFun[T](elem: T, message: String) = CmsfsAkkaStream.loggerFlow(logger)(elem, message)
-
-  source
-    .map(elem => loggerFlowFun(elem, s"receive jdbc collect ${elem.connector.id}"))
+  source.map(elem => loggerFlow(elem, s"receive jdbc collect ${elem.connector.id}"))
     .mapAsync(10) { cis =>
       val monitorDetailId = cis.monitorDetailId
       val url = cis.connector.url
@@ -41,11 +37,11 @@ class Collecting(ct: CollectTopic,
 
       collectAction(url, user, password, genUrl(path), Nil)
         .map(rs => (monitorDetailId, metricName, rs, utcDate, name))
-    }.withAttributes(supervisionStrategyFun((em) => em + " xx"))
+    }.withAttributes(supervisionStrategy((em) => em + " xx"))
     .mapAsync(10) {
       case (id, metricName, rsOpt, utcDate, name) =>
         ms.pushCollectResult.invoke(CollectResult(id, metricName, rsOpt, utcDate, name)).map(_ => id)
-    }.withAttributes(supervisionStrategyFun((em) => em + " xx"))
+    }.withAttributes(supervisionStrategy((em) => em + " xx"))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def genUrl(path: String): String = {

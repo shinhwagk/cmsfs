@@ -1,11 +1,14 @@
 package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
+
 import akka.actor.ActorSystem
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import akka.stream.{ActorAttributes, Materializer, Supervision}
 import com.jcraft.jsch.{ChannelExec, JSch}
 import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.collect.core.CollectCore
+import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -16,15 +19,16 @@ import scala.util.{Failure, Success}
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
                  config: Configuration,
-                 system: ActorSystem)(implicit mat: Materializer) {
+                 system: ActorSystem)(implicit mat: Materializer)
+  extends CmsfsAkkaStream with CollectCore {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
   private val source = ct.CollectTopic.subscriber
 
-  source.map(flowLog("debug", "receive ssh collect", _))
+  source.map(elem => loggerFlow(elem, s"receive ssh collect ${elem.connector.id}"))
     .mapAsync(10) { cis =>
       logger.info("start ssh collect")
 
@@ -47,23 +51,12 @@ class Collecting(ct: CollectTopic,
         case Failure(ex) => logger.error(ex.getMessage)
       }
       c
-    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    }.withAttributes(supervisionStrategy((x => "x")))
     .mapAsync(10) {
       case (monitorDetailId, metricName, rsOpt, utcDate, dbName) =>
         ms.pushCollectResult.invoke(CollectResult(monitorDetailId, metricName, rsOpt, utcDate, dbName)).map(_ => monitorDetailId)
-    }.withAttributes(ActorAttributes.supervisionStrategy(decider))
+    }.withAttributes(supervisionStrategy((x => "x")))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
-
-  def flowLog[T](level: String, log: String, elem: T): T = {
-    logger.info(log)
-    elem
-  }
-
-  def decider(implicit log: Logger): Supervision.Decider = {
-    case ex: Exception =>
-      log.error(ex.getMessage + " XXXX")
-      Supervision.Resume
-  }
 
   def genUrl(path: String): String = {
     val formatUrl = config.getString("collect.url").get

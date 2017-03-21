@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.slf4j.LoggerFactory
-import org.wex.cmsfs.common.CmsfsAkka
+import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.config.api.{ConfigService, CoreMonitorDetail}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 import scala.concurrent.Future
@@ -12,7 +12,7 @@ import scala.concurrent.Future
 class MonitorActionAnalyze(mt: MonitorTopic,
                            fas: FormatAnalyzeService,
                            cs: ConfigService,
-                           system: ActorSystem)(implicit mi: Materializer) extends CmsfsAkka {
+                           system: ActorSystem)(implicit mi: Materializer) extends CmsfsAkkaStream {
 
   implicit val logger = LoggerFactory.getLogger(this.getClass)
 

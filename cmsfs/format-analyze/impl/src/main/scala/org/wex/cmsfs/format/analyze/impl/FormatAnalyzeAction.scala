@@ -8,7 +8,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.common.{CmsfsAkka, CmsfsPlayJson}
+import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson}
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import org.wex.cmsfs.fotmer.core.FormatCore
@@ -21,7 +21,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
                           override val config: Configuration,
                           es: ElasticsearchService,
                           system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkka with CmsfsPlayJson with FormatCore {
+  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore {
 
   override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
