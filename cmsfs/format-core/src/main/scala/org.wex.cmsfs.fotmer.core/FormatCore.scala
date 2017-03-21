@@ -8,8 +8,8 @@ trait FormatCore {
   val config: Configuration
 
   def genUrl(path: String): String = {
-    val formatUrl = config.getString("format.url").get
-    formatUrl :: Json.parse(path).as[Seq[String]] :: Nil mkString "/"
+    val formatUrl: String = config.getString("format.url").get
+    formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 
 }
