@@ -3,8 +3,8 @@ package org.wex.cmsfs.config.impl
 import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.wex.cmsfs.config.api._
-import org.wex.cmsfs.config.db.Tables
 import slick.jdbc.MySQLProfile.api._
+
 import scala.concurrent.ExecutionContext
 
 class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
@@ -41,6 +41,8 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     * machine
     */
   override def getMachines: ServiceCall[NotUsed, Seq[Machine]] = ServiceCall { _ =>
+    Tables
+
     db.run(Tables.machines.result)
   }
 

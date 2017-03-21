@@ -1,4 +1,4 @@
-package org.wex.cmsfs.config.db.table
+package org.wex.cmsfs.config.db
 
 import org.wex.cmsfs.config.api.CoreFormatAnalyze
 import slick.jdbc.MySQLProfile.api._

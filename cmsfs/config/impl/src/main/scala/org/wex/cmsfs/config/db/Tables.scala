@@ -1,6 +1,6 @@
 package org.wex.cmsfs.config.db.MonitorCategoryEnum
 
-import org.wex.cmsfs.config.db.table.{CoreFormatAlarms, _}
+import org.wex.cmsfs.config.db._
 import slick.jdbc.MySQLProfile.api._
 
 object Tables {
