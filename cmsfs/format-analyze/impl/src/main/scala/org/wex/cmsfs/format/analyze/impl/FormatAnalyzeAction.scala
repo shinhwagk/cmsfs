@@ -37,6 +37,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .map(elem => loggerFlow(elem, s"send format analyze ${elem}"))
     .mapConcat(fai => splitAnalyzeResult(fai).toList)
     .map(elem => loggerFlow(elem, "sview format rs s"))
+    .map(elem => loggerFlow(elem, s"add field ${elem}"))
     .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
@@ -67,14 +68,6 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     //    executeFormatAfter(workDirName)
     fai.copy(formatResult = Some(rs))
   }
-
-  //  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
-  //    val url = genUrl(name)
-  //    val workDirName = executeFormatBefore(url, data, args)
-  //    val rs = execScript(workDirName)
-  ////    executeFormatAfter(workDirName)
-  //    rs
-  //  }
 
   def executeFormatBefore(url: String, data: String, args: String): String = {
     val workDirName: String = createWorkDir
