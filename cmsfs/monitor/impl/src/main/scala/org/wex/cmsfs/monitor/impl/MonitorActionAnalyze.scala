@@ -34,7 +34,7 @@ class MonitorActionAnalyze(mt: MonitorTopic,
         seqDone <- Future.sequence {
           coreFormatAnalyzes.map { p =>
             val formatAnalyzeItem =
-              FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, p.args)
+              FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, p.args.getOrElse("[]"))
             fas.pushFormatAnalyze.invoke(formatAnalyzeItem)
           }
         }
