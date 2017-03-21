@@ -17,7 +17,7 @@ object QueryModeEnum extends Enumeration {
 class CollectingOracle(jdbcUrl: String, username: String, password: String, sqlText: String, parameters: Seq[String])
                       (implicit ec: ExecutionContext) {
 
-  Class.forName("oracle.jdbc.driver.OracleDriver");
+  Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
 
   def mode(mode: String): Future[String] = {
     QueryModeEnum.withName(mode.toUpperCase) match {

@@ -57,7 +57,8 @@ class Collecting(ct: CollectTopic,
     val DBTYPE = "oracle"
     try {
       if (DBTYPE == "oracle") {
-        new CollectingOracle(jdbcUrl, user, password, sqlText, parameters).mode("MAP").map(Some(_))
+        val collectOracle = new CollectingOracle(jdbcUrl, user, password, sqlText, parameters)
+        collectOracle.mode("MAP").map(Some(_))
       } else if (DBTYPE == "mysql") {
         Future.successful(None)
       } else {
