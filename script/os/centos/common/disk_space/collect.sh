@@ -1,1 +1,1 @@
-df -h | sed '1d'
+df -P | sed '1d'
