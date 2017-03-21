@@ -39,6 +39,7 @@ class Collecting(ct: CollectTopic,
 
       val c: Future[(Int, String, Option[String], String, String)] =
         collectAction(ip, user, genUrl(path), Some(port))
+          .filter(_.isDefined)
           .map(_.map(_.trim))
           .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
       c.onComplete {
