@@ -39,7 +39,7 @@ class Collecting(ct: CollectTopic,
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
-      collectAction(url, user, password, genUrl(path, metricName), Nil)
+      collectAction(url, user, password, genUrl(path), Nil)
         .map(rs => (monitorDetailId, metricName, rs, utcDate, name))
     }.withAttributes(supervisionStrategyFun((em) => em + " xx"))
     .mapAsync(10) {
@@ -48,9 +48,9 @@ class Collecting(ct: CollectTopic,
     }.withAttributes(supervisionStrategyFun((em) => em + " xx"))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
-  def genUrl(path: String, name: String): String = {
+  def genUrl(path: String): String = {
     val formatUrl = config.getString("collect.url").get
-    formatUrl :: Json.parse(path).as[Seq[String]] :: "collect.sql" :: Nil mkString "/"
+    formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 
   def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = {

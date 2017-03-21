@@ -40,7 +40,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
-  def splitAnalyzeResult(fai: FormatAnalyzeItem) = {
+  def splitAnalyzeResult(fai: FormatAnalyzeItem): Seq[(String, String, String)] = {
     try {
       val formatResult: String = fai.formatResult.get
       val _type = fai._type
@@ -48,9 +48,8 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
       val _metric = fai._metric
       val utcDate = fai.utcDate
       val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
-      logger.info("a" + arr.toString())
-      arr.map(elem => jsonObjectAddField(elem, "@timestamp", utcDate))
-        .map(elem => jsonObjectAddField(elem, "@metric", _metric))
+      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
+        .map(jsonObjectAddField(_, "@metric", _metric))
         .map(row => (_index, _type, row.toString))
     } catch {
       case ex: Exception => {

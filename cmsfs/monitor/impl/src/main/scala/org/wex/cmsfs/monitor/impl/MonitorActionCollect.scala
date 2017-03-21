@@ -60,7 +60,7 @@ class MonitorActionCollect(mt: MonitorTopic,
     val f: Future[Done] = p.future
 
     cmd.connectorMode.toUpperCase match {
-      case "RDB" =>
+      case "JDBC" =>
         p completeWith {
           for {
             coreCollect <- coreCollectFuture
