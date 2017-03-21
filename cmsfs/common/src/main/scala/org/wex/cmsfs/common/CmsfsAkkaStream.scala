@@ -25,14 +25,14 @@ trait CmsfsAkka {
 
   val logger: Logger
 
-  def decider(f: (String) => String): Supervision.Decider = {
+  private def decider(f: (String) => String): Supervision.Decider = {
     case ex: Exception =>
       logger.error(f(ex.getMessage))
       Supervision.Resume
   }
 
   def supervisionStrategy(f: (String) => String) = {
-    ActorAttributes.supervisionStrategy(decider(logger, f))
+    ActorAttributes.supervisionStrategy(decider(f))
   }
 
   def loggerFlow[T](elem: T, mess: String): T = {
