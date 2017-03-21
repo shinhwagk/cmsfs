@@ -9,7 +9,7 @@ class CoreFormatAnalyzes(tag: Tag) extends Table[CoreFormatAnalyze](tag, "core_f
 
   def path = column[String]("PATH")
 
-  def args = column[String]("ARGS")
+  def args = column[Option[String]]("ARGS")
 
   def collectId = column[Int]("COLLECT_ID")
 

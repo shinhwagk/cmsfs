@@ -82,7 +82,6 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   //  }
 
 
-
   //  override def getMonitorById(id: Int): ServiceCall[NotUsed, api.MonitorModeJDBC] = ServiceCall { _ =>
   //    db.run(Tables.monitorModeJDBCs.filter(_.id === id).result.head).map(f = mmj => {
   //      api.MonitorModeJDBC(mmj.id.get, mmj.category, JsonFormat.toJsArray(mmj.categoryVerison), mmj.dslCode, mmj.args.map(_.toString).toSeq)
