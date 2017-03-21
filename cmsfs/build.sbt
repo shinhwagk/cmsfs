@@ -49,6 +49,8 @@ lazy val `monitor-impl` = (project in file("monitor/impl"))
     `format-analyze-api`, `format-alarm-api`,
     `lagom-service-locator`)
 
+lazy val `collect-core` = (project in file("collect-core"))
+
 lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .settings(libraryDependencies += lagomScaladslApi)
   .dependsOn(`config-api`)
