@@ -39,7 +39,7 @@ class MonitorActionAnalyze(mt: MonitorTopic,
           coreFormatAnalyzes.map { p =>
             val formatAnalyzeItem =
               FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, p.args)
-            fas.pushFormatAnalyze.invoke()
+            fas.pushFormatAnalyze.invoke(formatAnalyzeItem)
           }
         }
       } yield seqDone
