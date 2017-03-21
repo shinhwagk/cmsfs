@@ -25,7 +25,6 @@ class MonitorActionAnalyze(mt: MonitorTopic,
     */
   mt.collectResultTopic.subscriber
     .map { elem => loggerFlow(elem, "analyze action " + elem.monitorDetailId) }
-    .filter(_.rs.isDefined)
     .mapAsync(10) { i =>
       val monitorDetailId = i.monitorDetailId
       val coreMonitorDetailFuture: Future[CoreMonitorDetail] = cs.getCoreMonitorDetailById(monitorDetailId).invoke()

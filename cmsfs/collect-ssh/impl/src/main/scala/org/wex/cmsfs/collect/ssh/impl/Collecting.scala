@@ -13,7 +13,6 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
@@ -21,7 +20,7 @@ class Collecting(ct: CollectTopic,
                  system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CollectCore {
 
-  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
@@ -29,7 +28,6 @@ class Collecting(ct: CollectTopic,
 
   source.map(elem => loggerFlow(elem, s"receive ssh collect ${elem.connector.id}"))
     .mapAsync(10) { cis =>
-      logger.info("start ssh collect")
 
       val monitorDetailId = cis.monitorDetailId
       val ip = cis.connector.ip
@@ -40,16 +38,9 @@ class Collecting(ct: CollectTopic,
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
-      val c: Future[(Int, String, Option[String], String, String)] =
-        collectAction(ip, user, genUrl(path), Some(port))
-          .filter(_.isDefined)
-          .map(_.map(_.trim))
-          .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
-      c.onComplete {
-        case Success(a) => logger.info(a.toString())
-        case Failure(ex) => logger.error(ex.getMessage)
-      }
-      c
+      collectAction(ip, user, genUrl(path), Some(port))
+        .filter(_.isDefined)
+        .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
     }.withAttributes(supervisionStrategy((x => "x")))
     .mapAsync(10) {
       case (monitorDetailId, metricName, rsOpt, utcDate, dbName) =>

@@ -16,7 +16,7 @@ class Collecting(ct: CollectTopic,
                  system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CollectCore {
 
-  implicit val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
@@ -24,6 +24,7 @@ class Collecting(ct: CollectTopic,
 
   source.map(elem => loggerFlow(elem, s"receive jdbc collect ${elem.connector.id}"))
     .mapAsync(10) { cis =>
+
       val monitorDetailId = cis.monitorDetailId
       val url = cis.connector.url
       val user = cis.connector.user
@@ -34,6 +35,7 @@ class Collecting(ct: CollectTopic,
       val path = cis.collect.path
 
       collectAction(url, user, password, genUrl(path), Nil)
+        .filter(_.isDefined)
         .map(rs => (monitorDetailId, metricName, rs, utcDate, name))
     }.withAttributes(supervisionStrategy((em) => em + " xx"))
     .mapAsync(10) {
