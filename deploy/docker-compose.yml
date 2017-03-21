@@ -110,8 +110,6 @@ services:
     volumes:
       # - /var/lib/mysql:/var/lib/mysql
       - /etc/localtime:/etc/localtime
-    depends_on: 
-      - consul
     networks: 
       cmsfs:
         aliases: 
