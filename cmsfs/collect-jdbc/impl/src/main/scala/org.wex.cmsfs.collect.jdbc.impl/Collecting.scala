@@ -9,7 +9,6 @@ import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
-
 import scala.concurrent.Future
 
 class Collecting(ct: CollectTopic,
@@ -65,6 +64,5 @@ class Collecting(ct: CollectTopic,
       case ex: Exception => logger.error(ex.getMessage + " collectionAction"); Future.successful(None)
     }
   }
-
 
 }
