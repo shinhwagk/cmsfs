@@ -15,5 +15,15 @@ class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_m
 
   def collectId = column[Int]("COLLECT_ID")
 
-  override def * = (id, cron, connectorMode, connectorId, collectId) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
+  def collectArgs = column[Option[String]]("COLLECT_ARGS")
+
+  def formatAnalyzeId = column[Option[Int]]("FORMAT_ANALYZE_ID")
+
+  def formatAnalyzeArgs = column[Option[String]]("FORMAT_ANALYZE_ARGS")
+
+  def formatAlarmId = column[Option[Int]]("FORMAT_ALARM_ID")
+
+  def formatAlarmArgs = column[Option[String]]("FORMAT_ANALYZE_ARGS")
+
+  override def * = (id, cron, connectorMode, connectorId, collectId, collectArgs, formatAnalyzeId, formatAnalyzeArgs, formatAlarmId, formatAlarmArgs) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
 }

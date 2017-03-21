@@ -11,14 +11,12 @@ class CoreFormatAnalyzes(tag: Tag) extends Table[CoreFormatAnalyze](tag, "core_f
 
   def args = column[Option[String]]("ARGS")
 
-  def collectId = column[Int]("COLLECT_ID")
-
   def _index = column[String]("_INDEX")
 
   def _type = column[String]("_TYPE")
 
   def _metric = column[String]("_METRIC")
 
-  override def * = (id, path, args, collectId, _index, _type, _metric) <> (CoreFormatAnalyze.tupled, CoreFormatAnalyze.unapply)
+  override def * = (id, path, args, _index, _type, _metric) <> (CoreFormatAnalyze.tupled, CoreFormatAnalyze.unapply)
 }
 

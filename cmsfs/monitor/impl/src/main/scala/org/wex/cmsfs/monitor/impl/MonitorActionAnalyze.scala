@@ -5,7 +5,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.slf4j.LoggerFactory
 import org.wex.cmsfs.common.CmsfsAkka
-import org.wex.cmsfs.config.api.{ConfigService, CoreFormatAnalyze}
+import org.wex.cmsfs.config.api.{ConfigService, CoreFormatAnalyze, CoreMonitorDetail}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 
 import scala.concurrent.Future
@@ -25,20 +25,33 @@ class MonitorActionAnalyze(mt: MonitorTopic,
     * analyze format
     */
   mt.collectResultTopic.subscriber
-    .map { elem => loggerFlow(elem, "analyze action " + elem.id) }
+    .map { elem => loggerFlow(elem, "analyze action " + elem.monitorDetailId) }
     .filter(_.rs.isDefined)
     .mapAsync(10) { i =>
-      val coreFormatAnalyzesFuture: Future[Seq[CoreFormatAnalyze]] = cs.getCoreFormatAnalyzesByCollectId(i.id).invoke();
+      val monitorDetailId = i.monitorDetailId
+      val coreMonitorDetailFuture: Future[CoreMonitorDetail] = cs.getCoreMonitorDetailById(monitorDetailId).invoke()
       for {
-        coreFormatAnalyzes <- coreFormatAnalyzesFuture
-        seqDone <- Future.sequence {
-          coreFormatAnalyzes.map { p =>
-            val formatAnalyzeItem =
-              FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, p.args.getOrElse("[]"))
-            fas.pushFormatAnalyze.invoke(formatAnalyzeItem)
-          }
+        coreMonitorDetail <- coreMonitorDetailFuture if coreMonitorDetail.formatAnalyzeId.isDefined
+        coreFormatAnalyze <- cs.getCoreFormatAnalyzesById(coreMonitorDetail.formatAnalyzeId.get).invoke()
+        done <- {
+          val p = coreFormatAnalyze
+          val formatAnalyzeItem =
+            FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, coreMonitorDetail.formatAnalyzeArgs.getOrElse("[]"))
+          fas.pushFormatAnalyze.invoke(formatAnalyzeItem)
         }
-      } yield seqDone
+      } yield done
+
+      //      val coreFormatAnalyzesFuture: Future[CoreFormatAnalyze] = cs.getCoreFormatAnalyzesById(i.monitorDetailId).invoke();
+      //      for {
+      //        coreFormatAnalyzes <- coreFormatAnalyzesFuture
+      //        seqDone <- Future.sequence {
+      //          coreFormatAnalyzes.map { p =>
+      //            val formatAnalyzeItem =
+      //              FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, p.args.getOrElse("[]"))
+      //            fas.pushFormatAnalyze.invoke(formatAnalyzeItem)
+      //          }
+      //        }
+      //      } yield seqDone
     }.withAttributes(supervisionStrategy((x) => x + "xx"))
     .runWith(Sink.ignore)
 
@@ -46,7 +59,7 @@ class MonitorActionAnalyze(mt: MonitorTopic,
     * alarm format
     */
   mt.collectResultTopic.subscriber
-    .map { elem => loggerFlow(elem, "alarm action " + elem.id) }
+    .map { elem => loggerFlow(elem, "alarm action " + elem.monitorDetailId) }
     .filter(_.rs.isDefined)
     //    .mapAsync(10)(x => fas.pushFormatAnalyze.invoke(FormatAnalyzeItem(x.id, x.metricName, x.rs.get, "[]", x.utcDate, x.name)))
     .runWith(Sink.ignore)

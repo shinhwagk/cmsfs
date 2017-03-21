@@ -63,6 +63,8 @@ trait ConfigService extends Service {
 
   def getCoreMonitorDetails: ServiceCall[NotUsed, Seq[CoreMonitorDetail]]
 
+  def getCoreMonitorDetailById(id: Int): ServiceCall[NotUsed, CoreMonitorDetail]
+
   def addCoreMonitorDetail: ServiceCall[CoreMonitorDetail, Done]
 
   def getCoreConnectorJdbcById(id: Int): ServiceCall[NotUsed, CoreConnectorJdbc]
@@ -78,8 +80,6 @@ trait ConfigService extends Service {
   def addCoreCollect: ServiceCall[CoreCollect, Done]
 
   def getCoreFormatAnalyzesById(id: Int): ServiceCall[NotUsed, CoreFormatAnalyze]
-
-  def getCoreFormatAnalyzesByCollectId(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]]
 
   def addCoreFormatAnalyze: ServiceCall[CoreFormatAnalyze, Done]
 
@@ -134,6 +134,7 @@ trait ConfigService extends Service {
       //      restCall(Method.GET, "/v1/monitor/jdbc/:id", getMonitorById _)
 
       restCall(Method.GET, "/v1/core/monitor/details", getCoreMonitorDetails),
+      restCall(Method.GET, "/v1/core/monitor/detail/:id", getCoreMonitorDetailById _),
       restCall(Method.POST, "/v1/core/monitor/detail", addCoreMonitorDetail),
       restCall(Method.GET, "/v1/core/connector/jdbc/:id", getCoreConnectorJdbcById _),
       restCall(Method.POST, "/v1/core/connector/jdbc", addCoreConnectorJdbc),
@@ -142,7 +143,6 @@ trait ConfigService extends Service {
       restCall(Method.GET, "/v1/core/collect/:id", getCoreCollectById _),
       restCall(Method.POST, "/v1/core/collect", addCoreCollect),
       restCall(Method.GET, "/v1/core/format/analyze/:id", getCoreFormatAnalyzesById _),
-      restCall(Method.GET, "/v1/core/format/analyze/collect/:id", getCoreFormatAnalyzesByCollectId _),
       restCall(Method.POST, "/v1/core/format/analyze", addCoreFormatAnalyze),
       restCall(Method.GET, "/v1/core/format/alarm/:id", getCoreFormatAlarmsById _),
       restCall(Method.POST, "/v1/core/format/alarm", addCoreFormatAlarm)

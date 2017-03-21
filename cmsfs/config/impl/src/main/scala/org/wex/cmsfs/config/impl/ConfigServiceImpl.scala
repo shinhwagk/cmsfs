@@ -141,10 +141,6 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.coreFormatAnalyzes.filter(_.id === id).result.head)
   }
 
-  override def getCoreFormatAnalyzesByCollectId(id: Int): ServiceCall[NotUsed, Seq[CoreFormatAnalyze]] = ServiceCall { _ =>
-    db.run(Tables.coreFormatAnalyzes.filter(_.collectId === id).result)
-  }
-
   override def getCoreFormatAlarmsById(id: Int): ServiceCall[NotUsed, CoreFormatAlarm] = ServiceCall { _ =>
     db.run(Tables.coreFormatAlarms.filter(_.id === id).result.head)
   }
@@ -173,4 +169,7 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.coreFormatAlarms += cfa).map(_ => Done)
   }
 
+  override def getCoreMonitorDetailById(id: Int): ServiceCall[NotUsed, CoreMonitorDetail] = ServiceCall { _ =>
+    db.run(Tables.coreMonitorDetails.filter(_.id === id).result.head)
+  }
 }

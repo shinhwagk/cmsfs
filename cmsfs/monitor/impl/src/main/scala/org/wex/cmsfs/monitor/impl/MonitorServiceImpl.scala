@@ -12,7 +12,7 @@ class MonitorServiceImpl(mt: MonitorTopic)(implicit ec: ExecutionContext) extend
   private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def pushCollectResult: ServiceCall[CollectResult, Done] = ServiceCall { cr =>
-    logger.info(s"collect result receive: ${cr.id}")
+    logger.info(s"collect result receive: ${cr.monitorDetailId}")
     mt.collectResultTopic.publish(cr); Future.successful(Done)
   }
 }
