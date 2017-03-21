@@ -8,12 +8,11 @@ import org.wex.cmsfs.collect.core.CollectCore
 import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
-import play.api.libs.json.Json
 import scala.concurrent.Future
 
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
-                 config: Configuration,
+                 override val config: Configuration,
                  system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CollectCore {
 

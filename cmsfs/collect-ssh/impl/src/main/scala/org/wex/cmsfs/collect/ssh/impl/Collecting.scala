@@ -1,7 +1,6 @@
 package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
-
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
@@ -18,7 +17,7 @@ import scala.util.{Failure, Success}
 
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
-                 config: Configuration,
+                 override val config: Configuration,
                  system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CollectCore {
 
