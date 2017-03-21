@@ -37,6 +37,8 @@ class Collecting(ct: CollectTopic,
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
+      logger.info(s"collect-ssh path ${genUrl(path)}")
+
       val c: Future[(Int, String, Option[String], String, String)] =
         collectAction(ip, user, genUrl(path), Some(port))
           .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
