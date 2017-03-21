@@ -50,9 +50,8 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
       val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
       logger.info("a" + arr.toString())
       arr.map(elem => jsonObjectAddField(elem, "@timestamp", utcDate))
-      logger.info("b" + arr.toString())
-      arr.map(elem => jsonObjectAddField(elem, "@metric", _metric))
-      arr.map(row => (_index, _type, row.toString))
+        .map(elem => jsonObjectAddField(elem, "@metric", _metric))
+        .map(row => (_index, _type, row.toString))
     } catch {
       case ex: Exception => {
         logger.error("splitAnalyzeResult " + ex.getMessage)
