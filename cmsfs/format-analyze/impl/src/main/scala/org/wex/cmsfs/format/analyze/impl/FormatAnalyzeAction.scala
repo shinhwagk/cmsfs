@@ -37,8 +37,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .map(elem => loggerFlow(elem, s"send format analyze ${elem}"))
     .mapConcat(fai => splitAnalyzeResult(fai).toList)
     .map(elem => loggerFlow(elem, "sview format rs s"))
-    .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }
-    .withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
   def splitAnalyzeResult(fai: FormatAnalyzeItem) = {

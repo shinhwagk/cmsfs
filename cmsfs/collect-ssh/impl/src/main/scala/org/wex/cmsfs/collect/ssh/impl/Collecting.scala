@@ -65,7 +65,7 @@ class Collecting(ct: CollectTopic,
 
   def genUrl(path: String): String = {
     val formatUrl = config.getString("collect.url").get
-    formatUrl :: Json.parse(path).as[Seq[String]] :: Nil mkString "/"
+    formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
