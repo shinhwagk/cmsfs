@@ -43,11 +43,6 @@ class Collecting(ct: CollectTopic,
     }.withAttributes(supervisionStrategy((em) => em + " xx"))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
-  def genUrl(path: String): String = {
-    val formatUrl = config.getString("collect.url").get
-    formatUrl :: Json.parse(path).as[List[String]] mkString "/"
-  }
-
   def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = {
     val DBTYPE = "oracle"
     try {
