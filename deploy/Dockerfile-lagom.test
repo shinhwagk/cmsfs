@@ -1,0 +1,17 @@
+FROM cmsfs/oraclejdk8
+
+ARG SVC_NAME
+
+ADD register.py register.py
+ADD entrypoint.sh /usr/local/bin/entrypoint.sh
+ADD logback.xml /opt/logback.xml
+
+EXPOSE 9000
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
+
+RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/app.sh

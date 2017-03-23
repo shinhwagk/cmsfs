@@ -8,7 +8,9 @@ import org.wex.cmsfs.collect.core.CollectCore
 import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
+
 import scala.concurrent.Future
+import scala.io.Source
 
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
@@ -34,7 +36,9 @@ class Collecting(ct: CollectTopic,
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
-      collectAction(url, user, password, genUrl(path), Nil)
+      val sqlText = Source.fromURL(genUrl(path), "UTF-8").mkString
+
+      collectAction(url, user, password, sqlText, Nil)
         .filter(_.isDefined)
         .map(rs => (monitorDetailId, metricName, rs, utcDate, name))
     }.withAttributes(supervisionStrategy((em) => em + " xx"))
@@ -49,7 +53,9 @@ class Collecting(ct: CollectTopic,
     try {
       if (DBTYPE == "oracle") {
         val collectOracle = new CollectingOracle(jdbcUrl, user, password, sqlText, parameters)
-        collectOracle.mode("MAP").map(Some(_))
+        val c = collectOracle.mode("MAP").map(Some(_))
+        c.foreach(rs => println("xxx " + rs + " xxxxxxx"))
+        c
       } else if (DBTYPE == "mysql") {
         Future.successful(None)
       } else {

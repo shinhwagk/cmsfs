@@ -21,7 +21,27 @@ GET http://10.65.103.60:9000/v1/core/connector/jdbc/1 HTTP/1.1
 
 
 ###
-GET http://10.65.103.63:9200/monitor/_search HTTP/1.1
+GET http://10.65.103.63:9200/monitor/dev3/_search HTTP/1.1
+
+###
+GET http://10.65.103.63:9200/monitor/ya HTTP/1.1
 
 ###
 DELETE http://10.65.103.63:9200/monitor HTTP/1.1
+
+###
+PUT http://10.65.103.63:9200/_aliases HTTP/1.1
+content-type: application/json
+
+{
+    "actions": [
+        { "remove": {
+            "alias": "monitor",
+            "index": "monitor"
+        }},
+        { "add": {
+            "alias": "monitor",
+            "index": "monitor2"
+        }}
+    ]
+}

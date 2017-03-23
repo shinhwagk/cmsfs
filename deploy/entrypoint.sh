@@ -1,3 +1,2 @@
 #!/bin/bash
-register.sh
-app.sh $@
+python register.py && cd /opt/cmsfs/bin && sh app.sh $@

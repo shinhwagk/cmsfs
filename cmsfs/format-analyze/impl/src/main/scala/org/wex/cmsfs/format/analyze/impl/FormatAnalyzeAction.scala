@@ -64,7 +64,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
     val rs: String = execScript(workDirName)
-    //    executeFormatAfter(workDirName)
+    executeFormatAfter(workDirName)
     fai.copy(formatResult = Some(rs))
   }
 
@@ -111,8 +111,9 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     FileUtils.deleteDirectory(new File(dirPath))
   }
 
+  import sys.process._
+
   def execScript(workDirName: String): String = {
-    import sys.process._
     try {
       Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
     } catch {

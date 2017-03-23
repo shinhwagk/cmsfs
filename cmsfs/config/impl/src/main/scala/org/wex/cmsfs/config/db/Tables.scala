@@ -1,6 +1,5 @@
-package org.wex.cmsfs.config.db.MonitorCategoryEnum
+package org.wex.cmsfs.config.db
 
-import org.wex.cmsfs.config.db._
 import slick.jdbc.MySQLProfile.api._
 
 object Tables {

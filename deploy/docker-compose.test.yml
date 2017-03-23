@@ -4,9 +4,9 @@ services:
   consul:
     container_name: cmsfs_consul
     image: consul
-    networks: 
+    networks:
       cmsfs:
-        aliases: 
+        aliases:
           - consul.cmsfs.org
     ports:
       - "8500:8500"
@@ -14,7 +14,7 @@ services:
   config:
     build:
       context: ./
-      dockerfile: Dockerfile-lagom.prod
+      dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: config
     image: cmsfs/config
@@ -22,16 +22,15 @@ services:
     environment: 
       - SERVICE_NAME=config
       - SERVICE_PORT=9000
+    volumes: 
+      - ./config:/opt/cmsfs
     networks: 
       - cmsfs
-    depends_on:
-      - consul
-      - db
 
   monitor:
     build:
       context: ./
-      dockerfile: Dockerfile-lagom.prod
+      dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: monitor
     image: cmsfs/monitor
@@ -39,19 +38,15 @@ services:
     environment: 
       - SERVICE_NAME=monitor
       - SERVICE_PORT=9000
+    volumes:
+      - ./monitor:/opt/cmsfs
     networks: 
       - cmsfs
-    depends_on:
-      - consul
-      - config
-      - collect-ssh
-      - collect-jdbc
-      - format-analyze
 
   collect-ssh:
     build:
       context: ./
-      dockerfile: Dockerfile-lagom.prod
+      dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: collect-ssh
     image: cmsfs/collect-ssh
@@ -61,15 +56,14 @@ services:
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
       - /etc/localtime:/etc/localtime
+      - ./collect-ssh:/opt/cmsfs
     networks: 
       - cmsfs
-    depends_on: 
-      - consul
 
   collect-jdbc:
     build:
       context: ./
-      dockerfile: Dockerfile-lagom.prod
+      dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: collect-jdbc
     image: cmsfs/collect-jdbc
@@ -78,15 +72,14 @@ services:
       - SERVICE_PORT=9000
     volumes:
       - /etc/localtime:/etc/localtime
+      - ./collect-jdbc:/opt/cmsfs
     networks: 
       - cmsfs
-    depends_on: 
-      - consul
 
   format-analyze:
     build:
       context: ./
-      dockerfile: Dockerfile-lagom.prod
+      dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: format-analyze
     image: cmsfs/format-analyze
@@ -95,16 +88,15 @@ services:
       - SERVICE_PORT=9000
     volumes: 
       - /etc/localtime:/etc/localtime
+      - ./format-analyze:/opt/cmsfs
     networks: 
       - cmsfs
-    depends_on: 
-      - consul
 
   db:
     container_name: cmsfs_db
     image: mysql
-    expose:
-      - "3306"
+    ports:
+      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
@@ -168,9 +160,9 @@ services:
       - SERVICE_NAME=elastic-search
       - SERVICE_PORT=9200
     volumes:
-      - ./register.sh:/register.sh
+      - ./register.py:/register.py
       - /etc/localtime:/etc/localtime
-    entrypoint: sh -c "/register.sh && /docker-entrypoint.sh elasticsearch"
+    entrypoint: sh -c "python /register.sh && /docker-entrypoint.sh elasticsearch"
     ports: 
       - "9200:9200"
 
