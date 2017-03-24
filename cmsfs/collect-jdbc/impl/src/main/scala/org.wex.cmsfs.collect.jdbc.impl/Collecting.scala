@@ -32,15 +32,18 @@ class Collecting(ct: CollectTopic,
       val user = cis.connector.user
       val password = cis.connector.password
       val metricName = cis.collect.name
-      val name = cis.connector.name
+      val dbName = cis.connector.name
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
       val sqlText = Source.fromURL(genUrl(path), "UTF-8").mkString
 
+      val collectTimeMonitorCalculate: (String) => String = collectTimeMonitor
+
       collectAction(url, user, password, sqlText, Nil)
+        .map(elem => loggerFlow(elem, collectTimeMonitorCalculate(metricName + " " + dbName)))
         .filter(_.isDefined)
-        .map(rs => (monitorDetailId, metricName, rs, utcDate, name))
+        .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
     }.withAttributes(supervisionStrategy((em) => em + " xx"))
     .mapAsync(10) {
       case (id, metricName, rsOpt, utcDate, name) =>

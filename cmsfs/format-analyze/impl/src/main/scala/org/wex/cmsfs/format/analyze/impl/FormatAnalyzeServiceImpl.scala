@@ -9,10 +9,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FormatAnalyzeServiceImpl(topic: FormatAnalyzeTopic)(implicit ec: ExecutionContext) extends FormatAnalyzeService {
 
-  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def pushFormatAnalyze: ServiceCall[FormatAnalyzeItem, Done] = ServiceCall { fai =>
-    logger.info(s"format alarm receive: ${fai._metric}")
+    logger.info(s"format analyze receive: ${fai._metric}")
     topic.formatTopic.publish(fai);
     Future.successful(Done)
   }

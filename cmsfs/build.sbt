@@ -108,7 +108,7 @@ lazy val `notification-impl` = (project in file("notification/impl"))
   .settings(libraryDependencies += lagomScaladslPubSub)
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`notification-api`)
+  .dependsOn(`notification-api`, `lagom-service-locator`)
 
 lazy val `lagom-service-locator` = (project in file("locator"))
   .enablePlugins(LagomScala)

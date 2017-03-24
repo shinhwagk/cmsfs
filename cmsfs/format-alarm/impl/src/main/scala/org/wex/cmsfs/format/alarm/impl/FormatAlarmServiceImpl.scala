@@ -9,9 +9,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FormatAlarmServiceImpl(topic: FormatAlarmTopic)(implicit ec: ExecutionContext) extends FormatAlarmService {
 
-  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def pushFormatAlarm: ServiceCall[FormatAlarmItem, Done] = ServiceCall { fai =>
-    topic.formatTopic.publish(fai); Future.successful(Done)
+    logger.info(s"format alarm receive: ${fai._metric}")
+    topic.formatTopic.publish(fai);
+    Future.successful(Done)
   }
 }

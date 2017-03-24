@@ -10,7 +10,12 @@ services:
           - consul.cmsfs.org
     ports:
       - "8500:8500"
-  
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
+
   config:
     build:
       context: ./
@@ -24,8 +29,14 @@ services:
       - SERVICE_PORT=9000
     volumes: 
       - ./config:/opt/cmsfs
+      - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   monitor:
     build:
@@ -40,8 +51,14 @@ services:
       - SERVICE_PORT=9000
     volumes:
       - ./monitor:/opt/cmsfs
+      - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   collect-ssh:
     build:
@@ -56,9 +73,13 @@ services:
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
       - /etc/localtime:/etc/localtime
-      - ./collect-ssh:/opt/cmsfs
     networks: 
       - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   collect-jdbc:
     build:
@@ -75,6 +96,11 @@ services:
       - ./collect-jdbc:/opt/cmsfs
     networks: 
       - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   format-analyze:
     build:
@@ -91,6 +117,31 @@ services:
       - ./format-analyze:/opt/cmsfs
     networks: 
       - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
+
+  notification:
+    build:
+      context: ./
+      dockerfile: Dockerfile-lagom.test
+      args:
+        SVC_NAME: notification
+    image: cmsfs/notification
+    environment: 
+      - SERVICE_NAME=notification
+      - SERVICE_PORT=9000
+    volumes:
+      - /etc/localtime:/etc/localtime
+    networks: 
+      - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   db:
     container_name: cmsfs_db
@@ -148,6 +199,11 @@ services:
       - "3000:3000"
     environment: 
       - GF_SECURITY_ADMIN_PASSWORD=123456aA+ 
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   elasticsearch:
     container_name: cmsfs_elasticsearch
@@ -159,12 +215,19 @@ services:
     environment: 
       - SERVICE_NAME=elastic-search
       - SERVICE_PORT=9200
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    mem_limit: 1g
     volumes:
-      - ./register.py:/register.py
+      - ./register.sh:/register.sh
       - /etc/localtime:/etc/localtime
-    entrypoint: sh -c "python /register.sh && /docker-entrypoint.sh elasticsearch"
+    entrypoint: sh -c "sh /register.sh && /docker-entrypoint.sh elasticsearch"
     ports: 
       - "9200:9200"
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
 
   # kibana:
   #   container_name: cmsfs_kibana

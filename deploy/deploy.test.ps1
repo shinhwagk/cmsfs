@@ -41,6 +41,18 @@ function start-services($service_name){
   ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs ps"
 }
 
+# function restart-cmsfs {
+#     ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs stop"
+#     ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs rm -f monitor config collect-ssh collect-jdbc format-analyze notification"
+#     ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up -d consul db grafana elasticsearch"
+#     ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up -d config collect-ssh collect-jdbc format-analyze"
+#     ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up -d monitor"
+# }
+
+# function start-base_services(){
+#     ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up -d consul "
+# }
+
 scp-metadate
 stage-service $args[0]
 start-services $args[0]

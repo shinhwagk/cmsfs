@@ -2,61 +2,74 @@ package org.wex.cmsfs.format.alarm.impl
 
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
-
+import akka.actor.ActorSystem
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
+import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson}
 import org.wex.cmsfs.format.alarm.api.FormatAlarmItem
+import org.wex.cmsfs.fotmer.core.FormatCore
+import org.wex.cmsfs.notification.impl.NotificationService
 import play.api.Configuration
-
+import play.api.libs.json.{JsArray, JsValue, Json}
 import scala.concurrent.Future
 import scala.io.Source
 
-class FormatAlarmAction(topic: FormatAlarmTopic, config: Configuration) {
+class FormatAlarmAction(topic: FormatAlarmTopic,
+                        override val config: Configuration,
+                        es: NotificationService,
+                        system: ActorSystem)(implicit mat: Materializer)
+  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore {
 
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private val formatUrl = config.getString("format.url")
+  private implicit val executionContext = system.dispatcher
 
   private val subscriber = topic.formatTopic.subscriber
 
+  logger.info(s"${this.getClass.getName} start.")
+
   subscriber
-    //    .mapAsync(10)(fai => actionFormat(fai.metricName, fai.data, fai.args))
-    .map(streamLog("start format analyze", _))
-    .mapAsync(10)(actionFormat)
-    .map(streamLog("end format analyze", _))
+    .map(elem => loggerFlow(elem, s"start format alarm ${elem._metric}"))
+    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .map(elem => loggerFlow(elem, s"send format alarm ${elem._metric}"))
+    .mapConcat(fai => splitAnalyzeResult(fai).toList)
+//    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
-  def genUrl(name: String): String = {
-    List(formatUrl, name, "analyze.sh").mkString("/")
+  def splitAnalyzeResult(fai: FormatAlarmItem): Seq[(String, String, String)] = {
+    try {
+      val formatResult: String = fai.formatResult.get
+      val _type = fai._type
+      val _index = fai._index
+      val _metric = fai._metric
+      val utcDate = fai.utcDate
+      val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
+      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
+        .map(jsonObjectAddField(_, "@metric", _metric))
+        .map(row => (_index, _type, row.toString))
+    } catch {
+      case ex: Exception => {
+        logger.error("splitAnalyzeResult " + ex.getMessage)
+        Seq()
+      }
+    }
   }
 
-  def streamLog[T](log: String, elem: T): T = {
-    logger.info(log);
-    elem
-  }
-
-  def actionFormat(fai: FormatAlarmItem): Future[String] = Future {
-    val url = genUrl(fai.metricName)
-    val workDirName = executeFormatBefore(url, fai.data, fai.args)
-    val rs = execScript(workDirName)
+  def actionFormat(fai: FormatAlarmItem): Future[FormatAlarmItem] = Future {
+    val url: String = genUrl(fai.path)
+    val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
+    val rs: String = execScript(workDirName)
     executeFormatAfter(workDirName)
-    rs
-  }
-
-  def actionFormat(name: String, data: String, args: String): Future[String] = Future {
-    val url = genUrl(name)
-    val workDirName = executeFormatBefore(url, data, args)
-    val rs = execScript(workDirName)
-    executeFormatAfter(workDirName)
-    rs
+    fai.copy(formatResult = Some(rs))
   }
 
   def executeFormatBefore(url: String, data: String, args: String): String = {
     val workDirName: String = createWorkDir
     downAndWriteScript(url, workDirName)
     writeData(data, workDirName)
-    writeData(args, workDirName)
+    writeArgs(args, workDirName)
     workDirName
   }
 
@@ -64,7 +77,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic, config: Configuration) {
     val dirName = s"workspace/${ThreadLocalRandom.current.nextLong(100000000).toString}"
     val file = new File(dirName)
     file.exists() match {
-      case false => file.mkdir()
+      case false => file.mkdirs()
       case true => throw new Exception(s"dirName:${dirName} exists.")
     }
     dirName
@@ -80,7 +93,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic, config: Configuration) {
 
   def downAndWriteScript(url: String, dirPath: String): Unit = {
     val script = Source.fromURL(url, "UTF-8").mkString
-    writeFile(s"${dirPath}/analyze.py", script)
+    writeFile(s"${dirPath}/alarm.py", script)
   }
 
   def writeFile(fileName: String, content: String) = {
@@ -95,12 +108,16 @@ class FormatAlarmAction(topic: FormatAlarmTopic, config: Configuration) {
     FileUtils.deleteDirectory(new File(dirPath))
   }
 
+  import sys.process._
+
   def execScript(workDirName: String): String = {
-    import sys.process._
     try {
-      Seq("python", s"${workDirName}/alarm.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
+      Seq("python", s"${workDirName}/analyze.py", s"${workDirName}/data.json", s"${workDirName}/args.json").!!.trim
     } catch {
-      case e: Exception => "[]"
+      case e: Exception => {
+        logger.error(e.getMessage)
+        "[]"
+      }
     }
   }
 }

@@ -2,7 +2,6 @@ package org.wex.cmsfs.format.analyze.impl
 
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
-
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
@@ -32,11 +31,10 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
   logger.info(s"${this.getClass.getName} start.")
 
   subscriber
-    .map(elem => loggerFlow(elem, s"start format analyze ${elem}"))
+    .map(elem => loggerFlow(elem, s"start format analyze ${elem._metric}"))
     .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    .map(elem => loggerFlow(elem, s"send format analyze ${elem}"))
+    .map(elem => loggerFlow(elem, s"send format analyze ${elem._metric}"))
     .mapConcat(fai => splitAnalyzeResult(fai).toList)
-    .map(elem => loggerFlow(elem, "sview format rs s"))
     .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
@@ -61,7 +59,6 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   def actionFormat(fai: FormatAnalyzeItem): Future[FormatAnalyzeItem] = Future {
     val url: String = genUrl(fai.path)
-    logger.info(s"analyze ${url}")
     val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
     val rs: String = execScript(workDirName)
     executeFormatAfter(workDirName)

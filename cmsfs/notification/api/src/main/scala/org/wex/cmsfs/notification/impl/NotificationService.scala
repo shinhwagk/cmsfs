@@ -1,4 +1,4 @@
-package org.wex.cmsfs.notification.api
+package org.wex.cmsfs.notification.impl
 
 import akka.Done
 import com.lightbend.lagom.scaladsl.api.transport.Method
@@ -16,8 +16,7 @@ trait NotificationService extends Service {
     import NotificationService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      restCall(Method.POST, "/v1/notification/email", pushNotificationItem),
-      restCall(Method.POST, "/v1/notification/phone", pushNotificationItem)
+      restCall(Method.POST, "/v1/notification", pushNotificationItem)
     )
   }
 }

@@ -34,18 +34,21 @@ class Collecting(ct: CollectTopic,
       val user = cis.connector.user
       val metricName = cis.collect.name
       val port = cis.connector.port
-      val dbName = cis.connector.name
+      val hostname = cis.connector.name
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
+      val collectTimeMonitorCalculate: (String) => String = collectTimeMonitor
+
       collectAction(ip, user, genUrl(path), Some(port))
+        .map(elem => loggerFlow(elem, collectTimeMonitorCalculate(metricName + " " + hostname)))
         .filter(_.isDefined)
-        .map(rs => (monitorDetailId, metricName, rs, utcDate, dbName))
-    }.withAttributes(supervisionStrategy((x => "x")))
+        .map(rs => (monitorDetailId, metricName, rs, utcDate, hostname))
+    }.withAttributes(supervisionStrategy((x => s"${x} x")))
     .mapAsync(10) {
       case (monitorDetailId, metricName, rsOpt, utcDate, dbName) =>
         ms.pushCollectResult.invoke(CollectResult(monitorDetailId, metricName, rsOpt, utcDate, dbName)).map(_ => monitorDetailId)
-    }.withAttributes(supervisionStrategy((x => "x")))
+    }.withAttributes(supervisionStrategy((x => s"${x} y")))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {

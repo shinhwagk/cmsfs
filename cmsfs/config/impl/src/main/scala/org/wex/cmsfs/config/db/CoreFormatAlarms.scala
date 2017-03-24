@@ -13,5 +13,7 @@ class CoreFormatAlarms(tag: Tag) extends Table[CoreFormatAlarm](tag, "core_forma
 
   def args = column[String]("ARGS")
 
-  override def * = (id, path, name, args) <> (CoreFormatAlarm.tupled, CoreFormatAlarm.unapply)
+  def notification = column[String]("NOTIFICATION")
+
+  override def * = (id, path, name, args, notification) <> (CoreFormatAlarm.tupled, CoreFormatAlarm.unapply)
 }
