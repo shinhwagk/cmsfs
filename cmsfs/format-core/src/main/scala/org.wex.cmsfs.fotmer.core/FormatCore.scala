@@ -7,8 +7,9 @@ trait FormatCore {
 
   val config: Configuration
 
+  val formatUrl: String = config.getString("format.url").get
+
   def genUrl(path: String): String = {
-    val formatUrl: String = config.getString("format.url").get
     formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 

@@ -7,11 +7,10 @@ import com.softwaremill.macwire._
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.config.api.ConfigService
-import org.wex.cmsfs.format.alarm.api.FormatAlarmService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
+import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
-import play.api.LoggerConfigurator
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
@@ -19,13 +18,8 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
     new ServiceApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication = {
-    loaderEnvironment(context)
+    Common.loaderEnvironment(context)
     new ServiceApplication(context) with ConsulServiceLocatorComponents
-  }
-
-  def loaderEnvironment(context: LagomApplicationContext): Unit = {
-    val environment = context.playContext.environment
-    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
   }
 }
 

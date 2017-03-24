@@ -6,7 +6,7 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.config.api.ConfigService
-import play.api.LoggerConfigurator
+import org.wex.cmsfs.lagom.service.discovery.Common
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
@@ -14,15 +14,10 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
     new ServiceApplication(context) with LagomDevModeComponents
 
   override def load(context: LagomApplicationContext): LagomApplication = {
-    loaderEnvironment(context)
+    Common.loaderEnvironment(context)
     new ServiceApplication(context) {
       override def serviceLocator: ServiceLocator = NoServiceLocator
     }
-  }
-
-  def loaderEnvironment(context: LagomApplicationContext): Unit = {
-    val environment = context.playContext.environment
-    LoggerConfigurator(environment.classLoader).foreach(_.configure(environment))
   }
 }
 

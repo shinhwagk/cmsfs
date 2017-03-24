@@ -11,7 +11,6 @@ import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
-
   override def loadDevMode(context: LagomApplicationContext): LagomApplication = {
     new ServiceApplication(context) with LagomDevModeComponents
   }
@@ -20,7 +19,6 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
     Common.loaderEnvironment(context)
     new ServiceApplication(context) with ConsulServiceLocatorComponents
   }
-
 }
 
 abstract class ServiceApplication(context: LagomApplicationContext)

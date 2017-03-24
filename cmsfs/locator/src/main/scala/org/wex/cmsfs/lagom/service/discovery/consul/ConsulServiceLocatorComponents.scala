@@ -17,11 +17,12 @@ trait ConsulServiceLocatorComponents extends CircuitBreakerComponents {
 class ConsulServiceLocator(configuration: Configuration, circuitBreakers: CircuitBreakers)(implicit ec: ExecutionContext)
   extends CircuitBreakingServiceLocator(circuitBreakers) {
 
-  private final val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val consulServiceExtract = new ConsulServiceExtract(configuration)
 
   override def locate(name: String, serviceCall: Call[_, _]): Future[Option[URI]] = Future {
+    logger.debug(s"request Service Name: ${name}.")
     consulServiceExtract.getService(name)
   }
 }

@@ -34,7 +34,7 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(libraryDependencies ++= Seq(mysqlJdbc, slick))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`config-api`)
+  .dependsOn(`config-api`, `lagom-service-locator`)
 
 lazy val `monitor-api` = (project in file("monitor/api"))
   .settings(libraryDependencies += lagomScaladslApi)
