@@ -2,9 +2,11 @@ package org.wex.cmsfs.format.alarm.impl
 
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
+
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
+import com.lightbend.lagom.scaladsl.api.transport.{MessageProtocol, RequestHeader}
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson}
@@ -13,6 +15,7 @@ import org.wex.cmsfs.fotmer.core.FormatCore
 import org.wex.cmsfs.notification.impl.NotificationService
 import play.api.Configuration
 import play.api.libs.json.{JsArray, JsValue, Json}
+
 import scala.concurrent.Future
 import scala.io.Source
 
@@ -29,6 +32,12 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   private val subscriber = topic.formatTopic.subscriber
 
   logger.info(s"${this.getClass.getName} start.")
+
+
+  def a(rh:RequestHeader):RequestHeader = {
+    rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))
+  }
+  es.pushNotificationItem.handleRequestHeader(a).invoke()
 
   subscriber
     .map(elem => loggerFlow(elem, s"start format alarm ${elem._metric}"))

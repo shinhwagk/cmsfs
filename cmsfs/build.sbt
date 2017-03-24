@@ -20,7 +20,7 @@ lazy val root = (project in file("."))
     `collect-jdbc-api`, `collect-jdbc-impl`,
     `format-analyze-api`, `format-analyze-impl`,
     `lagom-service-locator`,
-    `elasticsearch-api`
+    `elasticsearch-api`, `web-gateway`
   )
 
 def implCommonSettings: Seq[Setting[_]] = Seq(
@@ -114,6 +114,11 @@ lazy val `lagom-service-locator` = (project in file("locator"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += consul)
 
+lazy val `web-gateway` = (project in file("web-gateway"))
+  .enablePlugins(PlayScala && LagomPlay)
+  .dependsOn()
+  .settings(libraryDependencies ++= Seq(lagomScaladslServer, macwire, scalaTest)
+
 lazy val `common` = (project in file("common"))
   .enablePlugins(LagomScala)
 
@@ -123,5 +128,6 @@ lagomCassandraCleanOnStart in ThisBuild := false
 lagomServiceLocatorEnabled in ThisBuild := false
 
 parallelExecution in ThisBuild := true
+testForkedParallel in ThisBuild := true
 
 fork in run := true

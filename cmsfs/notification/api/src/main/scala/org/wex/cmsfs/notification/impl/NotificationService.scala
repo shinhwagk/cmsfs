@@ -16,7 +16,7 @@ trait NotificationService extends Service {
     import NotificationService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      restCall(Method.POST, "/v1/notification", pushNotificationItem)
+      pathCall("/v1/notification", pushNotificationItem)
     )
   }
 }
