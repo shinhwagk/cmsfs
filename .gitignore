@@ -1,8 +1,0 @@
-/cmsfs/.idea
-/cmsfs/target
-/cmsfs/project/target
-/cmsfs/project/project
-/cmsfs/**/target
-/cmsfs/**/*.log
-/cmsfs/logs
-/deploy/cmsfs
