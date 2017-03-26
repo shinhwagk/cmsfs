@@ -1,3 +1,5 @@
+import scala.language.postfixOps
+
 organization in ThisBuild := "org.wex"
 version in ThisBuild := "1.0-SNAPSHOT"
 scalaVersion in ThisBuild := "2.11.8"
@@ -114,10 +116,33 @@ lazy val `lagom-service-locator` = (project in file("locator"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += consul)
 
+val Success = 0 // 0 exit code
+val Error = 1 // 1 exit code
+
+lazy val `ui-prod-build` = TaskKey[Unit]("Run UI build when packaging the application.")
+
 lazy val `web-gateway` = (project in file("web-gateway"))
   .enablePlugins(PlayScala && LagomPlay)
-  .dependsOn()
-  .settings(libraryDependencies ++= Seq(lagomScaladslServer, macwire, scalaTest)
+  .settings(`ui-prod-build` := {
+    implicit val UIroot = baseDirectory.value / "ui"
+    if (runProdBuild != Success) throw new Exception("Oops! UI Build crashed.")
+  })
+  .settings(libraryDependencies ++= Seq(lagomScaladslServer, macwire, scalaTest))
+
+def runProdBuild(implicit dir: File): Int = ifUiInstalled(runScript("npm run build-prod"))
+
+def ifUiInstalled(task: => Int)(implicit dir: File): Int =
+  if (runNpmInstall == Success) task
+  else Error
+
+def runScript(script: String)(implicit dir: File): Int = Process(script, dir) !
+
+def runNpmInstall(implicit dir: File): Int =
+  if (uiWasInstalled) Success else runScript("npm install")
+
+def uiWasInstalled(implicit dir: File): Boolean = (dir / "node_modules").exists()
+
+
 
 lazy val `common` = (project in file("common"))
   .enablePlugins(LagomScala)
