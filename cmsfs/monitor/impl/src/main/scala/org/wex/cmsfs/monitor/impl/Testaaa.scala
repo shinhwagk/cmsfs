@@ -9,7 +9,10 @@ case class MonitorDetailForJdbc(id: Int,
                                 analyze: Option[FormatAnalyze],
                                 alarm: Option[FormatAlarm])
 
-case class MonitorDetailForSsh(id: Int, connector: ConnectorSsh, collect: Collect)
+case class MonitorDetailForSsh(id: Int,
+                               connector: ConnectorSsh, collect: Collect,
+                               analyze: Option[FormatAnalyze],
+                               alarm: Option[FormatAlarm])
 
 case class Collect(id: Int, name: String, path: String, args: Option[String])
 
@@ -23,7 +26,7 @@ case class FormatAnalyze(id: Int, path: String, args: Option[String], elasticsea
 
 /**
   *
-  * map[mail -> seq(191631513@qq.com),phone -> seq(13818888888)]
+  * eg: Map(mail -> seq(191631513@qq.com),phone -> seq(13818888888))
   *
   */
 case class Notification(args: String, sends: Map[String, Seq[String]])
