@@ -124,7 +124,7 @@ lazy val `monitor-status-impl` = (project in file("monitor-status/impl"))
 
 lazy val `web-gateway` = (project in file("web-gateway"))
   .enablePlugins(PlayScala && LagomPlay)
-  .dependsOn(`monitor-status-api`)
+  .dependsOn(`monitor-status-api`, `lagom-service-locator`)
   .settings(libraryDependencies ++= Seq(lagomScaladslServer, macwire, scalaTest))
 
 lazy val `lagom-service-locator` = (project in file("locator"))

@@ -2,7 +2,6 @@ package org.wex.cmsfs.monitor.impl
 
 import java.util.Date
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import org.quartz.CronExpression
@@ -11,8 +10,7 @@ import org.wex.cmsfs.collect.jdbc.api.{CollectItemJdbc, CollectJDBCService}
 import org.wex.cmsfs.collect.ssh.api.{CollectItemSsh, CollectSSHService}
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
-
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 import scala.util.{Failure, Success}
 
 class MonitorActionCollect(mt: MonitorTopic,
@@ -24,7 +22,7 @@ class MonitorActionCollect(mt: MonitorTopic,
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private implicit val executionContext = system.dispatcher
+  private implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   Future {
     while (true) {
@@ -74,9 +72,9 @@ class MonitorActionCollect(mt: MonitorTopic,
         p completeWith {
           for {
             coreCollect <- coreCollectFuture
-            coreConnectorJdbc <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
-            _ <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
-          } yield (coreConnectorJdbc.name, coreCollect.name)
+            coreConnectorSsh <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
+            _ <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, coreCollect, coreConnectorSsh, utcDate))
+          } yield (coreConnectorSsh.name, coreCollect.name)
         }
     }
 
