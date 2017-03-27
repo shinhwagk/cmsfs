@@ -11,6 +11,7 @@ import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
+import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
@@ -36,6 +37,7 @@ abstract class ServiceApplication(context: LagomApplicationContext)
   val collectSSHService = serviceClient.implement[CollectSSHService]
   val collectJDBCService = serviceClient.implement[CollectJDBCService]
   val formatAnalyzeService = serviceClient.implement[FormatAnalyzeService]
+  val monitorStatusService = serviceClient.implement[MonitorStatusService]
 
   val monitorTopic = wire[MonitorTopic]
   val monitorAction = wire[MonitorActionCollect]

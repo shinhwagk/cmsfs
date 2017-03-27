@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory
 import org.wex.cmsfs.common.CmsfsAkkaStream
 import org.wex.cmsfs.config.api.{ConfigService, CoreMonitorDetail}
 import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem, FormatAlarmService}
-import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
-
 import scala.concurrent.Future
 
 class MonitorActionAlarm(mt: MonitorTopic,

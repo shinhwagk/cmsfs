@@ -34,7 +34,7 @@ class MonitorActionAnalyze(mt: MonitorTopic,
         done <- {
           val p = coreFormatAnalyze
           val formatAnalyzeItem =
-            FormatAnalyzeItem(i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, coreMonitorDetail.formatAnalyzeArgs.getOrElse("[]"))
+            FormatAnalyzeItem(monitorDetailId,i.connectorName, p._index, p._metric, i.utcDate, i.rs.get, p.path, coreMonitorDetail.formatAnalyzeArgs.getOrElse("[]"))
           fas.pushFormatAnalyze.invoke(formatAnalyzeItem)
         }
       } yield done

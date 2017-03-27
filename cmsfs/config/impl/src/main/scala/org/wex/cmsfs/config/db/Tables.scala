@@ -16,4 +16,6 @@ object Tables {
 
   val coreFormatAnalyzes = TableQuery[CoreFormatAnalyzes]
 
+//  val coreMonitorStatuses = TableQuery[CoreMonitorStatuses]
+
 }

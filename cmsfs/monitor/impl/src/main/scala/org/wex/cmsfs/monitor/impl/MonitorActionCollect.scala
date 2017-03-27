@@ -10,6 +10,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.collect.jdbc.api.{CollectItemJdbc, CollectJDBCService}
 import org.wex.cmsfs.collect.ssh.api.{CollectItemSsh, CollectSSHService}
 import org.wex.cmsfs.config.api._
+import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
 
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
@@ -18,6 +19,7 @@ class MonitorActionCollect(mt: MonitorTopic,
                            cs: ConfigService,
                            cSSHs: CollectSSHService,
                            cJDBCs: CollectJDBCService,
+                           mss: MonitorStatusService,
                            system: ActorSystem)(implicit mat: Materializer) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -56,8 +58,8 @@ class MonitorActionCollect(mt: MonitorTopic,
   def monitorDistributor(utcDate: String)(cmd: CoreMonitorDetail): Unit = {
     val coreCollectFuture: Future[CoreCollect] = cs.getCoreCollectById(cmd.collectId).invoke()
 
-    val p: Promise[Done] = Promise[Done]
-    val f: Future[Done] = p.future
+    val p: Promise[(String, String)] = Promise[(String, String)]
+    val f: Future[(String, String)] = p.future
 
     cmd.connectorMode.toUpperCase match {
       case "JDBC" =>
@@ -65,23 +67,27 @@ class MonitorActionCollect(mt: MonitorTopic,
           for {
             coreCollect <- coreCollectFuture
             coreConnectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
-            done <- cJDBCs.pushCollectItem.invoke(CollectItemJdbc(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
-          } yield done
+            _ <- cJDBCs.pushCollectItem.invoke(CollectItemJdbc(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
+          } yield (coreConnectorJdbc.name, coreCollect.name)
         }
       case "SSH" =>
         p completeWith {
           for {
             coreCollect <- coreCollectFuture
             coreConnectorJdbc <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
-            done <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
-          } yield done
+            _ <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
+          } yield (coreConnectorJdbc.name, coreCollect.name)
         }
     }
 
     f.onComplete {
-      case Success(_) => logger.info("send collect " + cmd.collectId.toString)
+      case Success((name, metric)) => {
+        val id = cmd.id.get
+        val category = cmd.connectorMode
+        mss.putCoreMonitorStatus(id, category, name, metric).invoke()
+        logger.info("send collect " + cmd.collectId.toString)
+      }
       case Failure(ex) => logger.error("send collect " + ex.getMessage)
     }
-
   }
 }

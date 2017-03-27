@@ -33,6 +33,12 @@ trait ConfigService extends Service {
 
   def addCoreFormatAlarm: ServiceCall[CoreFormatAlarm, Done]
 
+//  def putCoreMonitorStatusCollectById(id: Int): ServiceCall[CoreMonitorStatus, Done]
+//
+//  def putCoreMonitorStatusAnalyzeById(id: Int): ServiceCall[CoreMonitorStatus, Done]
+//
+//  def putCoreMonitorStatusAlarmById(id: Int): ServiceCall[CoreMonitorStatus, Done]
+
   override final def descriptor = {
     named("config").withCalls(
       restCall(Method.GET, "/v1/core/monitor/details", getCoreMonitorDetails),
@@ -48,6 +54,10 @@ trait ConfigService extends Service {
       restCall(Method.POST, "/v1/core/format/analyze", addCoreFormatAnalyze),
       restCall(Method.GET, "/v1/core/format/alarm/:id", getCoreFormatAlarmsById _),
       restCall(Method.POST, "/v1/core/format/alarm", addCoreFormatAlarm)
+//      ,
+//      restCall(Method.PUT, "/v1/core/monitor/status/collect/:id", putCoreMonitorStatusCollectById _),
+//      restCall(Method.PUT, "/v1/core/monitor/status/analyze/:id", putCoreMonitorStatusAnalyzeById _),
+//      restCall(Method.PUT, "/v1/core/monitor/status/alarm/:id", putCoreMonitorStatusAnalyzeById _)
     )
   }
 }

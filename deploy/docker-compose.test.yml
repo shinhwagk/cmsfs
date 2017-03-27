@@ -143,6 +143,50 @@ services:
         max-file: "3"
         max-size: "10m"
 
+  web-gateway:
+    build:
+      context: ./
+      dockerfile: Dockerfile-lagom.test
+      args:
+        SVC_NAME: web-gateway
+    image: cmsfs/web-gateway
+    environment: 
+      - SERVICE_NAME=web-gateway
+      - SERVICE_PORT=9000
+    volumes:
+      - /etc/localtime:/etc/localtime
+    networks: 
+      - cmsfs
+    ports: 
+      - "80:9000"
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
+
+  monitor-status:
+    build:
+      context: ./
+      dockerfile: Dockerfile-lagom.test
+      args:
+        SVC_NAME: monitor-status
+    image: cmsfs/web-gateway
+    environment: 
+      - SERVICE_NAME=monitor-status
+      - SERVICE_PORT=9000
+    volumes:
+      - /etc/localtime:/etc/localtime
+    networks: 
+      - cmsfs
+    ports: 
+      - "9000:9000"
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
+
   db:
     container_name: cmsfs_db
     image: mysql
