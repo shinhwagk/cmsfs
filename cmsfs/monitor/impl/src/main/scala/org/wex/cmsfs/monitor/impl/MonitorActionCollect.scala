@@ -63,18 +63,18 @@ class MonitorActionCollect(mt: MonitorTopic,
       case "JDBC" =>
         p completeWith {
           for {
-            coreCollect <- coreCollectFuture
-            coreConnectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
-            _ <- cJDBCs.pushCollectItem.invoke(CollectItemJdbc(cmd.id.get, coreCollect, coreConnectorJdbc, utcDate))
-          } yield (coreConnectorJdbc.name, coreCollect.name)
+            collect <- coreCollectFuture
+            connectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
+            _ <- cJDBCs.pushCollectItem.invoke(CollectItemJdbc(cmd.id.get, collect, connectorJdbc, utcDate))
+          } yield (connectorJdbc.name, collect.name)
         }
       case "SSH" =>
         p completeWith {
           for {
-            coreCollect <- coreCollectFuture
-            coreConnectorSsh <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
-            _ <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, coreCollect, coreConnectorSsh, utcDate))
-          } yield (coreConnectorSsh.name, coreCollect.name)
+            collect <- coreCollectFuture
+            connectorSsh <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
+            _ <- cSSHs.pushCollectItem.invoke(CollectItemSsh(cmd.id.get, collect, connectorSsh, utcDate))
+          } yield (connectorSsh.name, collect.name)
         }
     }
 

@@ -4,6 +4,8 @@ import org.slf4j.Logger
 import play.api.Configuration
 import play.api.libs.json.Json
 
+import scala.io.Source
+
 trait CollectCore {
 
   val config: Configuration
@@ -13,6 +15,10 @@ trait CollectCore {
 
   def genUrl(path: String): String = {
     formatUrl :: Json.parse(path).as[List[String]] mkString "/"
+  }
+
+  def getPathContent(path:String):String = {
+    Source.fromURL(genUrl(path), "UTF-8").mkString
   }
 
   def collectTimeMonitor: (String) => String = {
