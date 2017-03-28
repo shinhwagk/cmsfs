@@ -10,7 +10,6 @@ import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponen
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
-
   override def load(context: LagomApplicationContext): LagomApplication = {
     Common.loaderEnvironment(context)
     new ServiceApplication(context) with ConsulServiceLocatorComponents
@@ -22,13 +21,10 @@ abstract class ServiceApplication(context: LagomApplicationContext)
     with AhcWSComponents {
 
   override lazy val lagomServer = LagomServer.forServices()
-  //  override lazy val lagomServer = LagomServer.forServices(
-  //    bindService[MonitorService].to(wire[MonitorServiceImpl])
-  //  )
 
   val configService = serviceClient.implement[ConfigService]
   val collectSSHService = serviceClient.implement[CollectSSHService]
   val collectJDBCService = serviceClient.implement[CollectJDBCService]
 
-  val monitorAction = wire[MonitorActionCollect]
+  val bootstrapActionCollect = wire[BootstrapActionCollect]
 }

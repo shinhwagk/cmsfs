@@ -58,6 +58,8 @@ services:
       - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
+    depends_on: 
+      - consul
     logging: 
       driver: "json-file"
       options: 

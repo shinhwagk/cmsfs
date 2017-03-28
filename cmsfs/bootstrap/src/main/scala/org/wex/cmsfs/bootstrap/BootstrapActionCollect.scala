@@ -16,10 +16,10 @@ import org.wex.cmsfs.config.api.{CoreFormatAnalyze, _}
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 import scala.util.{Failure, Success}
 
-class MonitorActionCollect(cs: ConfigService,
-                           cSSHs: CollectSSHService,
-                           cJDBCs: CollectJDBCService,
-                           system: ActorSystem)(implicit mat: Materializer) {
+class BootstrapActionCollect(cs: ConfigService,
+                             cSSHs: CollectSSHService,
+                             cJDBCs: CollectJDBCService,
+                             system: ActorSystem)(implicit mat: Materializer) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -28,7 +28,7 @@ class MonitorActionCollect(cs: ConfigService,
   Future {
     while (true) {
       logger.info(s"${System.currentTimeMillis()}")
-      schedulerMonitor
+//      schedulerMonitor
       Thread.sleep(1000)
     }
   }
