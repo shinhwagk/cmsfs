@@ -1,4 +1,4 @@
-package org.wex.cmsfs.collect.core
+package org.wex.cmsfs.common.collect
 
 object ConnectorCategory {
   val JDBC = "JDBC"

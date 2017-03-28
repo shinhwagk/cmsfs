@@ -3,20 +3,18 @@ package org.wex.cmsfs.format.analyze.impl
 import java.io.{File, PrintWriter}
 import java.util.Date
 import java.util.concurrent.ThreadLocalRandom
-
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson}
+import org.wex.cmsfs.common.format.FormatCore
+import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson, Common}
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
-import org.wex.cmsfs.fotmer.core.FormatCore
 import org.wex.cmsfs.monitor.status.impl.{CoreMonitorStatusAnalyze, MonitorStatusService}
 import play.api.Configuration
 import play.api.libs.json._
-
 import scala.concurrent.Future
 import scala.io.Source
 
@@ -25,7 +23,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
                           mss: MonitorStatusService,
                           es: ElasticsearchService,
                           system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore {
+  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {
 
   override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -64,7 +62,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   def actionFormat(fai: FormatAnalyzeItem): Future[FormatAnalyzeItem] = Future {
     try {
-      val url: String = genUrl(fai.path)
+      val url: String = getUrlPathContent(fai.path)
       val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
       val rs: String = execScript(workDirName)
       executeFormatAfter(workDirName)

@@ -2,20 +2,18 @@ package org.wex.cmsfs.format.alarm.impl
 
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
-
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.lightbend.lagom.scaladsl.api.transport.{MessageProtocol, RequestHeader}
 import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson}
+import org.wex.cmsfs.common.format.FormatCore
+import org.wex.cmsfs.common.{CmsfsAkkaStream, CmsfsPlayJson, Common}
 import org.wex.cmsfs.format.alarm.api.FormatAlarmItem
-import org.wex.cmsfs.fotmer.core.FormatCore
 import org.wex.cmsfs.notification.impl.NotificationService
 import play.api.Configuration
 import play.api.libs.json.{JsArray, JsValue, Json}
-
 import scala.concurrent.Future
 import scala.io.Source
 
@@ -23,7 +21,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
                         override val config: Configuration,
                         es: NotificationService,
                         system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore {
+  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {
 
   override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -34,9 +32,10 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   logger.info(s"${this.getClass.getName} start.")
 
 
-  def a(rh:RequestHeader):RequestHeader = {
+  def a(rh: RequestHeader): RequestHeader = {
     rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))
   }
+
   es.pushNotificationItem.handleRequestHeader(a).invoke()
 
   subscriber
@@ -44,7 +43,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .map(elem => loggerFlow(elem, s"send format alarm ${elem._metric}"))
     .mapConcat(fai => splitAnalyzeResult(fai).toList)
-//    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
   def splitAnalyzeResult(fai: FormatAlarmItem): Seq[(String, String, String)] = {
@@ -67,7 +66,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   }
 
   def actionFormat(fai: FormatAlarmItem): Future[FormatAlarmItem] = Future {
-    val url: String = genUrl(fai.path)
+    val url: String = getUrlPathContent(fai.path)
     val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
     val rs: String = execScript(workDirName)
     executeFormatAfter(workDirName)

@@ -1,16 +1,18 @@
 package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
+
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.jcraft.jsch.{ChannelExec, JSch}
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.collect.core.CollectCore
-import org.wex.cmsfs.common.CmsfsAkkaStream
+import org.wex.cmsfs.common.{CmsfsAkkaStream, Common}
+import org.wex.cmsfs.common.collect.CollectCore
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 import play.api.libs.json.Json
+
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 
@@ -18,7 +20,7 @@ class Collecting(ct: CollectTopic,
                  ms: MonitorService,
                  override val config: Configuration,
                  system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CollectCore {
+  extends CmsfsAkkaStream with CollectCore with Common {
 
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -40,7 +42,7 @@ class Collecting(ct: CollectTopic,
 
       val collectTimeMonitorCalculate: (String) => String = collectTimeMonitor
 
-      collectAction(ip, user, genUrl(path), Some(port))
+      collectAction(ip, user, getUrlPathContent(path), Some(port))
         .map(elem => loggerFlow(elem, collectTimeMonitorCalculate(metricName + " " + hostname)))
         .filter(_.isDefined)
         .map(rs => (monitorDetailId, metricName, rs, utcDate, hostname))

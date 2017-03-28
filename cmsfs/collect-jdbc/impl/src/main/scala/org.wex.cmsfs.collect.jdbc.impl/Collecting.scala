@@ -4,19 +4,18 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.collect.core.CollectCore
-import org.wex.cmsfs.common.CmsfsAkkaStream
+import org.wex.cmsfs.common.{CmsfsAkkaStream, Common}
+import org.wex.cmsfs.common.collect.CollectCore
 import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
 import play.api.Configuration
 
 import scala.concurrent.Future
-import scala.io.Source
 
 class Collecting(ct: CollectTopic,
                  ms: MonitorService,
                  override val config: Configuration,
                  system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CollectCore {
+  extends CmsfsAkkaStream with CollectCore with Common{
 
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -36,7 +35,7 @@ class Collecting(ct: CollectTopic,
       val utcDate = cis.utcDate
       val path = cis.collect.path
 
-      val sqlText = getPathContent(path)
+      val sqlText = getUrlPathContent(path)
 
       val collectTimeCalculateFun: (String) => String = collectTimeMonitor
 
