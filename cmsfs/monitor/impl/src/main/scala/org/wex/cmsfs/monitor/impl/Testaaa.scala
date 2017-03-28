@@ -4,12 +4,12 @@ class Testaaa {
 
 }
 
-case class MonitorDetailForJdbc(id: Int,utcDate: String,
+case class MonitorDetailForJdbc(id: Int, utcDate: String,
                                 connector: ConnectorJdbc, collect: Collect,
                                 analyze: Option[FormatAnalyze],
                                 alarm: Option[FormatAlarm])
 
-case class MonitorDetailForSsh(id: Int,utcDate: String,
+case class MonitorDetailForSsh(id: Int, utcDate: String,
                                connector: ConnectorSsh, collect: Collect,
                                analyze: Option[FormatAnalyze],
                                alarm: Option[FormatAlarm])

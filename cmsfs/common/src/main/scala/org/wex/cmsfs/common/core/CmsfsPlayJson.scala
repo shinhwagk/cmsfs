@@ -1,4 +1,4 @@
-package org.wex.cmsfs.common
+package org.wex.cmsfs.common.core
 
 import play.api.libs.json.{JsObject, JsString, JsValue}
 

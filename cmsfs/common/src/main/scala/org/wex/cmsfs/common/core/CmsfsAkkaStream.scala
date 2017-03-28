@@ -1,4 +1,4 @@
-package org.wex.cmsfs.common
+package org.wex.cmsfs.common.core
 
 import akka.stream.{ActorAttributes, Supervision}
 import org.slf4j.Logger

@@ -4,9 +4,10 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import org.slf4j.LoggerFactory
-import org.wex.cmsfs.common.CmsfsAkkaStream
+import org.wex.cmsfs.common.core.CmsfsAkkaStream
 import org.wex.cmsfs.config.api.{ConfigService, CoreMonitorDetail}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
+
 import scala.concurrent.Future
 
 class MonitorActionAnalyze(mt: MonitorTopic,

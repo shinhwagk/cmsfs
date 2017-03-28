@@ -7,17 +7,19 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import com.jcraft.jsch.{ChannelExec, JSch}
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.common.{CmsfsAkkaStream, Common}
+import org.wex.cmsfs.common.`object`.{CoreCollect, CoreConnectorSsh}
 import org.wex.cmsfs.common.collect.CollectCore
-import org.wex.cmsfs.monitor.api.{CollectResult, MonitorService}
+import org.wex.cmsfs.common.core.{CmsfsAkkaStream, Common}
+import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem2, FormatAlarmService}
+import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem2, FormatAnalyzeService}
 import play.api.Configuration
 import play.api.libs.json.Json
-
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 
 class Collecting(ct: CollectTopic,
-                 ms: MonitorService,
+                 analyzeService: FormatAnalyzeService,
+                 alarmService: FormatAlarmService,
                  override val config: Configuration,
                  system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CollectCore with Common {
@@ -31,27 +33,30 @@ class Collecting(ct: CollectTopic,
   source.map(elem => loggerFlow(elem, s"receive ssh collect ${elem.connector.id}"))
     .mapAsync(10) { cis =>
 
-      val monitorDetailId = cis.monitorDetailId
-      val ip = cis.connector.ip
-      val user = cis.connector.user
-      val metricName = cis.collect.name
-      val port = cis.connector.port
-      val hostname = cis.connector.name
-      val utcDate = cis.utcDate
-      val path = cis.collect.path
+      val connector = cis.connector
+      val collect = cis.collect
 
-      val collectTimeMonitorCalculate: (String) => String = collectTimeMonitor
+      val collectTimeCalculateFun: (String) => String = collectTimeMonitor
 
-      collectAction(ip, user, getUrlPathContent(path), Some(port))
-        .map(elem => loggerFlow(elem, collectTimeMonitorCalculate(metricName + " " + hostname)))
+      collectFun(connector, collect)
+        .map(elem => loggerFlow(elem, collectTimeCalculateFun(collect.name + " " + connector.name)))
         .filter(_.isDefined)
-        .map(rs => (monitorDetailId, metricName, rs, utcDate, hostname))
-    }.withAttributes(supervisionStrategy((x => s"${x} x")))
-    .mapAsync(10) {
-      case (monitorDetailId, metricName, rsOpt, utcDate, dbName) =>
-        ms.pushCollectResult.invoke(CollectResult(monitorDetailId, metricName, rsOpt, utcDate, dbName)).map(_ => monitorDetailId)
+        .map(_.get)
+        .flatMap { rs =>
+          val a = cis.analyze match {
+            case Some(cfa) => analyzeService.pushFormatAnalyze2.invoke(FormatAnalyzeItem2(cis.id, collect.name, cis.utcDate, rs, cfa))
+          }
+          val b = cis.alarm match {
+            case Some(cfa) => alarmService.pushFormatAlarm2.invoke(FormatAlarmItem2(cis.id, rs, cfa))
+          }
+          Future.sequence(a :: b :: Nil)
+        }
     }.withAttributes(supervisionStrategy((x => s"${x} y")))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
+
+  def collectFun(cr: CoreConnectorSsh, ct: CoreCollect): Future[Option[String]] = {
+    collectAction(cr.ip, cr.user, ct.path)
+  }
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
     val OSName = System.getProperty("os.name").toLowerCase();

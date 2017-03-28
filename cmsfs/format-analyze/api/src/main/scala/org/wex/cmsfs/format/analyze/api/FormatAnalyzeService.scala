@@ -10,12 +10,14 @@ object FormatAnalyzeService {
 trait FormatAnalyzeService extends Service {
 
   def pushFormatAnalyze: ServiceCall[FormatAnalyzeItem, Done]
+  def pushFormatAnalyze2: ServiceCall[FormatAnalyzeItem2, Done]
 
   override final def descriptor = {
     import FormatAnalyzeService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      pathCall("/v1/format/analyze", pushFormatAnalyze)
+      pathCall("/v1/format/analyze", pushFormatAnalyze),
+      pathCall("/v1/format/analyze", pushFormatAnalyze2)
     )
   }
 }
