@@ -8,7 +8,6 @@ import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
-import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
@@ -30,7 +29,6 @@ abstract class ServiceApplication(context: LagomApplicationContext)
   )
 
   val elasticsearchService = serviceClient.implement[ElasticsearchService]
-  val monitorStatusService = serviceClient.implement[MonitorStatusService]
 
   val topic = wire[FormatAnalyzeTopic]
   val action = wire[FormatAnalyzeAction]

@@ -10,6 +10,7 @@ import org.wex.cmsfs.common.core.{CmsfsAkkaStream, Common}
 import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem2, FormatAlarmService}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem2, FormatAnalyzeService}
 import play.api.Configuration
+
 import scala.concurrent.Future
 
 class Collecting(ct: CollectTopic,
@@ -38,7 +39,7 @@ class Collecting(ct: CollectTopic,
         .map(_.get)
         .flatMap { rs =>
           val sendAnalyze = cis.analyze match {
-            case Some(cfa) => analyzeService.pushFormatAnalyze2.invoke(FormatAnalyzeItem2(cis.id, rs, cfa))
+            case Some(cfa) => analyzeService.pushFormatAnalyze2.invoke(FormatAnalyzeItem2(cis.id, cis.collect.name, cis.utcDate, rs, cfa))
           }
           val sendAlarm = cis.alarm match {
             case Some(cfa) => alarmService.pushFormatAlarm2.invoke(FormatAlarmItem2(cis.id, rs, cfa))

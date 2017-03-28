@@ -16,3 +16,4 @@ case class FormatAlarmItem2(id: Int, collectResult: String, coreFormatAlarm: Cor
 
 object FormatAlarmItem2 {
   implicit val format: Format[FormatAlarmItem2] = Json.format
+}

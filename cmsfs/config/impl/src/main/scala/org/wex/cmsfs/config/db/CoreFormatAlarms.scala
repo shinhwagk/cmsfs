@@ -11,7 +11,7 @@ class CoreFormatAlarms(tag: Tag) extends Table[CoreFormatAlarm](tag, "core_forma
 
   def name = column[String]("NAME")
 
-  def args = column[String]("ARGS")
+  def args = column[Option[String]]("ARGS")
 
   def notification = column[String]("NOTIFICATION")
 

@@ -1,7 +1,5 @@
 package org.wex.cmsfs.format.analyze.impl
 
-import java.util.Date
-
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
@@ -10,7 +8,6 @@ import org.wex.cmsfs.common.core.{CmsfsAkkaStream, CmsfsPlayJson, Common}
 import org.wex.cmsfs.common.format.FormatCore
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeItem2}
-import org.wex.cmsfs.monitor.status.impl.{CoreMonitorStatusAnalyze, MonitorStatusService}
 import play.api.Configuration
 import play.api.libs.json._
 
@@ -18,7 +15,6 @@ import scala.concurrent.Future
 
 class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
                           override val config: Configuration,
-                          mss: MonitorStatusService,
                           es: ElasticsearchService,
                           system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {

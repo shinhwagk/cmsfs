@@ -5,6 +5,7 @@ import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.collect.jdbc.api.{CollectItemJdbc, CollectJDBCService}
 import org.wex.cmsfs.common.`object`.CoreMonitorDetailForJdbc
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CollectJDBCServiceImpl(ct: CollectTopic)(implicit ec: ExecutionContext) extends CollectJDBCService {

@@ -5,6 +5,8 @@ import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
+import org.wex.cmsfs.format.alarm.api.FormatAlarmService
+import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import org.wex.cmsfs.monitor.api.MonitorService
@@ -30,7 +32,8 @@ abstract class ServiceApplication(context: LagomApplicationContext)
     bindService[CollectJDBCService].to(wire[CollectJDBCServiceImpl])
   )
 
-  val monitorService = serviceClient.implement[MonitorService]
+  val formatAlarmService = serviceClient.implement[FormatAlarmService]
+  val formatAnalyzeService = serviceClient.implement[FormatAnalyzeService]
 
   val collectTopic = wire[CollectTopic]
   val collecting = wire[Collecting]

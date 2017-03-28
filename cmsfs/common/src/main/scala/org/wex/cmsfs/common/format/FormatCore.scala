@@ -2,10 +2,8 @@ package org.wex.cmsfs.common.format
 
 import java.io.{File, PrintWriter}
 import java.util.concurrent.ThreadLocalRandom
-
 import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
-
 import scala.io.Source
 
 trait FormatCore {
