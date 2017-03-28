@@ -1,6 +1,6 @@
 package org.wex.cmsfs.collect.jdbc.api
 
-import org.wex.cmsfs.config.api.{CoreCollect, CoreConnectorJdbc}
+import org.wex.cmsfs.common.`object`.{CoreCollect, CoreConnectorJdbc}
 import play.api.libs.json.{Format, Json}
 
 case class CollectItemJdbc(monitorDetailId: Int, collect: CoreCollect, connector: CoreConnectorJdbc, utcDate: String)

@@ -55,14 +55,12 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   def actionFormat2(fai: FormatAnalyzeItem2): Future[Seq[(String, String, String)]] = Future {
     val url: String = getUrlPathContent(fai.coreFormatAnalyze.path)
-    val workDirName = executeFormatBefore(url, fai.collectResult, fai.coreFormatAnalyze.args.get)
-    val rs: String = execScript(workDirName)
-    executeFormatAfter(workDirName)
+    val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.get)
     val _type = fai.coreFormatAnalyze.elasticsearch._type
     val _index = fai.coreFormatAnalyze.elasticsearch._index
     val _metric = fai._metric
     val utcDate = fai.utcDate
-    val arr: Seq[JsValue] = Json.parse(rs).as[JsArray].value
+    val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
     arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
       .map(jsonObjectAddField(_, "@metric", _metric))
       .map(row => (_index, _type, row.toString))

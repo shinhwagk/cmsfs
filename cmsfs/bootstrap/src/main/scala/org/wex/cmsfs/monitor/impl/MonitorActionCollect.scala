@@ -12,15 +12,13 @@ import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.common.`object`
 import org.wex.cmsfs.common.`object`.{CoreMonitorDetailForJdbc, CoreMonitorDetailForSsh}
 import org.wex.cmsfs.config.api.{CoreFormatAnalyze, _}
-import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
+
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 import scala.util.{Failure, Success}
 
-class MonitorActionCollect(mt: MonitorTopic,
-                           cs: ConfigService,
+class MonitorActionCollect(cs: ConfigService,
                            cSSHs: CollectSSHService,
                            cJDBCs: CollectJDBCService,
-                           mss: MonitorStatusService,
                            system: ActorSystem)(implicit mat: Materializer) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)

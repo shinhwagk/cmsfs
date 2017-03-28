@@ -21,5 +21,4 @@ trait CmsfsAkkaStream {
     logger.info(mess)
     elem
   }
-
 }

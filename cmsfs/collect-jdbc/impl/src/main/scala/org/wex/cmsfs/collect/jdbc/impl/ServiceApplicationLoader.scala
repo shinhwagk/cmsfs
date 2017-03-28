@@ -9,7 +9,6 @@ import org.wex.cmsfs.format.alarm.api.FormatAlarmService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
-import org.wex.cmsfs.monitor.api.MonitorService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {

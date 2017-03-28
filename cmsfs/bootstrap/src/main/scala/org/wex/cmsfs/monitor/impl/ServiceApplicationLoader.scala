@@ -1,17 +1,13 @@
 package org.wex.cmsfs.monitor.impl
 
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
-import com.lightbend.lagom.scaladsl.pubsub.PubSubComponents
 import com.lightbend.lagom.scaladsl.server._
 import com.softwaremill.macwire._
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.config.api.ConfigService
-import org.wex.cmsfs.format.analyze.api.FormatAnalyzeService
 import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
-import org.wex.cmsfs.monitor.api.MonitorService
-import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
 import play.api.libs.ws.ahc.AhcWSComponents
 
 class ServiceApplicationLoader extends LagomApplicationLoader {
@@ -26,20 +22,16 @@ class ServiceApplicationLoader extends LagomApplicationLoader {
 
 abstract class ServiceApplication(context: LagomApplicationContext)
   extends LagomApplication(context)
-    with AhcWSComponents
-    with PubSubComponents {
+    with AhcWSComponents {
 
-  override lazy val lagomServer = LagomServer.forServices(
-    bindService[MonitorService].to(wire[MonitorServiceImpl])
-  )
+  override lazy val lagomServer = LagomServer.forServices()
+  //  override lazy val lagomServer = LagomServer.forServices(
+  //    bindService[MonitorService].to(wire[MonitorServiceImpl])
+  //  )
 
   val configService = serviceClient.implement[ConfigService]
   val collectSSHService = serviceClient.implement[CollectSSHService]
   val collectJDBCService = serviceClient.implement[CollectJDBCService]
-  val formatAnalyzeService = serviceClient.implement[FormatAnalyzeService]
-  val monitorStatusService = serviceClient.implement[MonitorStatusService]
 
-  val monitorTopic = wire[MonitorTopic]
   val monitorAction = wire[MonitorActionCollect]
-  val monitorActionAnalyze = wire[MonitorActionAnalyze]
 }

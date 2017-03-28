@@ -39,6 +39,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .map(elem => loggerFlow(elem, s"send format alarm ${elem._metric}"))
     .mapConcat(fai => splitAnalyzeResult(fai).toList)
+    .mapAsync(10) {}
     //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
@@ -63,8 +64,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   def actionFormat(fai: FormatAlarmItem): Future[FormatAlarmItem] = Future {
     val url: String = getUrlPathContent(fai.path)
-    val workDirName = executeFormatBefore(url, fai.collectResult, fai.args)
-    val rs: String = execScript(workDirName)
+    val formatResult = executeFormat(url, "Alarm.py", fai.collectResult, fai.args)
     executeFormatAfter(workDirName)
     fai.copy(formatResult = Some(rs))
   }
