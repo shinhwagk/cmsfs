@@ -14,7 +14,7 @@ import play.api.libs.json.{JsArray, JsValue, Json}
 import scala.concurrent.Future
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
-                        override val config: Configuration,
+                        config: Configuration,
                         es: NotificationService,
                         system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {
@@ -26,7 +26,6 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   private val subscriber = topic.formatTopic.subscriber
 
   logger.info(s"${this.getClass.getName} start.")
-
 
   def a(rh: RequestHeader): RequestHeader = {
     rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))

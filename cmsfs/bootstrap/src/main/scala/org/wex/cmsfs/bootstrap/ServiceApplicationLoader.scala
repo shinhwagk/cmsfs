@@ -1,4 +1,4 @@
-package org.wex.cmsfs.monitor.impl
+package org.wex.cmsfs.bootstrap
 
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.lightbend.lagom.scaladsl.server._

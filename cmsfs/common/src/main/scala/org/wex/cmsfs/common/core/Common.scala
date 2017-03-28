@@ -16,6 +16,6 @@ trait Common {
   }
 
   def getUrlPathContent(path: String): String = {
-    Source.fromURL(genUrl(path), "UTF-8").mkString
+    Source.fromURL(genUrl(path), "UTF-8").mkString.trim
   }
 }

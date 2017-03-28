@@ -29,7 +29,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   subscriber
     .map(elem => loggerFlow(elem, s"start format analyze ${elem.id}"))
-    .mapAsync(10)(actionFormat2).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .mapConcat(p => p.toList)
     .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
@@ -53,7 +53,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def actionFormat2(fai: FormatAnalyzeItem2): Future[Seq[(String, String, String)]] = Future {
+  def actionFormat(fai: FormatAnalyzeItem2): Future[Seq[(String, String, String)]] = Future {
     val url: String = getUrlPathContent(fai.coreFormatAnalyze.path)
     val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.get)
     val _type = fai.coreFormatAnalyze.elasticsearch._type

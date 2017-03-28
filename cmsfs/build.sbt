@@ -16,8 +16,8 @@ val consul = "com.ecwid.consul" % "consul-api" % "1.2.1"
 
 lazy val root = (project in file("."))
   .aggregate(
+    `bootstrap`,
     `config-api`, `config-impl`,
-    `monitor-api`, `monitor-impl`,
     `collect-ssh-api`, `collect-ssh-impl`,
     `collect-jdbc-api`, `collect-jdbc-impl`,
     `format-analyze-api`, `format-analyze-impl`,
@@ -39,22 +39,20 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `common`, `lagom-service-locator`)
 
-lazy val `monitor-api` = (project in file("monitor/api"))
-  .settings(libraryDependencies += lagomScaladslApi)
-lazy val `monitor-impl` = (project in file("monitor/impl"))
+lazy val `bootstrap` = (project in file("bootstrap"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += lagomScaladslPubSub)
   .settings(libraryDependencies ++= Seq(quartz))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`common`, `monitor-api`, `config-api`,
+  .dependsOn(`common`, `config-api`,
     `collect-ssh-api`, `collect-jdbc-api`,
     `format-analyze-api`, `format-alarm-api`,
-    `lagom-service-locator`, `monitor-status-api`)
+    `lagom-service-locator`)
 
 lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .settings(libraryDependencies += lagomScaladslApi)
-  .dependsOn(`config-api`, `common`)
+  .dependsOn(`common`)
 lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += lagomScaladslPubSub)
@@ -65,7 +63,7 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
 
 lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
   .settings(libraryDependencies += lagomScaladslApi)
-  .dependsOn(`config-api`, `common`)
+  .dependsOn(`common`)
 lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += lagomScaladslPubSub)
@@ -73,7 +71,7 @@ lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
   .settings(libraryDependencies += "com.oracle" % "jdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collect-jdbc-api`, `format-alarm-api`, `format-analyze-api`, `monitor-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`collect-jdbc-api`, `format-alarm-api`, `format-analyze-api`, `lagom-service-locator`, `monitor-status-api`)
 
 lazy val `elasticsearch-api` = (project in file("elasticsearch/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -86,7 +84,7 @@ lazy val `format-analyze-impl` = (project in file("format-analyze/impl"))
   .settings(libraryDependencies += lagomScaladslPubSub)
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`format-analyze-api`, `monitor-api`, `elasticsearch-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`format-analyze-api`, `elasticsearch-api`, `lagom-service-locator`, `monitor-status-api`)
 
 lazy val `format-alarm-api` = (project in file("format-alarm/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -97,7 +95,7 @@ lazy val `format-alarm-impl` = (project in file("format-alarm/impl"))
 
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`format-alarm-api`, `monitor-api`, `notification-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`format-alarm-api`, `notification-api`, `lagom-service-locator`, `monitor-status-api`)
 
 lazy val `notification-api` = (project in file("notification/api"))
   .settings(libraryDependencies += lagomScaladslApi)

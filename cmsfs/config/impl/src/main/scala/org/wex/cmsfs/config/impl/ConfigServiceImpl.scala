@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 
 class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
 
-  val db = Database.forConfig("oso-config")
+  val db = Database.forConfig("cmsfs-config")
 
   override def getCoreMonitorDetails: ServiceCall[NotUsed, Seq[CoreMonitorDetail]] = ServiceCall { _ =>
     db.run(Tables.coreMonitorDetails.result)
