@@ -23,7 +23,7 @@ function scp-metadate(){
   scp E:\github\Monitor\deploy\logback.xml root@10.65.103.63:/opt/cmsfs_test/logback.xml
 }
 
-function stage-service($service_name){
+function build-service($service_name){
   cd E:\github\Monitor\cmsfs
   sbt "${service_name}-impl/stage"
 }
@@ -54,6 +54,6 @@ function start-services($service_name){
 # }
 
 scp-metadate
-stage-service $args[0]
+build-service $args[0]
 start-services $args[0]
 # ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up -d db consul"
