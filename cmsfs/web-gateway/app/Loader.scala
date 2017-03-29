@@ -1,15 +1,16 @@
-import com.lightbend.lagom.scaladsl.api.ServiceLocator.NoServiceLocator
 import com.lightbend.lagom.scaladsl.api.{ServiceAcl, ServiceInfo}
 import com.lightbend.lagom.scaladsl.client.LagomServiceClientComponents
 import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.softwaremill.macwire._
 import controllers.{Assets, Main}
-import org.wex.cmsfs.monitor.status.impl.MonitorStatusService
+import ogr.wex.cmsfs.monitor.api.MonitorService
+import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import play.api.ApplicationLoader.Context
 import play.api.i18n.I18nComponents
 import play.api.libs.ws.ahc.AhcWSComponents
 import play.api.{ApplicationLoader, BuiltInComponentsFromContext, Mode}
 import router.Routes
+
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext
 
@@ -30,7 +31,7 @@ abstract class WebGateway(context: Context) extends BuiltInComponentsFromContext
     wire[Routes]
   }
 
-  lazy val monitorStatusService = serviceClient.implement[MonitorStatusService]
+  lazy val monitorService = serviceClient.implement[MonitorService]
   lazy val main = wire[Main]
   lazy val assets = wire[Assets]
 }
@@ -43,9 +44,7 @@ class WebGatewayLoader extends ApplicationLoader {
       case Mode.Dev =>
         new WebGateway(context) with LagomDevModeComponents {}.application
       case _ =>
-        new WebGateway(context) {
-          override def serviceLocator = NoServiceLocator
-        }.application
+        new WebGateway(context) with ConsulServiceLocatorComponents {}.application
     }
   }
 }
