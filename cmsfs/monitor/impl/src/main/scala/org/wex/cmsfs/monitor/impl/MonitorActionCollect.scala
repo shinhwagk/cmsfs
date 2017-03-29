@@ -1,4 +1,4 @@
-package org.wex.cmsfs.bootstrap
+package org.wex.cmsfs.monitor.impl
 
 import java.util.Date
 
@@ -16,10 +16,10 @@ import org.wex.cmsfs.config.api.{CoreFormatAnalyze, _}
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 import scala.util.{Failure, Success}
 
-class BootstrapActionCollect(cs: ConfigService,
-                             cSSHs: CollectSSHService,
-                             cJDBCs: CollectJDBCService,
-                             system: ActorSystem)(implicit mat: Materializer) {
+class MonitorActionCollect(cs: ConfigService,
+                           cSSHs: CollectSSHService,
+                           cJDBCs: CollectJDBCService,
+                           system: ActorSystem)(implicit mat: Materializer) {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -28,7 +28,7 @@ class BootstrapActionCollect(cs: ConfigService,
   Future {
     while (true) {
       logger.info(s"${System.currentTimeMillis()}")
-//      schedulerMonitor
+      schedulerMonitor
       Thread.sleep(1000)
     }
   }
@@ -56,8 +56,16 @@ class BootstrapActionCollect(cs: ConfigService,
 
   def monitorDistributor(utcDate: String)(cmd: CoreMonitorDetail): Unit = {
     val coreCollectFuture: Future[CoreCollect] = cs.getCoreCollectById(cmd.collectId).invoke()
-    val formatAnalyzeFuture = cs.getCoreFormatAnalyzesById(cmd.formatAnalyzeId.get).invoke()
-    val formatAlarmFuture = cs.getCoreFormatAlarmsById(cmd.formatAlarmId.get).invoke()
+
+    val formatAnalyzeFuture = cmd.formatAnalyzeId match {
+      case Some(id) => cs.getCoreFormatAnalyzesById(id).invoke().map(Some(_))
+      case None => Future.successful(None)
+    }
+
+    val formatAlarmFuture = cmd.formatAlarmId match {
+      case Some(id) => cs.getCoreFormatAlarmsById(id).invoke().map(Some(_))
+      case None => Future.successful(None)
+    }
 
     val p: Promise[Done] = Promise[Done]
     val f: Future[Done] = p.future
@@ -70,6 +78,7 @@ class BootstrapActionCollect(cs: ConfigService,
             connectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
             formatAnalyze <- formatAnalyzeFuture
             formatAlarm <- formatAlarmFuture
+            _ <- cs.addCoreMonitorStatus.invoke(CoreMonitorStatus(cmd.id.get, "ORACLE", collect.name, "{}"))
             done <- sendMonitorForJdbc(cmd.id.get, utcDate, collect, connectorJdbc, formatAnalyze, formatAlarm)
           } yield done
         }
@@ -80,6 +89,7 @@ class BootstrapActionCollect(cs: ConfigService,
             connectorSsh <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
             formatAnalyze <- formatAnalyzeFuture
             formatAlarm <- formatAlarmFuture
+            _ <- cs.addCoreMonitorStatus.invoke(CoreMonitorStatus(cmd.id.get, "OS", collect.name, "{}"))
             done <- sendMonitorForSsh(cmd.id.get, utcDate, collect, connectorSsh, formatAnalyze, formatAlarm)
           } yield done
         }
@@ -91,27 +101,45 @@ class BootstrapActionCollect(cs: ConfigService,
     }
   }
 
-  def sendMonitorForJdbc(id: Int, utcDate: String, collect: CoreCollect, connector: CoreConnectorJdbc, analyze: CoreFormatAnalyze, alarm: CoreFormatAlarm): Future[Done] = {
+  def sendMonitorForJdbc(id: Int, utcDate: String, collect: CoreCollect, connector: CoreConnectorJdbc,
+                         analyze: Option[CoreFormatAnalyze],
+                         alarm: Option[CoreFormatAlarm]): Future[Done] = {
     val ccj = `object`.CoreConnectorJdbc(connector.id.get, connector.name, connector.url, connector.user, connector.password)
     val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
 
-    val es = `object`.CoreElasticsearch(analyze._index, analyze._type)
-    val formatAnalyze = `object`.CoreFormatAnalyze(analyze.id.get, analyze.path, analyze.args, es)
+    val sendFormatAnalyzeOpt = analyze match {
+      case Some(a) => {
+        val es = `object`.CoreElasticsearch(a._index, a._type)
+        Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, es))
+      }
+      case None => None
+    }
 
-    val formatAlarm = `object`.CoreFormatAlarm(alarm.id.get, alarm.path, alarm.args)
+    val sendformatAlarmOpt = alarm match {
+      case Some(a) => Some(`object`.CoreFormatAlarm(a.id.get, a.path, a.args))
+      case None => None
+    }
 
-    cJDBCs.pushCollectItem2.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, Some(formatAnalyze), Some(formatAlarm)))
+    cJDBCs.pushCollectItem.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, sendformatAlarmOpt))
   }
 
-  def sendMonitorForSsh(id: Int, utcDate: String, collect: CoreCollect, connector: CoreConnectorSsh, analyze: CoreFormatAnalyze, alarm: CoreFormatAlarm): Future[Done] = {
+  def sendMonitorForSsh(id: Int, utcDate: String, collect: CoreCollect, connector: CoreConnectorSsh, analyze: Option[CoreFormatAnalyze], alarm: Option[CoreFormatAlarm]): Future[Done] = {
     val ccj = `object`.CoreConnectorSsh(connector.id.get, connector.name, connector.ip, connector.user, connector.password, connector.privateKey)
     val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
 
-    val es = `object`.CoreElasticsearch(analyze._index, analyze._type)
-    val formatAnalyze = `object`.CoreFormatAnalyze(analyze.id.get, analyze.path, analyze.args, es)
+    val sendFormatAnalyzeOpt = analyze match {
+      case Some(a) => {
+        val es = `object`.CoreElasticsearch(a._index, a._type)
+        Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, es))
+      }
+      case None => None
+    }
 
-    val formatAlarm = `object`.CoreFormatAlarm(alarm.id.get, alarm.path, alarm.args)
+    val sendformatAlarmOpt = alarm match {
+      case Some(a) => Some(`object`.CoreFormatAlarm(a.id.get, a.path, a.args))
+      case None => None
+    }
 
-    cSSHs.pushCollectItem2.invoke(CoreMonitorDetailForSsh(id, utcDate, ccj, cc, Some(formatAnalyze), Some(formatAlarm)))
+    cSSHs.pushCollectItem.invoke(CoreMonitorDetailForSsh(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, sendformatAlarmOpt))
   }
 }

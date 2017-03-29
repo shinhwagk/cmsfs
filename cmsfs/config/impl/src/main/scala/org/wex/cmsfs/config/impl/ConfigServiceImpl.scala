@@ -4,8 +4,10 @@ import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import org.wex.cmsfs.config.api._
 import org.wex.cmsfs.config.db.Tables
+import play.api.libs.json.Json
 import slick.jdbc.MySQLProfile.api._
-import scala.concurrent.ExecutionContext
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
 
@@ -61,5 +63,41 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
 
   override def getCoreMonitorDetailById(id: Int): ServiceCall[NotUsed, CoreMonitorDetail] = ServiceCall { _ =>
     db.run(Tables.coreMonitorDetails.filter(_.id === id).result.head)
+  }
+
+  override def addCoreMonitorStatus: ServiceCall[CoreMonitorStatus, Done] = ServiceCall { cms =>
+    val action = Tables.coreMonitorStatuses.filter(_.id === cms.id).exists.result.flatMap { exists =>
+      if (!exists) {
+        Tables.coreMonitorStatuses += cms
+      } else {
+        DBIO.successful(None)
+        //        Tables.coreMonitorStatuses.filter(_.id === cms.id).map(p => (p.category, p.metric)).update(cms.category, cms.metric)
+      }
+    }
+    db.run(action).map(_ => Done)
+  }
+
+  override def putCoreMonitorStatusCollectById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
+    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
+    c.flatMap { p =>
+      val np = Json.parse(p).as[Map[String, List[String]]].+("COLLECT" -> lis)
+      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
+    }.map(_ => Done)
+  }
+
+  override def putCoreMonitorStatusAnalyzeById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
+    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
+    c.flatMap { p =>
+      val np = Json.parse(p).as[Map[String, List[String]]].+("ANALYZE" -> lis)
+      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
+    }.map(_ => Done)
+  }
+
+  override def putCoreMonitorStatusAlarmById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
+    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
+    c.flatMap { p =>
+      val np = Json.parse(p).as[Map[String, List[String]]].+("ALARM" -> lis)
+      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
+    }.map(_ => Done)
   }
 }

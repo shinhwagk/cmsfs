@@ -12,7 +12,7 @@ class FormatAlarmServiceImpl(topic: FormatAlarmTopic)(implicit ec: ExecutionCont
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   override def pushFormatAlarm: ServiceCall[FormatAlarmItem, Done] = ServiceCall { fai =>
-    logger.info(s"format alarm receive: ${fai._metric}")
+    logger.info(s"format alarm receive: ${fai.id}")
     topic.formatTopic.publish(fai);
     Future.successful(Done)
   }

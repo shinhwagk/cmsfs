@@ -11,11 +11,11 @@ trait Common {
 
   private val formatUrl: String = config.getString("cmsfs.url").get
 
-  private def genUrl(path: String): String = {
+  def getUrlByPath(path: String): String = {
     formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 
-  def getUrlPathContent(path: String): String = {
-    Source.fromURL(genUrl(path), "UTF-8").mkString.trim
+  def getUrlContentByPath(path: String): String = {
+    Source.fromURL(getUrlByPath(path), "UTF-8").mkString.trim
   }
 }

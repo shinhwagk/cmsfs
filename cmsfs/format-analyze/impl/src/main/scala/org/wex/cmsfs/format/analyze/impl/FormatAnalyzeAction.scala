@@ -7,7 +7,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.common.core.{CmsfsAkkaStream, CmsfsPlayJson, Common}
 import org.wex.cmsfs.common.format.FormatCore
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
-import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeItem2}
+import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
 import play.api.libs.json._
 
@@ -36,9 +36,9 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   def splitAnalyzeResult(fai: FormatAnalyzeItem): Seq[(String, String, String)] = {
     try {
-      val formatResult: String = fai.formatResult.get
-      val _type = fai._type
-      val _index = fai._index
+      val formatResult: String = fai.collectResult
+      val _type = fai.coreFormatAnalyze.elasticsearch._type
+      val _index = fai.coreFormatAnalyze.elasticsearch._index
       val _metric = fai._metric
       val utcDate = fai.utcDate
       val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
@@ -53,8 +53,8 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def actionFormat(fai: FormatAnalyzeItem2): Future[Seq[(String, String, String)]] = Future {
-    val url: String = getUrlPathContent(fai.coreFormatAnalyze.path)
+  def actionFormat(fai: FormatAnalyzeItem): Future[Seq[(String, String, String)]] = Future {
+    val url: String = getUrlContentByPath(fai.coreFormatAnalyze.path)
     val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.get)
     val _type = fai.coreFormatAnalyze.elasticsearch._type
     val _index = fai.coreFormatAnalyze.elasticsearch._index

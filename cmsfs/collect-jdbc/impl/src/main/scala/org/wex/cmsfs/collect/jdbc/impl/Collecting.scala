@@ -7,8 +7,8 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.common.`object`.{CoreCollect, CoreConnectorJdbc}
 import org.wex.cmsfs.common.collect.CollectCore
 import org.wex.cmsfs.common.core.{CmsfsAkkaStream, Common}
-import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem2, FormatAlarmService}
-import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem2, FormatAnalyzeService}
+import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem, FormatAlarmService}
+import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 import play.api.Configuration
 
 import scala.concurrent.Future
@@ -39,10 +39,10 @@ class Collecting(ct: CollectTopic,
         .map(_.get)
         .flatMap { rs =>
           val sendAnalyze = cis.analyze match {
-            case Some(cfa) => analyzeService.pushFormatAnalyze2.invoke(FormatAnalyzeItem2(cis.id, cis.collect.name, cis.utcDate, rs, cfa))
+            case Some(cfa) => analyzeService.pushFormatAnalyze.invoke(FormatAnalyzeItem(cis.id, cis.collect.name, cis.utcDate, rs, cfa))
           }
           val sendAlarm = cis.alarm match {
-            case Some(cfa) => alarmService.pushFormatAlarm2.invoke(FormatAlarmItem2(cis.id, rs, cfa))
+            case Some(cfa) => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cis.id, rs, cfa))
           }
           Future.sequence(sendAnalyze :: sendAlarm :: Nil)
         }
@@ -50,7 +50,7 @@ class Collecting(ct: CollectTopic,
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def collectFun(cr: CoreConnectorJdbc, ct: CoreCollect): Future[Option[String]] = {
-    val sqlText = getUrlPathContent(ct.path)
+    val sqlText = getUrlContentByPath(ct.path)
     collectAction(cr.url, cr.user, cr.password, sqlText, Nil)
   }
 
@@ -59,9 +59,7 @@ class Collecting(ct: CollectTopic,
     try {
       if (DBTYPE == "oracle") {
         val collectOracle = new CollectingOracle(jdbcUrl, user, password, sqlText, parameters)
-        val c = collectOracle.mode("MAP").map(Some(_))
-        c.foreach(rs => println("xxx " + rs + " xxxxxxx"))
-        c
+        collectOracle.mode("MAP").map(Some(_))
       } else if (DBTYPE == "mysql") {
         Future.successful(None)
       } else {

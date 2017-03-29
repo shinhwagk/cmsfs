@@ -11,16 +11,12 @@ object CollectJDBCService {
 
 trait CollectJDBCService extends Service {
 
-  def pushCollectItem: ServiceCall[CollectItemJdbc, Done]
-
-  def pushCollectItem2: ServiceCall[CoreMonitorDetailForJdbc, Done]
+  def pushCollectItem: ServiceCall[CoreMonitorDetailForJdbc, Done]
 
   override final def descriptor = {
     import Service._
     named(CollectJDBCService.SERVICE_NAME).withCalls(
-      restCall(Method.POST, "/v1/collect", pushCollectItem),
-      restCall(Method.POST, "/v1/collect", pushCollectItem2)
-
+      restCall(Method.POST, "/v1/collect", pushCollectItem)
     )
   }
 }

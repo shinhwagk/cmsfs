@@ -14,5 +14,5 @@ ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
 
-RUN ln -s /opt/cmsfs/bin/${SVC_NAME} /usr/local/bin/app.sh
+RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/app.sh
 ADD ${SVC_NAME} /opt/cmsfs

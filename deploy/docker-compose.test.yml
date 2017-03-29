@@ -10,6 +10,7 @@ services:
           - consul.cmsfs.org
     ports:
       - "8500:8500"
+    restart: always
     logging: 
       driver: "json-file"
       options: 
@@ -36,25 +37,26 @@ services:
       - "9000:9000"
     depends_on: 
       - consul
+      - db
     logging: 
       driver: "json-file"
       options: 
         max-file: "3"
         max-size: "10m"
 
-  bootstrap:
+  monitor:
     build:
       context: ./
       dockerfile: Dockerfile-lagom.test
       args:
-        SVC_NAME: bootstrap
-    image: cmsfs/bootstrap
-    container_name: cmsfs_bootstrap
+        SVC_NAME: monitor
+    image: cmsfs/monitor
+    container_name: cmsfs_monitor
     environment: 
-      - SERVICE_NAME=bootstrap
+      - SERVICE_NAME=monitor
       - SERVICE_PORT=9000
     volumes:
-      - ./bootstrap:/opt/cmsfs
+      - ./monitor:/opt/cmsfs
       - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
@@ -207,6 +209,7 @@ services:
       cmsfs:
         aliases: 
           - db.cmsfs.org
+    restart: always 
     healthcheck:
       test: ["CMD-SHELL", "ss -lt | grep mysql"]
       interval: 3s

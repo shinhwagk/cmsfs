@@ -14,7 +14,7 @@ import play.api.libs.json.{JsArray, JsValue, Json}
 import scala.concurrent.Future
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
-                        config: Configuration,
+                        override val config: Configuration,
                         es: NotificationService,
                         system: ActorSystem)(implicit mat: Materializer)
   extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {
@@ -31,40 +31,40 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))
   }
 
-  es.pushNotificationItem.handleRequestHeader(a).invoke()
+//  es.pushNotificationItem.handleRequestHeader(a).invoke()
 
   subscriber
-    .map(elem => loggerFlow(elem, s"start format alarm ${elem._metric}"))
-    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    .map(elem => loggerFlow(elem, s"send format alarm ${elem._metric}"))
-    .mapConcat(fai => splitAnalyzeResult(fai).toList)
-    .mapAsync(10) {}
-    //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    .runWith(Sink.ignore)
-
-  def splitAnalyzeResult(fai: FormatAlarmItem): Seq[(String, String, String)] = {
-    try {
-      val formatResult: String = fai.formatResult.get
-      val _type = fai._type
-      val _index = fai._index
-      val _metric = fai._metric
-      val utcDate = fai.utcDate
-      val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
-      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
-        .map(jsonObjectAddField(_, "@metric", _metric))
-        .map(row => (_index, _type, row.toString))
-    } catch {
-      case ex: Exception => {
-        logger.error("splitAnalyzeResult " + ex.getMessage)
-        Seq()
-      }
-    }
-  }
-
-  def actionFormat(fai: FormatAlarmItem): Future[FormatAlarmItem] = Future {
-    val url: String = getUrlPathContent(fai.path)
-    val formatResult = executeFormat(url, "Alarm.py", fai.collectResult, fai.args)
-    executeFormatAfter(workDirName)
-    fai.copy(formatResult = Some(rs))
-  }
+  //    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
+  //    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+  //    .map(elem => loggerFlow(elem, s"send format alarm ${elem._metric}"))
+  //    .mapConcat(fai => splitAnalyzeResult(fai).toList)
+  //    .mapAsync(10) {}
+  //    //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
+  //    .runWith(Sink.ignore)
+  //
+  //  def splitAnalyzeResult(fai: FormatAlarmItem): Seq[(String, String, String)] = {
+  //    try {
+  //      val formatResult: String = fai.formatResult.get
+  //      val _type = fai._type
+  //      val _index = fai._index
+  //      val _metric = fai._metric
+  //      val utcDate = fai.utcDate
+  //      val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
+  //      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
+  //        .map(jsonObjectAddField(_, "@metric", _metric))
+  //        .map(row => (_index, _type, row.toString))
+  //    } catch {
+  //      case ex: Exception => {
+  //        logger.error("splitAnalyzeResult " + ex.getMessage)
+  //        Seq()
+  //      }
+  //    }
+  //  }
+  //
+  //  def actionFormat(fai: FormatAlarmItem): Future[FormatAlarmItem] = Future {
+  //    val url: String = getUrlPathContent(fai.path)
+  //    val formatResult = executeFormat(url, "Alarm.py", fai.collectResult, fai.args)
+  //    executeFormatAfter(workDirName)
+  //    fai.copy(formatResult = Some(rs))
+  //  }
 }

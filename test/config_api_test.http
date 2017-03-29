@@ -45,3 +45,20 @@ content-type: application/json
         }}
     ]
 }
+
+
+###
+POST http://10.65.103.63:9000/v1/core/monitor/status HTTP/1.1
+content-type: application/json
+
+{
+    "id":12,
+    "category":"b",
+    "metric":"b",
+    "status":"{}"
+}
+###
+PUt http://10.65.103.63:9000/v1/core/monitor/status/collect/12 HTTP/1.1
+content-type: application/json
+
+["aaa","fff"]

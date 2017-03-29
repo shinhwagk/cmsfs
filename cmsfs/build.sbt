@@ -16,12 +16,12 @@ val consul = "com.ecwid.consul" % "consul-api" % "1.2.1"
 
 lazy val root = (project in file("."))
   .aggregate(
-    `bootstrap`,
+    `monitor-api`, `monitor-impl`,
     `config-api`, `config-impl`,
     `collect-ssh-api`, `collect-ssh-impl`,
     `collect-jdbc-api`, `collect-jdbc-impl`,
     `format-analyze-api`, `format-analyze-impl`,
-    `monitor-status-api`, `monitor-status-impl`,
+    //    `monitor-status-api`, `monitor-status-impl`,
     `lagom-service-locator`,
     `elasticsearch-api`, `web-gateway`
   )
@@ -39,16 +39,26 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `common`, `lagom-service-locator`)
 
-lazy val `bootstrap` = (project in file("bootstrap"))
+//lazy val `bootstrap` = (project in file("bootstrap"))
+//  .enablePlugins(LagomScala)
+//  .settings(libraryDependencies += lagomScaladslPubSub)
+//  .settings(libraryDependencies ++= Seq(quartz))
+//  .settings(implCommonSettings: _*)
+//  .settings(lagomForkedTestSettings: _*)
+//  .dependsOn(`common`, `config-api`,
+//    `collect-ssh-api`, `collect-jdbc-api`,
+//    `format-analyze-api`, `format-alarm-api`,
+//    `lagom-service-locator`)
+
+lazy val `monitor-api` = (project in file("monitor/api"))
+  .settings(libraryDependencies += lagomScaladslApi)
+lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += lagomScaladslPubSub)
   .settings(libraryDependencies ++= Seq(quartz))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`common`, `config-api`,
-    `collect-ssh-api`, `collect-jdbc-api`,
-    `format-analyze-api`, `format-alarm-api`,
-    `lagom-service-locator`)
+  .dependsOn(`monitor-api`, `common`, `config-api`, `collect-ssh-api`, `collect-jdbc-api`, `lagom-service-locator`)
 
 lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -127,6 +137,7 @@ lazy val `lagom-service-locator` = (project in file("locator"))
 lazy val `common` = (project in file("common"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies ++= Seq(commonIO))
+  .dependsOn(`config-api`)
 
 //val Success = 0 // 0 exit code
 //val Error = 1 // 1 exit code

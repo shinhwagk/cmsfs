@@ -12,13 +12,7 @@ class CollectJDBCServiceImpl(ct: CollectTopic)(implicit ec: ExecutionContext) ex
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  override def pushCollectItem: ServiceCall[CollectItemJdbc, Done] = ServiceCall { ci =>
-    logger.info(s"collect jdbc receive: ${ci.monitorDetailId}-${ci.collect.name}")
-//    ct.CollectTopic.publish(ci);
-    Future.successful(Done)
-  }
-
-  override def pushCollectItem2: ServiceCall[CoreMonitorDetailForJdbc, Done] = ServiceCall { cmdfj =>
+  override def pushCollectItem: ServiceCall[CoreMonitorDetailForJdbc, Done] = ServiceCall { cmdfj =>
     logger.info(s"collect jdbc receive: ${cmdfj.id}-${cmdfj.collect.name}")
     ct.CollectTopic.publish(cmdfj);
     Future.successful(Done)

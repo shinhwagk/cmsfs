@@ -2,18 +2,20 @@ package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
 
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import akka.stream.scaladsl.Sink
+import akka.stream.scaladsl.{Flow, Sink}
 import com.jcraft.jsch.{ChannelExec, JSch}
 import org.slf4j.{Logger, LoggerFactory}
-import org.wex.cmsfs.common.`object`.{CoreCollect, CoreConnectorSsh}
+import org.wex.cmsfs.common.`object`.{CoreCollect, CoreConnectorSsh, CoreMonitorDetailForSsh}
 import org.wex.cmsfs.common.collect.CollectCore
 import org.wex.cmsfs.common.core.{CmsfsAkkaStream, Common}
-import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem2, FormatAlarmService}
-import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem2, FormatAnalyzeService}
+import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem, FormatAlarmService}
+import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 import play.api.Configuration
 import play.api.libs.json.Json
+
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 
@@ -28,38 +30,42 @@ class Collecting(ct: CollectTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  private val source = ct.CollectTopic.subscriber
+  private val flow: Flow[CoreMonitorDetailForSsh, Int, NotUsed] = Flow[CoreMonitorDetailForSsh]
+    .map(elem => loggerFlow(elem, s"receive ssh collect ${elem.connector.id}"))
+    .mapAsync(10) { cmdfs =>
 
-  source.map(elem => loggerFlow(elem, s"receive ssh collect ${elem.connector.id}"))
-    .mapAsync(10) { cis =>
-
-      val connector = cis.connector
-      val collect = cis.collect
+      logger.debug(s"collect ssh elem: ${Json.toJson(cmdfs).toString()}")
 
       val collectTimeCalculateFun: (String) => String = collectTimeMonitor
 
-      collectFun(connector, collect)
-        .map(elem => loggerFlow(elem, collectTimeCalculateFun(collect.name + " " + connector.name)))
+      collectFun(cmdfs.connector, cmdfs.collect)
+        .map(elem => loggerFlow(elem, collectTimeCalculateFun(cmdfs.collect.name + " " + cmdfs.connector.name)))
         .filter(_.isDefined)
         .map(_.get)
-        .flatMap { rs =>
-          val a = cis.analyze match {
-            case Some(cfa) => analyzeService.pushFormatAnalyze2.invoke(FormatAnalyzeItem2(cis.id, collect.name, cis.utcDate, rs, cfa))
+        .flatMap { collectResult =>
+          val a = cmdfs.analyze match {
+            case Some(cfa) => analyzeService.pushFormatAnalyze.invoke(FormatAnalyzeItem(cmdfs.id, cmdfs.collect.name, cmdfs.utcDate, collectResult, cfa))
+            case None => Future.successful(Done)
           }
-          val b = cis.alarm match {
-            case Some(cfa) => alarmService.pushFormatAlarm2.invoke(FormatAlarmItem2(cis.id, rs, cfa))
+          val b = cmdfs.alarm match {
+            case Some(cfa) => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, cfa))
+            case None => Future.successful(Done)
           }
-          Future.sequence(a :: b :: Nil)
+          Future.sequence(a :: b :: Nil).map(_ => cmdfs.id)
         }
-    }.withAttributes(supervisionStrategy((x => s"${x} y")))
+    }
+
+  ct.CollectTopic.subscriber
+    .via(flow).withAttributes(supervisionStrategy((x => s"${x} y")))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def collectFun(cr: CoreConnectorSsh, ct: CoreCollect): Future[Option[String]] = {
-    collectAction(cr.ip, cr.user, ct.path)
+    collectAction(cr.ip, cr.user, getUrlByPath(ct.path))
   }
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
     val OSName = System.getProperty("os.name").toLowerCase();
+    logger.info("collectAction...")
     try {
       if (OSName.startsWith("win")) {
         // test

@@ -11,9 +11,7 @@ object CollectSSHService {
 
 trait CollectSSHService extends Service {
 
-  def pushCollectItem: ServiceCall[CollectItemSsh, Done]
-
-  def pushCollectItem2: ServiceCall[CoreMonitorDetailForSsh, Done]
+  def pushCollectItem: ServiceCall[CoreMonitorDetailForSsh, Done]
 
   override final def descriptor = {
     import Service._
