@@ -44,13 +44,14 @@ class Collecting(ct: CollectTopic,
           val sendAlarm = cis.alarm match {
             case Some(cfa) => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cis.id, rs, cfa))
           }
-          Future.sequence(sendAnalyze :: sendAlarm :: Nil)
+          Future.sequence(sendAnalyze :: sendAlarm :: Nil).map(_ => cis.id)
         }
     }.withAttributes(supervisionStrategy((em) => em + " xx"))
     .runWith(Sink.foreach(id => logger.info(s"id:${id}, collect success.")))
 
   def collectFun(cr: CoreConnectorJdbc, ct: CoreCollect): Future[Option[String]] = {
     val sqlText = getUrlContentByPath(ct.path)
+    logger.info(sqlText)
     collectAction(cr.url, cr.user, cr.password, sqlText, Nil)
   }
 

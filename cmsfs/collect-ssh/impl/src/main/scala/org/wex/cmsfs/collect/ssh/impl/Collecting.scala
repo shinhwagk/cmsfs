@@ -65,7 +65,6 @@ class Collecting(ct: CollectTopic,
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Option[Int] = Some(22)): Future[Option[String]] = Future {
     val OSName = System.getProperty("os.name").toLowerCase();
-    logger.info("collectAction...")
     try {
       if (OSName.startsWith("win")) {
         // test
