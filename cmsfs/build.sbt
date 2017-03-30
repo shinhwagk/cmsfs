@@ -21,7 +21,6 @@ lazy val root = (project in file("."))
     `collect-ssh-api`, `collect-ssh-impl`,
     `collect-jdbc-api`, `collect-jdbc-impl`,
     `format-analyze-api`, `format-analyze-impl`,
-    //    `monitor-status-api`, `monitor-status-impl`,
     `lagom-service-locator`,
     `elasticsearch-api`, `web-gateway`
   )
@@ -69,7 +68,9 @@ lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
   .settings(libraryDependencies ++= Seq(jsch))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collect-ssh-api`, `format-alarm-api`, `format-analyze-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`collect-ssh-api`,
+    `format-alarm-api`, `format-analyze-api`,
+    `lagom-service-locator`)
 
 lazy val `collect-jdbc-api` = (project in file("collect-jdbc/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -81,7 +82,9 @@ lazy val `collect-jdbc-impl` = (project in file("collect-jdbc/impl"))
   .settings(libraryDependencies += "com.oracle" % "jdbc" % "8" from "file:///" + baseDirectory.value / ".." / "jars" / "ojdbc8.jar")
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`collect-jdbc-api`, `format-alarm-api`, `format-analyze-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`collect-jdbc-api`,
+    `format-alarm-api`, `format-analyze-api`,
+    `lagom-service-locator`)
 
 lazy val `elasticsearch-api` = (project in file("elasticsearch/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -94,7 +97,7 @@ lazy val `format-analyze-impl` = (project in file("format-analyze/impl"))
   .settings(libraryDependencies += lagomScaladslPubSub)
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`format-analyze-api`, `elasticsearch-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`format-analyze-api`, `elasticsearch-api`, `lagom-service-locator`)
 
 lazy val `format-alarm-api` = (project in file("format-alarm/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -105,7 +108,7 @@ lazy val `format-alarm-impl` = (project in file("format-alarm/impl"))
 
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`format-alarm-api`, `notification-api`, `lagom-service-locator`, `monitor-status-api`)
+  .dependsOn(`format-alarm-api`, `notification-api`, `lagom-service-locator`)
 
 lazy val `notification-api` = (project in file("notification/api"))
   .settings(libraryDependencies += lagomScaladslApi)
@@ -115,15 +118,6 @@ lazy val `notification-impl` = (project in file("notification/impl"))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`notification-api`, `lagom-service-locator`)
-
-lazy val `monitor-status-api` = (project in file("monitor-status/api"))
-  .settings(libraryDependencies += lagomScaladslApi)
-lazy val `monitor-status-impl` = (project in file("monitor-status/impl"))
-  .enablePlugins(LagomScala)
-  .settings(libraryDependencies += lagomScaladslPubSub)
-  .settings(implCommonSettings: _*)
-  .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`monitor-status-api`, `common`, `lagom-service-locator`)
 
 lazy val `web-gateway` = (project in file("web-gateway"))
   .enablePlugins(PlayScala && LagomPlay)
