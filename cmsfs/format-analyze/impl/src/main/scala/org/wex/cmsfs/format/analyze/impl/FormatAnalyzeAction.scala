@@ -29,10 +29,11 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
 
   subscriber
     .map(elem => loggerFlow(elem, s"start format analyze ${elem.id}"))
-    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .mapAsync(10)(analyzeResultFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .mapConcat(p => p.toList)
-    .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    .runWith(Sink.ignore)
+    .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }
+    .withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .runWith(Sink.foreach(_ => logger.info("format analyze success.")))
 
   def splitAnalyzeResult(fai: FormatAnalyzeItem): Seq[(String, String, String)] = {
     try {
@@ -53,9 +54,9 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def actionFormat(fai: FormatAnalyzeItem): Future[Seq[(String, String, String)]] = Future {
-    val url: String = getUrlContentByPath(fai.coreFormatAnalyze.path)
-    val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.get)
+  def analyzeResultFormat(fai: FormatAnalyzeItem): Future[Seq[(String, String, String)]] = Future {
+    val url: String = getUrlByPath(fai.coreFormatAnalyze.path)
+    val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.getOrElse(""))
     val _type = fai.coreFormatAnalyze.elasticsearch._type
     val _index = fai.coreFormatAnalyze.elasticsearch._index
     val _metric = fai._metric

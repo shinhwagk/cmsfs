@@ -23,10 +23,10 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: config
+        BOOTSTRAP_NAME: config-impl
     image: cmsfs/config
     container_name: cmsfs_config
     environment: 
-      - SERVICE_NAME=config
       - SERVICE_PORT=9000
     volumes: 
       - /etc/localtime:/etc/localtime
@@ -49,10 +49,10 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: monitor
+        BOOTSTRAP_NAME: monitor-impl
     image: cmsfs/monitor
     container_name: cmsfs_monitor
     environment: 
-      - SERVICE_NAME=monitor
       - SERVICE_PORT=9000
     volumes:
       - /etc/localtime:/etc/localtime
@@ -173,14 +173,14 @@ services:
         max-file: "3"
         max-size: "10m"
 
-  redis:
-    container_name: cmsfs_redis
-    image: redis
-    networks:
-      cmsfs:
-        aliases:
-          - redis.cmsfs.org
-    restart: always
+  # redis:
+  #   container_name: cmsfs_redis
+  #   image: redis
+  #   networks:
+  #     cmsfs:
+  #       aliases:
+  #         - redis.cmsfs.org
+  #   restart: always
 
   db:
     container_name: cmsfs_db

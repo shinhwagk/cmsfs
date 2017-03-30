@@ -13,6 +13,7 @@ class FormatAnalyzeServiceImpl(topic: FormatAnalyzeTopic)(implicit ec: Execution
 
   override def pushFormatAnalyze: ServiceCall[FormatAnalyzeItem, Done] = ServiceCall { fai =>
     logger.info(s"format analyze receive: ${fai._metric}")
+    topic.formatTopic.publish(fai)
     Future.successful(Done)
   }
 }
