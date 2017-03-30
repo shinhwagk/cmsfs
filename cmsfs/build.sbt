@@ -119,7 +119,7 @@ lazy val `lagom-service-locator` = (project in file("locator"))
 lazy val `common` = (project in file("common"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies ++= Seq(commonIO))
-  .dependsOn(`config-api`)
+  .dependsOn(`config-api`, `monitor-api`)
 
 //val Success = 0 // 0 exit code
 //val Error = 1 // 1 exit code

@@ -10,13 +10,16 @@ object MonitorService {
 
 trait MonitorService extends Service {
 
-  def pushCollectItem: ServiceCall[NotUsed, Done]
+  def pushMonitorStatus: ServiceCall[MonitorStatusItem, Done]
+
+  def getMonitorStatus(key: String): ServiceCall[NotUsed, Seq[String]]
 
   override final def descriptor = {
     import Service._
     import MonitorService._
     named(SERVICE_NAME).withCalls(
-      restCall(Method.POST, "/v1/collect", pushCollectItem)
+      restCall(Method.POST, "/v1/monitor/status", pushMonitorStatus),
+      restCall(Method.GET, "/v1/monitor/status/:key", getMonitorStatus _)
     )
   }
 }

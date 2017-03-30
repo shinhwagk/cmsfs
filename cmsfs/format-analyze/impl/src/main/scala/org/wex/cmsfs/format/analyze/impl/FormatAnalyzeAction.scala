@@ -30,7 +30,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
   subscriber
     .map(elem => loggerFlow(elem, s"start format analyze ${elem.id}"))
     .mapAsync(10)(analyzeResultFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    .mapConcat(p => p.toList)
+    .mapConcat(_.toList)
     .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }
     .withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.foreach(_ => logger.info("format analyze success.")))
