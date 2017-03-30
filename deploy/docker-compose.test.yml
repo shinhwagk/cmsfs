@@ -29,7 +29,6 @@ services:
       - SERVICE_NAME=config
       - SERVICE_PORT=9000
     volumes: 
-      - ./config:/opt/cmsfs
       - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
@@ -56,7 +55,6 @@ services:
       - SERVICE_NAME=monitor
       - SERVICE_PORT=9000
     volumes:
-      - ./monitor:/opt/cmsfs
       - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
@@ -74,9 +72,9 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: collect-ssh
+        BOOTSTRAP_NAME: collect-ssh-impl
     image: cmsfs/collect-ssh
     environment: 
-      - SERVICE_NAME=collect-ssh
       - SERVICE_PORT=9000
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
@@ -95,13 +93,12 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: collect-jdbc
+        BOOTSTRAP_NAME: collect-jdbc-impl
     image: cmsfs/collect-jdbc
     environment: 
-      - SERVICE_NAME=collect-jdbc
       - SERVICE_PORT=9000
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./collect-jdbc:/opt/cmsfs
     networks: 
       - cmsfs
     logging: 
@@ -116,13 +113,12 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: format-analyze
+        BOOTSTRAP_NAME: format-analyze-impl
     image: cmsfs/format-analyze
     environment: 
-      - SERVICE_NAME=format-analyze
       - SERVICE_PORT=9000
     volumes: 
       - /etc/localtime:/etc/localtime
-      - ./format-analyze:/opt/cmsfs
     networks: 
       - cmsfs
     logging: 
@@ -169,6 +165,8 @@ services:
       - cmsfs
     ports: 
       - "80:9000"
+    depends_on: 
+      - consul
     logging: 
       driver: "json-file"
       options: 

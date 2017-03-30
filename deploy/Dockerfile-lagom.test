@@ -7,6 +7,8 @@ ADD register.py register.py
 ADD entrypoint.sh /usr/local/bin/entrypoint.sh
 ADD logback.xml /opt/logback.xml
 
+ENV SERVICE_NAME ${SVC_NAME}
+
 EXPOSE 9000
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
@@ -16,4 +18,4 @@ ENTRYPOINT ["entrypoint.sh"]
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
 
 RUN ln -s /opt/cmsfs/bin/${BOOTSTRAP_NAME} /usr/local/bin/app.sh
-ADD ${SVC_NAME} /opt/cmsfs
+ADD cmsfs/${SVC_NAME} /opt/cmsfs
