@@ -1,6 +1,7 @@
 FROM cmsfs/oraclejdk8
 
 ARG SVC_NAME
+ARG BOOTSTRAP_NAME
 
 ADD register.py register.py
 ADD entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -14,5 +15,5 @@ ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
 
-RUN ln -s /opt/cmsfs/bin/${SVC_NAME}-impl /usr/local/bin/app.sh
+RUN ln -s /opt/cmsfs/bin/${BOOTSTRAP_NAME} /usr/local/bin/app.sh
 ADD ${SVC_NAME} /opt/cmsfs

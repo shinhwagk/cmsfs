@@ -152,13 +152,15 @@ services:
         max-size: "10m"
 
   web-gateway:
+    container_name: cmsfs_web-gateway
     build:
       context: ./
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: web-gateway
+        BOOTSTRAP_NAME: web-gateway
     image: cmsfs/web-gateway
-    environment: 
+    environment:
       - SERVICE_NAME=web-gateway
       - SERVICE_PORT=9000
     volumes:
@@ -173,27 +175,14 @@ services:
         max-file: "3"
         max-size: "10m"
 
-  monitor-status:
-    build:
-      context: ./
-      dockerfile: Dockerfile-lagom.test
-      args:
-        SVC_NAME: monitor-status
-    image: cmsfs/web-gateway
-    environment: 
-      - SERVICE_NAME=monitor-status
-      - SERVICE_PORT=9000
-    volumes:
-      - /etc/localtime:/etc/localtime
-    networks: 
-      - cmsfs
-    ports: 
-      - "9000:9000"
-    logging: 
-      driver: "json-file"
-      options: 
-        max-file: "3"
-        max-size: "10m"
+  redis:
+    container_name: cmsfs_redis
+    image: redis
+    networks:
+      cmsfs:
+        aliases:
+          - redis.cmsfs.org
+    restart: always
 
   db:
     container_name: cmsfs_db
@@ -205,11 +194,11 @@ services:
     volumes:
       # - /var/lib/mysql:/var/lib/mysql
       - /etc/localtime:/etc/localtime
-    networks: 
+    networks:
       cmsfs:
-        aliases: 
+        aliases:
           - db.cmsfs.org
-    restart: always 
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "ss -lt | grep mysql"]
       interval: 3s

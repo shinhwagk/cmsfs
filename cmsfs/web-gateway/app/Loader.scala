@@ -4,6 +4,7 @@ import com.lightbend.lagom.scaladsl.devmode.LagomDevModeComponents
 import com.softwaremill.macwire._
 import controllers.{Assets, Main}
 import ogr.wex.cmsfs.monitor.api.MonitorService
+import org.wex.cmsfs.lagom.service.discovery.Common
 import org.wex.cmsfs.lagom.service.discovery.consul.ConsulServiceLocatorComponents
 import play.api.ApplicationLoader.Context
 import play.api.i18n.I18nComponents
@@ -38,6 +39,7 @@ abstract class WebGateway(context: Context) extends BuiltInComponentsFromContext
 
 class WebGatewayLoader extends ApplicationLoader {
   override def load(context: Context) = {
+    Common.loaderEnvironment(context)
     println(context.environment.mode)
 
     context.environment.mode match {

@@ -13,6 +13,7 @@ val commonIO = "commons-io" % "commons-io" % "2.5"
 val quartz = "org.quartz-scheduler" % "quartz" % "2.2.3"
 val jsch = "com.jcraft" % "jsch" % "0.1.54"
 val consul = "com.ecwid.consul" % "consul-api" % "1.2.1"
+val redis = "net.debasishg" %% "redisclient" % "3.4"
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -21,8 +22,8 @@ lazy val root = (project in file("."))
     `collect-ssh-api`, `collect-ssh-impl`,
     `collect-jdbc-api`, `collect-jdbc-impl`,
     `format-analyze-api`, `format-analyze-impl`,
-    `lagom-service-locator`,
-    `elasticsearch-api`, `web-gateway`
+    `elasticsearch-api`, `web-gateway`,
+    `lagom-service-locator`
   )
 
 def implCommonSettings: Seq[Setting[_]] = Seq(
@@ -38,23 +39,11 @@ lazy val `config-impl` = (project in file("config/impl"))
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`config-api`, `common`, `lagom-service-locator`)
 
-//lazy val `bootstrap` = (project in file("bootstrap"))
-//  .enablePlugins(LagomScala)
-//  .settings(libraryDependencies += lagomScaladslPubSub)
-//  .settings(libraryDependencies ++= Seq(quartz))
-//  .settings(implCommonSettings: _*)
-//  .settings(lagomForkedTestSettings: _*)
-//  .dependsOn(`common`, `config-api`,
-//    `collect-ssh-api`, `collect-jdbc-api`,
-//    `format-analyze-api`, `format-alarm-api`,
-//    `lagom-service-locator`)
-
 lazy val `monitor-api` = (project in file("monitor/api"))
   .settings(libraryDependencies += lagomScaladslApi)
 lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
-  .settings(libraryDependencies += lagomScaladslPubSub)
-  .settings(libraryDependencies ++= Seq(quartz))
+  .settings(libraryDependencies ++= Seq(lagomScaladslPubSub, quartz, redis))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`monitor-api`, `common`, `config-api`, `collect-ssh-api`, `collect-jdbc-api`, `lagom-service-locator`)
@@ -64,8 +53,7 @@ lazy val `collect-ssh-api` = (project in file("collect-ssh/api"))
   .dependsOn(`common`)
 lazy val `collect-ssh-impl` = (project in file("collect-ssh/impl"))
   .enablePlugins(LagomScala)
-  .settings(libraryDependencies += lagomScaladslPubSub)
-  .settings(libraryDependencies ++= Seq(jsch))
+  .settings(libraryDependencies ++= Seq(lagomScaladslPubSub, jsch))
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`collect-ssh-api`,
