@@ -6,6 +6,7 @@ import akka.stream.scaladsl.Sink
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.common.core.{CmsfsAkkaStream, CmsfsPlayJson, Common}
 import org.wex.cmsfs.common.format.FormatCore
+import org.wex.cmsfs.common.monitor.MonitorStatus
 import org.wex.cmsfs.elasticsearch.api.ElasticsearchService
 import org.wex.cmsfs.format.analyze.api.FormatAnalyzeItem
 import play.api.Configuration
@@ -17,7 +18,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
                           override val config: Configuration,
                           es: ElasticsearchService,
                           system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {
+  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common with MonitorStatus {
 
   override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -31,7 +32,7 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     .map(elem => loggerFlow(elem, s"start format analyze ${elem.id}"))
     .mapAsync(10)(analyzeResultFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .mapConcat(p => p.toList)
-    .mapAsync(10) { case (_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }
+    .mapAsync(10) { case List(_index, _type, row) => es.pushElasticsearchItem(_index, _type).invoke(row) }.async
     .withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.foreach(_ => logger.info("format analyze success.")))
 
@@ -54,16 +55,25 @@ class FormatAnalyzeAction(topic: FormatAnalyzeTopic,
     }
   }
 
-  def analyzeResultFormat(fai: FormatAnalyzeItem): Future[Seq[(String, String, String)]] = Future {
-    val url: String = getUrlByPath(fai.coreFormatAnalyze.path)
-    val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.getOrElse(""))
-    val _type = fai.coreFormatAnalyze.elasticsearch._type
-    val _index = fai.coreFormatAnalyze.elasticsearch._index
-    val _metric = fai._metric
-    val utcDate = fai.utcDate
-    val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
-    arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
-      .map(jsonObjectAddField(_, "@metric", _metric))
-      .map(row => (_index, _type, row.toString))
+  def analyzeResultFormat(fai: FormatAnalyzeItem): Future[Seq[List[String]]] = Future {
+    val monitorStatus = putStatus(fai.id, "ANALYZE") _
+    try {
+      val url: String = getUrlByPath(fai.coreFormatAnalyze.path)
+      val formatResult = executeFormat(url, "analyze.py", fai.collectResult, fai.coreFormatAnalyze.args.getOrElse(""))
+      val _type = fai.coreFormatAnalyze.elasticsearch._type
+      val _index = fai.coreFormatAnalyze.elasticsearch._index
+      val _metric = fai._metric
+      val utcDate = fai.utcDate
+      val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
+      val rs: Seq[List[String]] = arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
+        .map(jsonObjectAddField(_, "@metric", _metric))
+        .map(row => List(_index, _type, row.toString))
+      monitorStatus(true, rs.toString())
+      rs
+    } catch {
+      case ex: Exception =>
+        monitorStatus(false, ex.getMessage)
+        throw new Exception(ex.getMessage)
+    }
   }
 }
