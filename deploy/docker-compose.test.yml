@@ -32,8 +32,6 @@ services:
       - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
-    ports:
-      - "9000:9000"
     depends_on: 
       - consul
       - db
@@ -60,6 +58,8 @@ services:
       - cmsfs
     depends_on: 
       - consul
+    ports:
+      - "9000:9000"
     logging: 
       driver: "json-file"
       options: 
@@ -81,7 +81,9 @@ services:
       - /etc/localtime:/etc/localtime
     networks: 
       - cmsfs
-    logging: 
+    depends_on:
+      - consul
+    logging:
       driver: "json-file"
       options: 
         max-file: "3"
@@ -173,14 +175,16 @@ services:
         max-file: "3"
         max-size: "10m"
 
-  # redis:
-  #   container_name: cmsfs_redis
-  #   image: redis
-  #   networks:
-  #     cmsfs:
-  #       aliases:
-  #         - redis.cmsfs.org
-  #   restart: always
+  redis:
+    container_name: cmsfs_redis
+    image: redis
+    volumes:
+      - /etc/localtime:/etc/localtime
+    networks:
+      cmsfs:
+        aliases:
+          - redis.cmsfs.org
+    restart: always
 
   db:
     container_name: cmsfs_db

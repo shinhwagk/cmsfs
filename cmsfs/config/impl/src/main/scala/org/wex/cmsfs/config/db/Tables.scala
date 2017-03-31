@@ -6,9 +6,9 @@ object Tables {
 
   val coreMonitorDetails = TableQuery[CoreMonitorDetails]
 
-  val coreCollectorJdbcs = TableQuery[CoreConnectorJdbcs]
+  val coreConnectorJdbcs = TableQuery[CoreConnectorJdbcs]
 
-  val coreCollectorSshs = TableQuery[CoreConnectorSshs]
+  val coreConnectorSshs = TableQuery[CoreConnectorSshs]
 
   val coreCollects = TableQuery[CoreCollects]
 
@@ -16,6 +16,6 @@ object Tables {
 
   val coreFormatAnalyzes = TableQuery[CoreFormatAnalyzes]
 
-  val coreMonitorStatuses = TableQuery[CoreMonitorStatuses]
+//  val coreMonitorStatuses = TableQuery[CoreMonitorStatuses]
 
 }

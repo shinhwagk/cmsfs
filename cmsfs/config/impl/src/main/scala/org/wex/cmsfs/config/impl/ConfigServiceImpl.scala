@@ -18,11 +18,11 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   }
 
   override def getCoreConnectorJdbcById(id: Int): ServiceCall[NotUsed, CoreConnectorJdbc] = ServiceCall { _ =>
-    db.run(Tables.coreCollectorJdbcs.filter(_.id === id).result.head)
+    db.run(Tables.coreConnectorJdbcs.filter(_.id === id).result.head)
   }
 
   override def getCoreConnectorSshById(id: Int): ServiceCall[NotUsed, CoreConnectorSsh] = ServiceCall { _ =>
-    db.run(Tables.coreCollectorSshs.filter(_.id === id).result.head)
+    db.run(Tables.coreConnectorSshs.filter(_.id === id).result.head)
   }
 
   override def getCoreCollectById(id: Int): ServiceCall[NotUsed, CoreCollect] = ServiceCall { _ =>
@@ -42,11 +42,11 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
   }
 
   override def addCoreConnectorJdbc: ServiceCall[CoreConnectorJdbc, Done] = ServiceCall { ccj =>
-    db.run(Tables.coreCollectorJdbcs += ccj).map(_ => Done)
+    db.run(Tables.coreConnectorJdbcs += ccj).map(_ => Done)
   }
 
   override def addCoreConnectorSsh: ServiceCall[CoreConnectorSsh, Done] = ServiceCall { ccs =>
-    db.run(Tables.coreCollectorSshs += ccs).map(_ => Done)
+    db.run(Tables.coreConnectorSshs += ccs).map(_ => Done)
   }
 
   override def addCoreCollect: ServiceCall[CoreCollect, Done] = ServiceCall { cc =>
@@ -65,39 +65,58 @@ class ConfigServiceImpl()(implicit ec: ExecutionContext) extends ConfigService {
     db.run(Tables.coreMonitorDetails.filter(_.id === id).result.head)
   }
 
-  override def addCoreMonitorStatus: ServiceCall[CoreMonitorStatus, Done] = ServiceCall { cms =>
-    val action = Tables.coreMonitorStatuses.filter(_.id === cms.id).exists.result.flatMap { exists =>
-      if (!exists) {
-        Tables.coreMonitorStatuses += cms
-      } else {
-        DBIO.successful(None)
-        //        Tables.coreMonitorStatuses.filter(_.id === cms.id).map(p => (p.category, p.metric)).update(cms.category, cms.metric)
-      }
-    }
-    db.run(action).map(_ => Done)
-  }
+//  override def addCoreMonitorStatus: ServiceCall[CoreMonitorStatus, Done] = ServiceCall { cms =>
+//    val action = Tables.coreMonitorStatuses.filter(_.id === cms.id).exists.result.flatMap { exists =>
+//      if (!exists) {
+//        Tables.coreMonitorStatuses += cms
+//      } else {
+//        DBIO.successful(None)
+//        //        Tables.coreMonitorStatuses.filter(_.id === cms.id).map(p => (p.category, p.metric)).update(cms.category, cms.metric)
+//      }
+//    }
+//    db.run(action).map(_ => Done)
+//  }
+//
+//  override def putCoreMonitorStatusCollectById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
+//    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
+//    c.flatMap { p =>
+//      val np = Json.parse(p).as[Map[String, List[String]]].+("COLLECT" -> lis)
+//      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
+//    }.map(_ => Done)
+//  }
+//
+//  override def putCoreMonitorStatusAnalyzeById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
+//    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
+//    c.flatMap { p =>
+//      val np = Json.parse(p).as[Map[String, List[String]]].+("ANALYZE" -> lis)
+//      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
+//    }.map(_ => Done)
+//  }
+//
+//  override def putCoreMonitorStatusAlarmById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
+//    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
+//    c.flatMap { p =>
+//      val np = Json.parse(p).as[Map[String, List[String]]].+("ALARM" -> lis)
+//      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
+//    }.map(_ => Done)
+//  }
 
-  override def putCoreMonitorStatusCollectById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
-    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
-    c.flatMap { p =>
-      val np = Json.parse(p).as[Map[String, List[String]]].+("COLLECT" -> lis)
-      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
-    }.map(_ => Done)
-  }
+  override def getCoreMonitorStatuses: ServiceCall[NotUsed, Seq[CoreMonitorStatus]] = ServiceCall { _ =>
+    val oracleRS = for {
+      cmd <- Tables.coreMonitorDetails if cmd.connectorMode === "JDBC"
+      ccj <- Tables.coreConnectorJdbcs if cmd.connectorId === ccj.id
+      cc <- Tables.coreCollects if cc.id === cmd.collectId
+    } yield (cmd.id, "ORACLE", ccj.name, cc.name)
 
-  override def putCoreMonitorStatusAnalyzeById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
-    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
-    c.flatMap { p =>
-      val np = Json.parse(p).as[Map[String, List[String]]].+("ANALYZE" -> lis)
-      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
-    }.map(_ => Done)
-  }
+    val osRS = for {
+      cmd <- Tables.coreMonitorDetails if cmd.connectorMode === "SSH"
+      ccs <- Tables.coreConnectorSshs if cmd.connectorId === ccs.id
+      cc <- Tables.coreCollects if cc.id === cmd.collectId
+    } yield (cmd.id, "OS", ccs.name, cc.name)
 
-  override def putCoreMonitorStatusAlarmById(id: Int): ServiceCall[List[String], Done] = ServiceCall { lis =>
-    val c = db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).result.head)
-    c.flatMap { p =>
-      val np = Json.parse(p).as[Map[String, List[String]]].+("ALARM" -> lis)
-      db.run(Tables.coreMonitorStatuses.filter(_.id === id).map(_.status).update(Json.toJson(np).toString()))
-    }.map(_ => Done)
+
+    val rs = oracleRS unionAll osRS
+
+    db.run(rs.result).map(_.map(r=>CoreMonitorStatus(r._1.get,r._2,r._3,r._4)))
   }
 }

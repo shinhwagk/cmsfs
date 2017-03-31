@@ -41,6 +41,7 @@ lazy val `config-impl` = (project in file("config/impl"))
 
 lazy val `monitor-api` = (project in file("monitor/api"))
   .settings(libraryDependencies += lagomScaladslApi)
+  .dependsOn(`config-api`)
 lazy val `monitor-impl` = (project in file("monitor/impl"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies ++= Seq(lagomScaladslPubSub, quartz, redis))
@@ -118,7 +119,7 @@ lazy val `lagom-service-locator` = (project in file("locator"))
 
 lazy val `common` = (project in file("common"))
   .enablePlugins(LagomScala)
-  .settings(libraryDependencies ++= Seq(commonIO))
+  .settings(libraryDependencies ++= Seq(commonIO, redis))
   .dependsOn(`config-api`)
 
 //val Success = 0 // 0 exit code

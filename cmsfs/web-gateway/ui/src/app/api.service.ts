@@ -9,15 +9,15 @@ import { CoreMonitorStatus } from './monitor-status';
 export class ApiService {
 
   private headers = new Headers({ 'Content-Type': 'application/json' });
-  private monitorStatusUrl = 'v1/core/monitor';  // URL to web api
+  private monitorStatusUrl = '/v1/monitor/statuses';  // URL to web api
 
   constructor(private http: Http) { }
 
   getMonitorStatuses(): Promise<CoreMonitorStatus[]> {
-    const url = `${this.monitorStatusUrl}/statues`
+    const url = `${this.monitorStatusUrl}`
     return this.http.get(url)
       .toPromise()
-      .then(response => response.json().data as CoreMonitorStatus[])
+      .then(response => response.json() as CoreMonitorStatus[])
       .catch(this.handleError);
   }
 
@@ -25,5 +25,4 @@ export class ApiService {
     console.error('An error occurred', error); // for demo purposes only
     return Promise.reject(error.message || error);
   }
-
 }

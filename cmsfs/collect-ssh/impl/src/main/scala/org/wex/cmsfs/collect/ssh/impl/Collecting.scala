@@ -2,7 +2,7 @@ package org.wex.cmsfs.collect.ssh.impl
 
 import java.io.{BufferedReader, InputStreamReader}
 
-import akka.{Done, NotUsed}
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Sink}
@@ -11,6 +11,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.common.`object`.{CoreCollect, CoreConnectorSsh, CoreMonitorDetailForSsh}
 import org.wex.cmsfs.common.collect.CollectCore
 import org.wex.cmsfs.common.core.{CmsfsAkkaStream, Common}
+import org.wex.cmsfs.common.monitor.MonitorStatus
 import org.wex.cmsfs.format.alarm.api.{FormatAlarmItem, FormatAlarmService}
 import org.wex.cmsfs.format.analyze.api.{FormatAnalyzeItem, FormatAnalyzeService}
 import play.api.Configuration
@@ -18,19 +19,20 @@ import play.api.libs.json.Json
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class Collecting(ct: CollectTopic,
                  analyzeService: FormatAnalyzeService,
                  alarmService: FormatAlarmService,
                  override val config: Configuration,
                  system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CollectCore with Common {
+  extends CmsfsAkkaStream with CollectCore with Common with MonitorStatus {
 
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = system.dispatcher
 
-  private val flow: Flow[CoreMonitorDetailForSsh, Int, NotUsed] = Flow[CoreMonitorDetailForSsh]
+  private val flow = Flow[CoreMonitorDetailForSsh]
     .map(elem => loggerFlow(elem, s"receive ssh collect ${elem.connector.id}"))
     .mapAsync(10) { cmdfs =>
 
@@ -38,7 +40,9 @@ class Collecting(ct: CollectTopic,
 
       val collectTimeCalculateFun: (String) => String = collectTimeMonitor
 
-      collectFun(cmdfs.connector, cmdfs.collect)
+      val statusSave = putStatus(cmdfs.id, "COLLECT") _
+
+      val c = collectFun(cmdfs.connector, cmdfs.collect)
         .map(elem => loggerFlow(elem, collectTimeCalculateFun(cmdfs.collect.name + " " + cmdfs.connector.name)))
         .filter(_.isDefined)
         .map(_.get)
@@ -51,8 +55,13 @@ class Collecting(ct: CollectTopic,
             case Some(cfa) => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, cfa))
             case None => Future.successful(Done)
           }
-          Future.sequence(a :: b :: Nil).map(_ => cmdfs.id)
+          Future.sequence(a :: b :: Nil).map(_ => collectResult)
         }
+      c onComplete {
+        case Failure(t) => statusSave(false, t.getMessage)
+        case Success(rs) => statusSave(true, rs)
+      }
+      c
     }
 
   ct.CollectTopic.subscriber

@@ -15,5 +15,51 @@
       <option>Mercedes</option>
       <option>Audi</option>
     </select>
+    <select [(ngModel)]="metric">
+      <option value="pow1">Volvo</option>
+      <option value="pow2">Saab</option>
+      <option>Mercedes</option>
+      <option>Audi</option>
+    </select>
     <button>query</button>
+</div>
+
+
+<div class="container">
+    <table class="table table-striped">
+        <tr>
+            <th>id</th>
+            <th>Category</th>
+            <th>Name</th>
+            <th>Metric</th>
+            <th>Collect</th>
+            <th>Analyze</th>
+            <th>Alarm</th>
+        </tr>
+        <tr *ngFor="let status of data">
+            <td>{{status.id}}</td>
+            <td>{{status.category}}</td>
+            <td>{{status.name}}</td>
+            <td>{{status.metric}}</td>
+            <td>
+                <div [ngClass]="setCurrentClasses(status.collect.state)" [title]="status.collect.result">{{status.collect.timestamp}}</div>
+            </td>
+            <td>
+                <div [ngSwitch]="status.analyze">
+                    <div *ngSwitchCase="">None</div>
+                    <div *ngSwitchDefault>
+                        <div [ngClass]="setCurrentClasses(status.analyze.state)" [title]="status.analyze.result">{{status.analyze.timestamp}}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div [ngSwitch]="status.alarm">
+                    <div *ngSwitchCase="">None</div>
+                    <div *ngSwitchDefault>
+                        <div [ngClass]="setCurrentClasses(status.alarm.state)" [title]="status.alarm.result">{{status.alarm.timestamp}} </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>

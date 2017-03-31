@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ApiService } from './api.service';
+import { testData, CoreMonitorStatus, CoreMonitorStatusCollect } from './monitor-status';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +11,20 @@ import { ApiService } from './api.service';
 export class AppComponent {
   title = 'test monitor!';
 
-  constructor(private apiServicer: ApiService) { }
+  constructor(private apiServicer: ApiService) {
+    this.apiServicer.getMonitorStatuses().then(p => {
+      this.data = p
+    })
 
-  metric: string
-  category: string
+  }
+
+  data: CoreMonitorStatus[] = []
+
+  setCurrentClasses(state) {
+    return {
+      "alert-success": state,
+      "alert-danger": !state
+    };
+  }
 
 }

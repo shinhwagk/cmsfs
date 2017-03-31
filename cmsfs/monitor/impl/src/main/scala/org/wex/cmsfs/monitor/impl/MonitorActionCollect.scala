@@ -78,7 +78,6 @@ class MonitorActionCollect(cs: ConfigService,
             connectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
             formatAnalyze <- formatAnalyzeFuture
             formatAlarm <- formatAlarmFuture
-            _ <- cs.addCoreMonitorStatus.invoke(CoreMonitorStatus(cmd.id.get, "ORACLE", collect.name, "{}"))
             done <- sendMonitorForJdbc(cmd.id.get, utcDate, collect, connectorJdbc, formatAnalyze, formatAlarm)
           } yield done
         }
@@ -89,7 +88,6 @@ class MonitorActionCollect(cs: ConfigService,
             connectorSsh <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
             formatAnalyze <- formatAnalyzeFuture
             formatAlarm <- formatAlarmFuture
-            _ <- cs.addCoreMonitorStatus.invoke(CoreMonitorStatus(cmd.id.get, "OS", collect.name, "{}"))
             done <- sendMonitorForSsh(cmd.id.get, utcDate, collect, connectorSsh, formatAnalyze, formatAlarm)
           } yield done
         }
