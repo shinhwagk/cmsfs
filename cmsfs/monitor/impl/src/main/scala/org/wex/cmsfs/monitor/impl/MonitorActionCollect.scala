@@ -107,7 +107,7 @@ class MonitorActionCollect(cs: ConfigService,
 
     val sendFormatAnalyzeOpt = analyze match {
       case Some(a) => {
-        val es = `object`.CoreElasticsearch(a._index, a._type)
+        val es = `object`.CoreElasticsearch(a._index, connector.name)
         Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, es))
       }
       case None => None
@@ -127,7 +127,7 @@ class MonitorActionCollect(cs: ConfigService,
 
     val sendFormatAnalyzeOpt = analyze match {
       case Some(a) => {
-        val es = `object`.CoreElasticsearch(a._index, a._type)
+        val es = `object`.CoreElasticsearch(a._index, connector.name)
         Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, es))
       }
       case None => None
