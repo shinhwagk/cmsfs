@@ -14,6 +14,7 @@ val quartz = "org.quartz-scheduler" % "quartz" % "2.2.3"
 val jsch = "com.jcraft" % "jsch" % "0.1.54"
 val consul = "com.ecwid.consul" % "consul-api" % "1.2.1"
 val redis = "net.debasishg" %% "redisclient" % "3.4"
+val httpClient = "org.apache.httpcomponents" % "httpclient" % "4.5.3"
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -97,6 +98,7 @@ lazy val `format-alarm-api` = (project in file("format-alarm/api"))
 lazy val `format-alarm-impl` = (project in file("format-alarm/impl"))
   .enablePlugins(LagomScala)
   .settings(libraryDependencies += lagomScaladslPubSub)
+  .settings(libraryDependencies += httpClient)
   .settings(implCommonSettings: _*)
   .settings(lagomForkedTestSettings: _*)
   .dependsOn(`format-alarm-api`, `notification-api`, `lagom-service-locator`)
