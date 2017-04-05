@@ -30,7 +30,7 @@ function scp_cmsfs() {
   git commit -m "test"
   git push
   # scp -r -C E:\github\cmsfs root@10.65.103.63:/opt/cmsfs_test/
-  # ssh root@10.65.103.63 "cd /opt/cmsfs_test/; git pull"
+  ssh root@10.65.103.63 "cd /opt/cmsfs/; git pull"
   # scp -r -C E:\github\deploy root@10.65.103.63:/opt/cmsfs_test/
 }
 
