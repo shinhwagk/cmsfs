@@ -4,7 +4,7 @@ import java.util
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import com.lightbend.lagom.scaladsl.api.transport.{MessageProtocol, RequestHeader}
+import com.lightbend.lagom.scaladsl.api.transport.{MessageProtocol, Method, RequestHeader}
 import org.apache.http.NameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.message.BasicNameValuePair
@@ -31,7 +31,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   logger.info(s"${this.getClass.getName} start.")
 
-  def genFormBody(): String = {
+  def genFormBody: String = {
     val nvps2 = new util.ArrayList[NameValuePair]();
     nvps2.add(new BasicNameValuePair("appId", "TOC"));
     nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
@@ -44,10 +44,12 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   }
 
   def a(rh: RequestHeader): RequestHeader = {
-    rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded; charset=utf-8")))
+    rh.withMethod(Method.POST)
+      .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded; charset=utf-8")))
   }
 
-  es.pushNotificationItem.handleRequestHeader(a).invoke(genFormBody()).onComplete {
+  logger.info(genFormBody)
+  es.pushNotificationItem.handleRequestHeader(a).invoke(genFormBody).onComplete {
     case Success(a) => println("success " + a)
     case Failure(ex) => println("failure " + ex.getMessage)
   }
