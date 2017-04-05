@@ -19,6 +19,6 @@ class MonitorServiceImpl(configService: ConfigService)(implicit ec: ExecutionCon
       val analyze: Option[CoreMonitorStageStatus] = r.get(s"${cms.id}_ANALYZE").map(Json.parse(_).as[CoreMonitorStageStatus])
       val alarm: Option[CoreMonitorStageStatus] = r.get(s"${cms.id}_ALARM").map(Json.parse(_).as[CoreMonitorStageStatus])
       cms.copy(collect = collect, analyze = analyze, alarm = alarm)
-    })
+    }.sortBy(_.id))
   }
 }
