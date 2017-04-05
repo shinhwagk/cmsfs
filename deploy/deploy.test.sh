@@ -34,6 +34,8 @@ echo ${PROJECT_PATH}
 
 cd ${DEPLOY}
 DOCKER_COMPOSE_COMMAND="docker-compose -p cmsfs -f docker-compose.test.yml"
+
+echo "remote: stop service: ${SERVICE_NAME}..."
 ${DOCKER_COMPOSE_COMMAND} stop ${SERVICE_NAME}
 ${DOCKER_COMPOSE_COMMAND} rm -f ${SERVICE_NAME}
 ${DOCKER_COMPOSE_COMMAND} up --build -d ${SERVICE_NAME} || docker-compose -p cmsfs logs ${SERVICE_NAME}
