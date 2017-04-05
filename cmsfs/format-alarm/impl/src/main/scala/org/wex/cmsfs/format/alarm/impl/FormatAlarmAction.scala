@@ -45,6 +45,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   def a(rh: RequestHeader): RequestHeader = {
     rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded; charset=utf-8")))
+  }
 
   es.pushNotificationItem.handleRequestHeader(a).invoke(genFormBody()).onComplete{
     case Success(a)=>println(a)
