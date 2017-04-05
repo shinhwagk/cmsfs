@@ -18,7 +18,6 @@ trait MonitorService extends Service {
     import MonitorService._
     named(SERVICE_NAME).withCalls(
       restCall(Method.GET, "/v1/monitor/statuses", getMonitorStatus)
-
     )
   }
 }

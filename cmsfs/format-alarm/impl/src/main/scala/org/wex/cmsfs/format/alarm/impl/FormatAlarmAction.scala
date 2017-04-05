@@ -47,9 +47,9 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded; charset=utf-8")))
   }
 
-  es.pushNotificationItem.handleRequestHeader(a).invoke(genFormBody()).onComplete{
-    case Success(a)=>println(a)
-    case Failure(ex)=>println(ex.getMessage)
+  es.pushNotificationItem.handleRequestHeader(a).invoke(genFormBody()).onComplete {
+    case Success(a) => println("success " + a)
+    case Failure(ex) => println("failure " + ex.getMessage)
   }
 
   //  subscriber

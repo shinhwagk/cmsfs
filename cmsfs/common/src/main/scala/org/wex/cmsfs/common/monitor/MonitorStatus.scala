@@ -1,5 +1,6 @@
 package org.wex.cmsfs.common.monitor
 
+import java.time.format.DateTimeFormatter
 import java.time.{ZoneOffset, ZonedDateTime}
 
 import com.redis.RedisClient
@@ -25,7 +26,8 @@ object CoreMonitorStatus {
   implicit val format: Format[CoreMonitorStatus] = Json.format
 }
 
-case class CoreMonitorStageStatus(state: Boolean, result: String, timestamp: String = ZonedDateTime.now(ZoneOffset.ofHours(8)).toString)
+case class CoreMonitorStageStatus(state: Boolean, result: String,
+                                  timestamp: String = ZonedDateTime.now(ZoneOffset.ofHours(8)).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:m:s")))
 
 object CoreMonitorStageStatus {
   implicit val format: Format[CoreMonitorStageStatus] = Json.format
