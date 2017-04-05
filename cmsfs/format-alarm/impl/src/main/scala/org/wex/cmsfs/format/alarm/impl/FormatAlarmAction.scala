@@ -31,7 +31,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     rh.withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))
   }
 
-//  es.pushNotificationItem.handleRequestHeader(a).invoke()
+  es.pushNotificationItem.handleRequestHeader(a).invoke()
 
   subscriber
   //    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))

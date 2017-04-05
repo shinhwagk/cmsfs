@@ -1,8 +1,7 @@
 package org.wex.cmsfs.notification.impl
 
 import akka.Done
-import com.lightbend.lagom.scaladsl.api.transport.Method
-import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
+import com.lightbend.lagom.scaladsl.api.{CircuitBreaker, Service, ServiceCall}
 
 object NotificationService {
   val SERVICE_NAME = "notification"
@@ -16,7 +15,8 @@ trait NotificationService extends Service {
     import NotificationService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      pathCall("/v1/notification", pushNotificationItem)
+      pathCall("/mns-web/services/rest/msgNotify", pushNotificationItem)
+        .withCircuitBreaker(CircuitBreaker.identifiedBy("elasticsearch-circuitbreaker"))
     )
   }
 }

@@ -8,4 +8,8 @@ object NotificationItem {
   implicit val format: Format[NotificationItem] = Json.format
 }
 
+case class NotificationItemTest(appId: String, orderNo: String, protocol: String, targetIdenty: String, targetCount: String, content: String, isRealTime: String)
 
+object NotificationItemTest {
+  implicit val format: Format[NotificationItemTest] = Json.format
+}
