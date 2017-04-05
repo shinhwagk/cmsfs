@@ -44,12 +44,20 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   }
 
   def a(rh: RequestHeader): RequestHeader = {
-    rh.withMethod(Method.POST)
+    val c = rh.withMethod(Method.POST)
       .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded; charset=utf-8")))
+
+    logger.info(c.acceptedResponseProtocols.toSeq.toString())
+    logger.info(c.method.name)
+    logger.info(c.principal.toString)
+    logger.info(c.uri.toString)
+    c
   }
 
   logger.info(genFormBody)
-  es.pushNotificationItem.handleRequestHeader(a).invoke(genFormBody).onComplete {
+
+  val request = es.pushNotificationItem.handleRequestHeader(a)
+  request.invoke(genFormBody).onComplete {
     case Success(a) => println("success " + a)
     case Failure(ex) => println("failure " + ex.getMessage)
   }
