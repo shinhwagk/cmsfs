@@ -15,7 +15,7 @@
 # ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs rm -f ${service_name}"
 # ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up --build -d ${service_name}"
 
-function scp-metadate() {
+function scp_metadate() {
   scp E:\github\Monitor\deploy\docker-compose.test.yml root@10.65.103.63:/opt/cmsfs_test/docker-compose.yml
   scp E:\github\Monitor\deploy\Dockerfile-lagom.test root@10.65.103.63:/opt/cmsfs_test/Dockerfile-lagom.test
   scp E:\github\Monitor\deploy\entrypoint.sh root@10.65.103.63:/opt/cmsfs_test/entrypoint.sh
@@ -24,9 +24,13 @@ function scp-metadate() {
   scp E:\github\Monitor\deploy\build.test.sh root@10.65.103.63:/opt/cmsfs_test/build.test.sh
 }
 
-function scp-cmsfs() {
-  scp -r -C E:\github\Monitor\cmsfs root@10.65.103.63:/opt/cmsfs_test/
-  scp -r -C E:\github\Monitor\deploy root@10.65.103.63:/opt/cmsfs_test/
+function scp_cmsfs() {
+  cd E:\github\cmsfs;
+  git add -A
+  git commit -m "test"
+  # scp -r -C E:\github\cmsfs root@10.65.103.63:/opt/cmsfs_test/
+  # ssh root@10.65.103.63 "cd /opt/cmsfs_test/; git pull"
+  # scp -r -C E:\github\deploy root@10.65.103.63:/opt/cmsfs_test/
 }
 
 function build-service($service_name) {
@@ -59,8 +63,8 @@ function start-services($service_name) {
 # start-services $args[0]
 # ssh root@10.65.103.63 "cd /opt/cmsfs_test; docker-compose -p cmsfs up -d db consul"
 
-scp-cmsfs | Out-Null
+scp_cmsfs
 
-$SERVICE_NAME=$args[0]
-$SERVICE_IMPL=$args[1]
-ssh root@10.65.103.63 "cd /opt/cmsfs_test/deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"
+# $SERVICE_NAME=$args[0]
+# $SERVICE_IMPL=$args[1]
+# ssh root@10.65.103.63 "cd /opt/cmsfs_test/deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"

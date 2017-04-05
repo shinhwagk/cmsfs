@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ApiService } from './api.service';
-import { CoreMonitorStatus, CoreMonitorStatusCollect } from './monitor-status';
+import { CoreMonitorStatus } from './monitor-status';
 
 @Component({
   selector: 'app-root',
