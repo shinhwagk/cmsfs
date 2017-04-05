@@ -129,6 +129,26 @@ services:
         max-file: "3"
         max-size: "10m"
 
+  format-alarm:
+    build:
+      context: ./
+      dockerfile: Dockerfile-lagom.test
+      args:
+        SVC_NAME: format-alarm
+        BOOTSTRAP_NAME: format-alarm-impl
+    image: cmsfs/format-alarm
+    environment: 
+      - SERVICE_PORT=9000
+    volumes: 
+      - /etc/localtime:/etc/localtime
+    networks: 
+      - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
+
   notification:
     build:
       context: ./
