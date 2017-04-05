@@ -29,9 +29,7 @@ function scp_cmsfs() {
   git add -A
   git commit -m "test"
   git push
-  # scp -r -C E:\github\cmsfs root@10.65.103.63:/opt/cmsfs_test/
   ssh root@10.65.103.63 "cd /opt/cmsfs/; git pull"
-  # scp -r -C E:\github\deploy root@10.65.103.63:/opt/cmsfs_test/
 }
 
 function build-service($service_name) {
@@ -66,6 +64,6 @@ function start-services($service_name) {
 
 scp_cmsfs
 
-# $SERVICE_NAME=$args[0]
-# $SERVICE_IMPL=$args[1]
-# ssh root@10.65.103.63 "cd /opt/cmsfs_test/deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"
+$SERVICE_NAME=$args[0]
+$SERVICE_IMPL=$args[1]
+ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"

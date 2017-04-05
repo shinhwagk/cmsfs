@@ -2,7 +2,7 @@
 
 set -e
 
-BASE="/opt/cmsfs_test"
+BASE="/opt/cmsfs"
 DEPLOY="${BASE}/deploy"
 CMSFS_HOME="${BASE}/cmsfs"
 SERVICE_NAME="${1}"
