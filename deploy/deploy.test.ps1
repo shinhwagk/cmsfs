@@ -3,8 +3,6 @@ function scp_cmsfs() {
   git add -A
   git commit -m "test"
   git push
-  ssh root@10.65.103.63 "cd /opt/cmsfs/; git pull;"
-  ssh root@
 }
 
 scp_cmsfs
@@ -13,4 +11,4 @@ $SERVICE_NAME=$args[0]
 $SERVICE_IMPL=$args[1]
 
 echo "start execute deploy"
-ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"
+ssh root@10.65.103.63 "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"
