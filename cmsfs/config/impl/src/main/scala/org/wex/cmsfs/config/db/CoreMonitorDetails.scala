@@ -1,9 +1,14 @@
 package org.wex.cmsfs.config.db
 
 import org.wex.cmsfs.config.api.CoreMonitorDetail
+import play.api.libs.json.Json
 import slick.jdbc.MySQLProfile.api._
 
 class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_monitor_detail") {
+  implicit val seqIntColumnType = MappedColumnType.base[Seq[Int], String](
+    { b => Json.toJson(b).toString() }, // map Bool to Int
+    { i => Json.parse(i).as[Seq[Int]] } // map Int to Bool
+  )
 
   def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
 
@@ -21,9 +26,7 @@ class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_m
 
   def formatAnalyzeArgs = column[Option[String]]("FORMAT_ANALYZE_ARGS")
 
-  def formatAlarmId = column[Option[Int]]("FORMAT_ALARM_ID")
+  def formatAlarmIds = column[Seq[Int]]("FORMAT_ALARM_IDS")
 
-  def formatAlarmArgs = column[Option[String]]("FORMAT_ANALYZE_ARGS")
-
-  override def * = (id, cron, connectorMode, connectorId, collectId, collectArgs, formatAnalyzeId, formatAnalyzeArgs, formatAlarmId, formatAlarmArgs) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
+  override def * = (id, cron, connectorMode, connectorId, collectId, collectArgs, formatAnalyzeId, formatAnalyzeArgs, formatAlarmIds) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
 }

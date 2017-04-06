@@ -15,7 +15,7 @@ import org.wex.cmsfs.common.format.FormatCore
 import org.wex.cmsfs.notification.impl.NotificationService
 import play.api.Configuration
 
-import scala.util.{Failure, Random, Success}
+import scala.util.Random
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
                         override val config: Configuration,
@@ -31,7 +31,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   logger.info(s"${this.getClass.getName} start.")
 
-  def genFormBody: String = {
+  def genFormBody(): String = {
     val num = new Random().nextInt(10)
     val nvps2 = new util.ArrayList[NameValuePair]();
     nvps2.add(new BasicNameValuePair("appId", "TOC"));
@@ -45,44 +45,19 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   }
 
   def a(rh: RequestHeader): RequestHeader = {
-    logger.info("=====================")
-    logger.info(rh.headerMap.toString())
-    logger.info(rh.protocol.toContentTypeHeader.toString)
-    logger.info(rh.headers.toString())
-    logger.info("=====================")
-
-
-    val c = rh.withMethod(Method.POST)
-//      .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded"), None, None))
-      //        .withHeaders(List(("Accept", "*/*")))
+    rh.withMethod(Method.POST)
+      .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded"), None, None))
       .removeHeader("Accept")
       .addHeader("Accept", "*/*")
-
-    logger.info(c.protocol.toString)
-    logger.info(c.method.name)
-    logger.info(c.principal.toString)
-    logger.info(c.uri.toString)
-
-    logger.info("=====================")
-    logger.info(c.headerMap.toString())
-    logger.info(c.protocol.toContentTypeHeader.toString)
-    logger.info(c.headers.toString())
-    logger.info("=====================")
-
-    c
   }
 
-  logger.info("=====================")
-  logger.info(genFormBody.toString)
-  logger.info("=====================")
 
-  val request = es.pushNotificationItem
-    .handleRequestHeader(a)
-
-  request.invoke(genFormBody).onComplete {
-    case Success(a) => println("success " + a)
-    case Failure(ex) => println("failure " + ex.getMessage)
-  }
+//  val request = es.pushNotificationItem.handleRequestHeader(a)
+//
+//  request.invoke(genFormBody).onComplete {
+//    case Success(a) => println("success " + a)
+//    case Failure(ex) => println("failure " + ex.getMessage)
+//  }
 
   //  subscriber
   //    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))

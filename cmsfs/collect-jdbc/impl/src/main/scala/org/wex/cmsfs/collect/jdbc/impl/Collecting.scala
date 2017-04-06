@@ -47,11 +47,14 @@ class Collecting(ct: CollectTopic,
             case Some(cfa) => analyzeService.pushFormatAnalyze.invoke(FormatAnalyzeItem(cis.id, cis.collect.name, cis.utcDate, rs, cfa))
             case None => Future.successful(Done)
           }
-          val sendAlarm = cis.alarm match {
-            case Some(cfa) => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cis.id, rs, cfa))
-            case None => Future.successful(Done)
-          }
-          Future.sequence(sendAnalyze :: sendAlarm :: Nil).map(_ => rs)
+
+          val c: Future[Seq[Done]] =
+            Future.sequence(cis.alarms.map(a => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cis.id, rs, a))))
+
+          for {
+            done <- sendAnalyze
+            seqDone <- c
+          } yield rs
         }
       c onComplete {
         case Failure(t) => statusSave(false, t.getMessage)

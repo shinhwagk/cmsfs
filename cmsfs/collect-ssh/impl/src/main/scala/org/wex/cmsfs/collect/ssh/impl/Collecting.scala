@@ -47,15 +47,18 @@ class Collecting(ct: CollectTopic,
         .filter(_.isDefined)
         .map(_.get)
         .flatMap { collectResult =>
-          val a = cmdfs.analyze match {
+          val a: Future[Done] = cmdfs.analyze match {
             case Some(cfa) => analyzeService.pushFormatAnalyze.invoke(FormatAnalyzeItem(cmdfs.id, cmdfs.collect.name, cmdfs.utcDate, collectResult, cfa))
             case None => Future.successful(Done)
           }
-          val b = cmdfs.alarm match {
-            case Some(cfa) => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, cfa))
-            case None => Future.successful(Done)
-          }
-          Future.sequence(a :: b :: Nil).map(_ => collectResult)
+
+          val c: Future[Seq[Done]] =
+            Future.sequence(cmdfs.alarms.map(a => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, a))))
+
+          for {
+            done <- a
+            seqDone <- c
+          } yield collectResult
         }
       c onComplete {
         case Failure(t) => statusSave(false, t.getMessage)
