@@ -45,9 +45,9 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   def a(rh: RequestHeader): RequestHeader = {
     val c = rh.withMethod(Method.POST)
-      .withProtocol(MessageProtocol().withContentType("application/x-www-form-urlencoded"))
+      .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))
 
-    logger.info(c.acceptedResponseProtocols.toSeq.toString())
+    logger.info(c.protocol.toString)
     logger.info(c.method.name)
     logger.info(c.principal.toString)
     logger.info(c.uri.toString)
