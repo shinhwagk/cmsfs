@@ -71,7 +71,8 @@ class MonitorActionCollect(cs: ConfigService,
         .map(_.map(apiAlarm => `object`.CoreFormatAlarm(apiAlarm.id.get, apiAlarm.path, apiAlarm.args, Json.parse(apiAlarm.notification).as[Seq[Seq[String]]])))
     }
 
-    formatAlarmsFuture.foreach(p => logger.info(s"future ${p.toString()}"))
+
+    formatAlarmsFuture.foreach(p => logger.info(s"future ${cmd.formatAlarmIds.toString()}, ${p.toString()}"))
 
     val p: Promise[Done] = Promise[Done]
     val f: Future[Done] = p.future
