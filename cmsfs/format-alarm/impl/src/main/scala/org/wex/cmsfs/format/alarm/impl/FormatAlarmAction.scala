@@ -68,11 +68,8 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     c
   }
 
-  logger.info("=====================")
-  logger.info(genFormBody.toString)
-  logger.info("=====================")
-
-  val request = es.pushNotificationItem.handleRequestHeader(a)
+  val request = es.pushNotificationItem
+//    .handleRequestHeader(a)
 
   request.invoke(genFormBody).onComplete {
     case Success(a) => println("success " + a)
