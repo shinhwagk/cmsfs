@@ -53,7 +53,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
 
     val c = rh.withMethod(Method.POST)
-      .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded"), None, None))
+//      .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded"), None, None))
       //        .withHeaders(List(("Accept", "*/*")))
       .removeHeader("Accept")
       .addHeader("Accept", "*/*")
@@ -77,7 +77,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   logger.info("=====================")
 
   val request = es.pushNotificationItem
-//    .handleRequestHeader(a)
+    .handleRequestHeader(a)
 
   request.invoke(genFormBody).onComplete {
     case Success(a) => println("success " + a)
