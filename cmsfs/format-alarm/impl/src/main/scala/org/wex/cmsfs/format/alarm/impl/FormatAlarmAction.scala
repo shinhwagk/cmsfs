@@ -44,6 +44,11 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   }
 
   def a(rh: RequestHeader): RequestHeader = {
+    logger.info("=====================")
+    logger.info(rh.headerMap.toString())
+    logger.info("=====================")
+
+
     val c = rh.withMethod(Method.POST)
       .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded")))
 
