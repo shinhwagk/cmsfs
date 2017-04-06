@@ -56,6 +56,8 @@ class MonitorActionCollect(cs: ConfigService,
   }
 
   def monitorDistributor(utcDate: String)(cmd: CoreMonitorDetail): Unit = {
+    logger.info(s"monitor details: ${cmd.formatAlarmIds.mkString(",")}")
+
     val coreCollectFuture: Future[CoreCollect] = cs.getCoreCollectById(cmd.collectId).invoke()
 
     val formatAnalyzeFuture = cmd.formatAnalyzeId match {
