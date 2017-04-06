@@ -4,6 +4,7 @@ import java.util
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
 import com.lightbend.lagom.scaladsl.api.transport.{MessageProtocol, Method, RequestHeader}
 import org.apache.http.NameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
@@ -12,16 +13,20 @@ import org.apache.http.util.EntityUtils
 import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.common.core.{CmsfsAkkaStream, CmsfsPlayJson, Common}
 import org.wex.cmsfs.common.format.FormatCore
+import org.wex.cmsfs.common.monitor.MonitorStatus
+import org.wex.cmsfs.format.alarm.api.FormatAlarmItem
 import org.wex.cmsfs.notification.impl.NotificationService
 import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
+import scala.concurrent.Future
 import scala.util.Random
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
                         override val config: Configuration,
                         es: NotificationService,
                         system: ActorSystem)(implicit mat: Materializer)
-  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common {
+  extends CmsfsAkkaStream with CmsfsPlayJson with FormatCore with Common with MonitorStatus {
 
   override val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -52,55 +57,38 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   }
 
 
-//  val request = es.pushNotificationItem.handleRequestHeader(a)
-//
-//  request.invoke(genFormBody).onComplete {
-//    case Success(a) => println("success " + a)
-//    case Failure(ex) => println("failure " + ex.getMessage)
-//  }
+  //
+  def sendNNN() = {
+    es.pushNotificationItem.handleRequestHeader(a).invoke()
+  }
 
-  //  subscriber
-  //    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
-  //    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
-  //    .map(elem => loggerFlow(elem, s"send format alarm ${elem._metric}"))
-  //    .mapConcat(fai => splitAnalyzeResult(fai).toList)
-  //    .mapAsync(10) {}
-  //    //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
-  //    .runWith(Sink.ignore)
-  //
-  //  def splitAnalyzeResult(fai: FormatAlarmItem): Seq[(String, String, String)] = {
-  //    try {
-  //      val formatResult: String = fai.formatResult.get
-  //      val _type = fai._type
-  //      val _index = fai._index
-  //      val _metric = fai._metric
-  //      val utcDate = fai.utcDate
-  //      val arr: Seq[JsValue] = Json.parse(formatResult).as[JsArray].value
-  //      arr.map(jsonObjectAddField(_, "@timestamp", utcDate))
-  //        .map(jsonObjectAddField(_, "@metric", _metric))
-  //        .map(row => (_index, _type, row.toString))
-  //    } catch {
-  //      case ex: Exception => {
-  //        logger.error("splitAnalyzeResult " + ex.getMessage)
-  //        Seq()
-  //      }
-  //    }
-  //  }
-  //
-  //  def actionFormat(fai: FormatAlarmItem): Future[FormatAlarmItem] = Future {
-  //    val url: String = getUrlPathContent(fai.path)
-  //    val formatResult = executeFormat(url, "Alarm.py", fai.collectResult, fai.args)
-  //    executeFormatAfter(workDirName)
-  //    fai.copy(formatResult = Some(rs))
-  //  }
+  subscriber
+    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
+    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .mapAsync(10)(p => p)
+    //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .runWith(Sink.ignore)
+
+  def actionFormat(fai: FormatAlarmItem): Future[Seq[(String, String)]] = Future {
+    val monitorStatus = putStatus(fai.id, "ALARM") _
+    try {
+      val url: String = getUrlByPath(fai.coreFormatAlarm.path)
+      val formatResultString: String = executeFormat(url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
+      val formatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
+      val mails = fai.coreFormatAlarm.notification.mail.map(mail => (mail, formatAlarmResult.mailResult))
+      val phones = fai.coreFormatAlarm.notification.phone.map(phone => (phone, formatAlarmResult.phoneResult))
+
+      mails ++ phones
+    } catch {
+      case ex: Exception =>
+        monitorStatus(false, ex.getMessage)
+        throw new Exception(ex.getMessage)
+    }
+  }
 }
 
+case class FormatAlarmResult(mailResult: String, phoneResult: String)
 
-//    nvps2.add(new BasicNameValuePair("appId", "TOC"));
-//    nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
-//    nvps2.add(new BasicNameValuePair("protocol", "M"));
-//    nvps2.add(new BasicNameValuePair("targetIdenty", "zhangxu@weibopay.com"));
-//    nvps2.add(new BasicNameValuePair("targetCount", "1"));
-//    nvps2.add(new BasicNameValuePair("content", "passw!@#$*&^%ord +-09"));
-//    nvps2.add(new BasicNameValuePair("isRealTime", "true"));
-//    nvps2.add(new BasicNameValuePair("subject", "JIRA (WCF-3549) FCM迭代"));
+object FormatAlarmResult {
+  implicit val format: Format[FormatAlarmResult] = Json.format
+}

@@ -13,7 +13,7 @@ class FormatAlarmServiceImpl(topic: FormatAlarmTopic)(implicit ec: ExecutionCont
 
   override def pushFormatAlarm: ServiceCall[FormatAlarmItem, Done] = ServiceCall { fai =>
     logger.info(s"format alarm receive: ${fai.id}")
-//    topic.formatTopic.publish(fai);
+    topic.formatTopic.publish(fai);
     Future.successful(Done)
   }
 }
