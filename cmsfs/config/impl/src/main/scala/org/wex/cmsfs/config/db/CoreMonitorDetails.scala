@@ -6,8 +6,7 @@ import slick.jdbc.MySQLProfile.api._
 
 class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_monitor_detail") {
   implicit val seqIntColumnType = MappedColumnType.base[Seq[Int], String](
-    { b => Json.toJson(b).toString() }, // map Bool to Int
-    { i => Json.parse(i).as[Seq[Int]] } // map Int to Bool
+    { b => Json.toJson(b).toString() }, { i => Json.parse(i).as[Seq[Int]] }
   )
 
   def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
