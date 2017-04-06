@@ -11,7 +11,6 @@ import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.common.`object`
 import org.wex.cmsfs.common.`object`.CoreMonitorDetailForJdbc
-import org.wex.cmsfs.config.api
 import org.wex.cmsfs.config.api.{CoreFormatAnalyze, _}
 import play.api.libs.json.Json
 
