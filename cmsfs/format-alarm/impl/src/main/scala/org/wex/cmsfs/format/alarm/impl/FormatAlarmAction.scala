@@ -53,9 +53,9 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
     val c = rh.withMethod(Method.POST)
       .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded"), Some("utf-8"), Some("1.1")))
-        .withHeaders(List(("Accept", "*/*")))
-//      .removeHeader("Accept")
-//      .addHeader("Accept", "*/*")
+      //        .withHeaders(List(("Accept", "*/*")))
+      .removeHeader("Accept")
+      .addHeader("Accept", "*/*")
 
     logger.info(c.protocol.toString)
     logger.info(c.method.name)
