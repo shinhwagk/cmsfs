@@ -52,6 +52,8 @@ class Collecting(ct: CollectTopic,
             case None => Future.successful(Done)
           }
 
+          logger.info("alarms: " + cmdfs.alarms.toString())
+          
           val c: Future[Seq[Done]] =
             Future.sequence(cmdfs.alarms.map(a => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, a))))
 
