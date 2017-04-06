@@ -1,5 +1,6 @@
 package org.wex.cmsfs.notification.impl
 
+import com.lightbend.lagom.scaladsl.api.deser.MessageSerializer
 import com.lightbend.lagom.scaladsl.api.{CircuitBreaker, Service, ServiceCall}
 
 object NotificationService {
@@ -14,7 +15,7 @@ trait NotificationService extends Service {
     import NotificationService._
     import Service._
     named(SERVICE_NAME).withCalls(
-      pathCall("/mns-web/services/rest/msgNotify", pushNotificationItem)
+      pathCall("/mns-web/services/rest/msgNotify", pushNotificationItem)(MessageSerializer.StringMessageSerializer, MessageSerializer.StringMessageSerializer)
         .withCircuitBreaker(CircuitBreaker.identifiedBy("alarm-circuitbreaker"))
     )
   }
