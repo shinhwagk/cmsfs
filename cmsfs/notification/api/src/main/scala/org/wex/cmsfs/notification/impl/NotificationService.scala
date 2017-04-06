@@ -28,7 +28,7 @@ trait NotificationService extends Service {
 }
 
 class PlainTextSerializer(val charset: String) extends NegotiatedSerializer[String, ByteString] {
-  override val protocol = MessageProtocol(Some("application/x-www-form-urlencoded"), Some(charset))
+  override val protocol = MessageProtocol(Some("application/json"), Some(charset))
 
   override def serialize(message: String) = ByteString.fromString(message, charset)
 }
@@ -38,7 +38,7 @@ class ProtobufSerializer extends StrictMessageSerializer[String] {
   final private val serializer = {
     new NegotiatedSerializer[String, ByteString]() {
       override def protocol: MessageProtocol =
-        MessageProtocol(Some("application/x-www-form-urlencoded"))
+        MessageProtocol(Some("application/json"))
 
       def serialize(order: String): ByteString = {
         ByteString.fromString(order)
