@@ -15,7 +15,7 @@ import org.wex.cmsfs.common.format.FormatCore
 import org.wex.cmsfs.notification.impl.NotificationService
 import play.api.Configuration
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Random, Success}
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
                         override val config: Configuration,
@@ -32,13 +32,14 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   logger.info(s"${this.getClass.getName} start.")
 
   def genFormBody: String = {
+    val num = new Random().nextInt(10)
     val nvps2 = new util.ArrayList[NameValuePair]();
     nvps2.add(new BasicNameValuePair("appId", "TOC"));
     nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
     nvps2.add(new BasicNameValuePair("protocol", "S"));
     nvps2.add(new BasicNameValuePair("targetIdenty", "13917926210"));
     nvps2.add(new BasicNameValuePair("targetCount", "1"));
-    nvps2.add(new BasicNameValuePair("content", "passw!@#$*&^%ord +-09"));
+    nvps2.add(new BasicNameValuePair("content", s"passw!@#ord +- ${num}"));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
   }
