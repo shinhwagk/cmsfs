@@ -60,9 +60,9 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     logger.info(c.uri.toString)
 
     logger.info("=====================")
-    logger.info(rh.headerMap.toString())
-    logger.info(rh.protocol.toContentTypeHeader.toString)
-    logger.info(rh.headers.toString())
+    logger.info(c.headerMap.toString())
+    logger.info(c.protocol.toContentTypeHeader.toString)
+    logger.info(c.headers.toString())
     logger.info("=====================")
 
     c
