@@ -35,7 +35,7 @@ class MonitorActionCollect(cs: ConfigService,
     }
   }
 
-  def schedulerMonitor = {
+  def schedulerMonitor: Unit = {
     val cDate = new Date()
     val filterMonitorDetailsFunByCron = filterMonitorDetails(cDate)(_)
 
@@ -67,12 +67,11 @@ class MonitorActionCollect(cs: ConfigService,
     }
 
     val formatAlarmsFuture: Future[Seq[`object`.CoreFormatAlarm]] = {
-      val c: Seq[Future[api.CoreFormatAlarm]] = cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke())
-      Future.sequence(c).foreach(p => logger.info("future " + p.toString()))
-
-      Future.sequence(cmd.formatAlarmIds.map(cs.getCoreFormatAlarmsById(_).invoke())
-        .map(_.map(apiAlarm => `object`.CoreFormatAlarm(apiAlarm.id.get, apiAlarm.path, apiAlarm.args, Json.parse(apiAlarm.notification).as[Seq[Seq[String]]]))))
+      Future.sequence(cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke()))
+        .map(_.map(apiAlarm => `object`.CoreFormatAlarm(apiAlarm.id.get, apiAlarm.path, apiAlarm.args, Json.parse(apiAlarm.notification).as[Seq[Seq[String]]])))
     }
+
+    formatAlarmsFuture.foreach(p => logger.info(s"future ${p.toString()}"))
 
     val p: Promise[Done] = Promise[Done]
     val f: Future[Done] = p.future
