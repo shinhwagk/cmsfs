@@ -40,15 +40,15 @@ class ProtobufSerializer extends StrictMessageSerializer[String] {
       override def protocol: MessageProtocol =
         MessageProtocol(Some("application/x-www-form-urlencoded"))
 
-      def serialize(order: String) = {
-        ByteString.apply(order)
+      def serialize(order: String): ByteString = {
+        ByteString.fromString(order)
       }
     }
   }
 
   final private val deserializer = {
     new NegotiatedDeserializer[String, ByteString] {
-      override def deserialize(bytes: ByteString) = ByteString.apply(bytes).toString()
+      override def deserialize(bytes: ByteString) = bytes.toString()
     }
   }
 
