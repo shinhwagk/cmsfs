@@ -46,6 +46,8 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
   def a(rh: RequestHeader): RequestHeader = {
     logger.info("=====================")
     logger.info(rh.headerMap.toString())
+    logger.info(rh.protocol.toContentTypeHeader.toString)
+    logger.info(rh.headers.toString())
     logger.info("=====================")
 
 
@@ -56,6 +58,13 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     logger.info(c.method.name)
     logger.info(c.principal.toString)
     logger.info(c.uri.toString)
+
+    logger.info("=====================")
+    logger.info(rh.headerMap.toString())
+    logger.info(rh.protocol.toContentTypeHeader.toString)
+    logger.info(rh.headers.toString())
+    logger.info("=====================")
+
     c
   }
 
