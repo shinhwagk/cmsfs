@@ -113,8 +113,10 @@ class MonitorActionCollect(cs: ConfigService,
       case None => None
     }
 
-    val formatAlarms: Seq[CoreFormatAlarm] =
+    val formatAlarms: Seq[`object`.CoreFormatAlarm] =
       alarms.map(alarm => `object`.CoreFormatAlarm(alarm.id, alarm.path, alarm.args, alarm.notification))
+
+    logger.info(s"formatAlarms: ${formatAlarms.toString()}")
 
     cJDBCs.pushCollectItem.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, formatAlarms))
   }
@@ -135,9 +137,11 @@ class MonitorActionCollect(cs: ConfigService,
       case None => None
     }
 
-    val formatAlarms: Seq[CoreFormatAlarm] =
+    val formatAlarms: Seq[`object`.CoreFormatAlarm] =
       alarms.map(alarm => `object`.CoreFormatAlarm(alarm.id, alarm.path, alarm.args, alarm.notification))
 
-    cSSHs.pushCollectItem.invoke(CoreMonitorDetailForSsh(id, utcDate, ccj, cc, formatAnalyzeOpt, formatAlarms))
+    logger.info(s"formatAlarms: ${formatAlarms.toString()}")
+
+    cSSHs.pushCollectItem.invoke(`object`.CoreMonitorDetailForSsh(id, utcDate, ccj, cc, formatAnalyzeOpt, formatAlarms))
   }
 }
