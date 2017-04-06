@@ -10,9 +10,9 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.wex.cmsfs.collect.jdbc.api.CollectJDBCService
 import org.wex.cmsfs.collect.ssh.api.CollectSSHService
 import org.wex.cmsfs.common.`object`
-import org.wex.cmsfs.common.`object`.{CoreFormatAlarm, CoreMonitorDetailForJdbc, CoreMonitorDetailForSsh}
+import org.wex.cmsfs.common.`object`.CoreMonitorDetailForJdbc
 import org.wex.cmsfs.config.api
-import org.wex.cmsfs.config.api.{CoreFormatAlarm, CoreFormatAnalyze, _}
+import org.wex.cmsfs.config.api.{CoreFormatAnalyze, _}
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
@@ -108,7 +108,7 @@ class MonitorActionCollect(cs: ConfigService,
 
   def sendMonitorForJdbc(id: Int, utcDate: String, collect: CoreCollect, connector: CoreConnectorJdbc,
                          analyze: Option[CoreFormatAnalyze],
-                         alarms: Seq[CoreFormatAlarm]): Future[Done] = {
+                         alarms: Seq[`object`.CoreFormatAlarm]): Future[Done] = {
     val ccj = `object`.CoreConnectorJdbc(connector.id.get, connector.name, connector.url, connector.user, connector.password)
     val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
 
@@ -132,7 +132,7 @@ class MonitorActionCollect(cs: ConfigService,
                         collect: CoreCollect,
                         connector: CoreConnectorSsh,
                         analyze: Option[CoreFormatAnalyze],
-                        alarms: Seq[CoreFormatAlarm]): Future[Done] = {
+                        alarms: Seq[`object`.CoreFormatAlarm]): Future[Done] = {
     val ccj = `object`.CoreConnectorSsh(connector.id.get, connector.name, connector.ip, connector.user, connector.password, connector.privateKey)
     val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
 
