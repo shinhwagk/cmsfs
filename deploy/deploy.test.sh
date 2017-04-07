@@ -9,13 +9,11 @@ SERVICE_NAME="${1}"
 SERVICE_IMPL="${2}"
 
 echo "remote: generate cmsfs project name & location..."
-PROJECT_PATH=""
-PROJECT_NAME=""
+# PROJECT_PATH=""
+# PROJECT_NAME=""
 if [[ ${SERVICE_IMPL} == 1 ]]; then
-  PROJECT_PATH=${CMSFS_HOME}/${SERVICE_NAME}/impl/target/universal/stage
   PROJECT_NAME="${SERVICE_NAME}-impl"
 else
-  PROJECT_PATH=${CMSFS_HOME}/${SERVICE_NAME}/target/universal/stage
   PROJECT_NAME="${SERVICE_NAME}"
 fi
 echo "remote: generate cmsfs project name & location: ${PROJECT_NAME} & ${PROJECT_PATH}"
