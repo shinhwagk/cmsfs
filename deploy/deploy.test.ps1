@@ -35,7 +35,7 @@ function startService($serviceName) {
 
   sshExecute "${DOCKER_COMPOSE} stop ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} rm -f ${serviceName}"
-  sshExecute "${DOCKER_COMPOSE} up -d ${serviceName}"
+  sshExecute "${DOCKER_COMPOSE} up -d --build ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} ps"
   Write-Host -ForegroundColor Red "end ${serviceName} service...";
 }
