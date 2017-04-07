@@ -4,6 +4,10 @@ Param(
   [switch]$startBaseServices
 )
 
+function sshExecute($command) {
+  ssh root@10.65.103.63 $command
+}
+
 function scp_cmsfs() {
   cd E:\github\cmsfs;
   git add -A; git commit -m "test"; git push;
@@ -19,11 +23,11 @@ function startBaseService($serviceName) {
 
 function startService($serviceName) {
   Write-Host -ForegroundColor Red "start ${serviceName} service...";
-  ssh root@10.65.103.63 "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${serviceName} 1"
-  ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml stop ${serviceName}"
-  ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml rm -f ${serviceName}"
-  ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml up -d ${serviceName}"
-  ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml ps"
+  sshExecute "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${serviceName} 1"
+  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml stop ${serviceName}"
+  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml rm -f ${serviceName}"
+  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml up -d ${serviceName}"
+  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml ps"
   Write-Host -ForegroundColor Red "end ${serviceName} service...";
 }
 
