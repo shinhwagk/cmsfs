@@ -22,13 +22,14 @@ function startBaseService($serviceName) {
 }
 
 function startService($serviceName) {
+  $DOCKER_COMPOSE = "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml"
   Write-Host -ForegroundColor Red "start ${serviceName} service...";
   # sshExecute "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${serviceName} 1"
   sshExecute "docker run -t --rm -v /opt/cmsfs/cmsfs:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c 'cd /opt/cmsfs; sbt clean ${serviceName}-impl/stage'"
-  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml stop ${serviceName}"
-  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml rm -f ${serviceName}"
-  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml up -d ${serviceName}"
-  sshExecute "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml ps"
+  sshExecute "${DOCKER_COMPOSE} stop ${serviceName}"
+  sshExecute "${DOCKER_COMPOSE} rm -f ${serviceName}"
+  sshExecute "${DOCKER_COMPOSE} up -d ${serviceName}"
+  sshExecute "${DOCKER_COMPOSE} ps"
   Write-Host -ForegroundColor Red "end ${serviceName} service...";
 }
 
