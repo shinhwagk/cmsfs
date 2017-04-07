@@ -76,6 +76,9 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
       val formatAlarmResult: FormatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
       val mails = fai.coreFormatAlarm.notification.mail.map(mail => (mail, formatAlarmResult.mailResult))
       val phones = fai.coreFormatAlarm.notification.phone.map(phone => (phone, formatAlarmResult.phoneResult))
+
+      logger.info(formatResultString)
+
       genFormBody("test", fai.coreFormatAlarm.notification.mail, formatAlarmResult.mailResult)
     } catch {
       case ex: Exception =>
