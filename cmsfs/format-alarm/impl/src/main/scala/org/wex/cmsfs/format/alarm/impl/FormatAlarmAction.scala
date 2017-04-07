@@ -20,7 +20,6 @@ import play.api.Configuration
 import play.api.libs.json.{Format, Json}
 
 import scala.concurrent.Future
-import scala.util.Random
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
                         override val config: Configuration,
@@ -36,17 +35,31 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   logger.info(s"${this.getClass.getName} start.")
 
-  def genFormBody(): String = {
-    val num = new Random().nextInt(10)
+  def genFormBody(contact: Seq[String], content: String): Unit = {
     val nvps2 = new util.ArrayList[NameValuePair]();
     nvps2.add(new BasicNameValuePair("appId", "TOC"));
     nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
     nvps2.add(new BasicNameValuePair("protocol", "S"));
-    nvps2.add(new BasicNameValuePair("targetIdenty", "13917926210"));
+    nvps2.add(new BasicNameValuePair("targetIdenty", contact.mkString(",")));
     nvps2.add(new BasicNameValuePair("targetCount", "1"));
-    nvps2.add(new BasicNameValuePair("content", s"passw!@#ord +- ${num}"));
+    nvps2.add(new BasicNameValuePair("content", content));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
-    EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
+    val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
+    es.pushNotificationItem.handleRequestHeader(a).invoke(body)
+  }
+
+  def genFormBody(subject: String, contact: Seq[String], content: String): Unit = {
+    val nvps2 = new util.ArrayList[NameValuePair]();
+    nvps2.add(new BasicNameValuePair("appId", "TOC"));
+    nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
+    nvps2.add(new BasicNameValuePair("protocol", "m"));
+    nvps2.add(new BasicNameValuePair("targetIdenty", contact.mkString(",")));
+    nvps2.add(new BasicNameValuePair("targetCount", "1"));
+    nvps2.add(new BasicNameValuePair("content", content));
+    nvps2.add(new BasicNameValuePair("isRealTime", "true"));
+    nvps2.add(new BasicNameValuePair("subject", subject));
+    val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
+    es.pushNotificationItem.handleRequestHeader(a).invoke(body)
   }
 
   def a(rh: RequestHeader): RequestHeader = {
@@ -56,9 +69,6 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
       .addHeader("Accept", "*/*")
   }
 
-  def sendNNN() = {
-    es.pushNotificationItem.handleRequestHeader(a).invoke()
-  }
 
   subscriber
     .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
@@ -66,16 +76,15 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
-  def actionFormat(fai: FormatAlarmItem): Future[Seq[(String, String)]] = Future {
+  def actionFormat(fai: FormatAlarmItem) = Future {
     val monitorStatus = putStatus(fai.id, "ALARM") _
     try {
       val url: String = getUrlByPath(fai.coreFormatAlarm.path)
       val formatResultString: String = executeFormat(url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
-      val formatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
+      val formatAlarmResult: FormatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
       val mails = fai.coreFormatAlarm.notification.mail.map(mail => (mail, formatAlarmResult.mailResult))
       val phones = fai.coreFormatAlarm.notification.phone.map(phone => (phone, formatAlarmResult.phoneResult))
-
-      mails ++ phones
+      genFormBody("test", fai.coreFormatAlarm.notification.mail, formatAlarmResult.mailResult)
     } catch {
       case ex: Exception =>
         monitorStatus(false, ex.getMessage)
