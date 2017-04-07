@@ -21,7 +21,7 @@ trait FormatCore {
     writeFile(s"${dirPath}/args.json", args)
 
   def downFormatScript(url: String, dirPath: String): Unit =
-    FileUtils.copyURLToFile(new URL(url), new File(s"${dirPath}/analyze.py"))
+    FileUtils.copyURLToFile(new URL(url), new File(url.split("/").last))
 
   def writeFile(fileName: String, content: String) =
     FileUtils.writeStringToFile(new File(fileName), content, Charset.forName("UTF-8"), false)
