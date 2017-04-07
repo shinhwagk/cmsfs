@@ -1,3 +1,5 @@
+import sbt.Keys.{publishArtifact, sources}
+
 import scala.language.postfixOps
 
 organization in ThisBuild := "org.wex"
@@ -29,7 +31,9 @@ lazy val root = (project in file("."))
   )
 
 def implCommonSettings: Seq[Setting[_]] = Seq(
-  libraryDependencies ++= Seq(lagomScaladslTestKit, macwire, scalaTest)
+  libraryDependencies ++= Seq(lagomScaladslTestKit, macwire, scalaTest),
+  sources in(Compile, doc) := Seq.empty,
+  publishArtifact in(Compile, packageDoc) := false
 )
 
 lazy val `config-api` = (project in file("config/api"))

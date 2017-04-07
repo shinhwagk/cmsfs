@@ -28,17 +28,17 @@ echo "remote: build ${SERVICE_NAME}..."
 docker run -t --rm -v ${CMSFS_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean ${PROJECT_NAME}/stage"
 echo "remote: build ${SERVICE_NAME} success..."
 
-rm -fr ${CMSFS_PROJECT_RUNNING_HOME}
-mkdir -p ${CMSFS_PROJECT_RUNNING_HOME}
-cp -r ${PROJECT_PATH}/* ${CMSFS_PROJECT_RUNNING_HOME}
-echo ${PROJECT_PATH}
+# rm -fr ${CMSFS_PROJECT_RUNNING_HOME}
+# mkdir -p ${CMSFS_PROJECT_RUNNING_HOME}
+# cp -r ${PROJECT_PATH}/* ${CMSFS_PROJECT_RUNNING_HOME}
+# echo ${PROJECT_PATH}
 # docker run -t --rm -v ${CMSFS_PROJECT_RUNNING_HOME}:/opt/cmsfs sbt:0.13.13 sh -c "cd /opt/cmsfs/bin; ./web-gateway"
 
-cd ${DEPLOY}
-DOCKER_COMPOSE_COMMAND="docker-compose -p cmsfs -f docker-compose.test.yml"
+# cd ${DEPLOY}
+# DOCKER_COMPOSE_COMMAND="docker-compose -p cmsfs -f docker-compose.test.yml"
 
-echo "remote: stop service: ${SERVICE_NAME}..."
-${DOCKER_COMPOSE_COMMAND} stop ${SERVICE_NAME}
-${DOCKER_COMPOSE_COMMAND} rm -f ${SERVICE_NAME}
-${DOCKER_COMPOSE_COMMAND} up --build -d ${SERVICE_NAME} || docker-compose -p cmsfs logs ${SERVICE_NAME}
-${DOCKER_COMPOSE_COMMAND} ps
+# echo "remote: stop service: ${SERVICE_NAME}..."
+# ${DOCKER_COMPOSE_COMMAND} stop ${SERVICE_NAME}
+# ${DOCKER_COMPOSE_COMMAND} rm -f ${SERVICE_NAME}
+# ${DOCKER_COMPOSE_COMMAND} up --build -d ${SERVICE_NAME} || docker-compose -p cmsfs logs ${SERVICE_NAME}
+# ${DOCKER_COMPOSE_COMMAND} ps
