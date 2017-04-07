@@ -31,7 +31,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  logger.info(s"${this.getClass.getName} start.")
+  logger.info(s"${this.getClass.getName} start1.")
 
   def genFormBody(contact: Seq[String], content: String): Unit = {
     val nvps2 = new util.ArrayList[NameValuePair]();
