@@ -20,6 +20,7 @@ import play.api.Configuration
 import play.api.libs.json.{Format, Json}
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class FormatAlarmAction(topic: FormatAlarmTopic,
                         override val config: Configuration,
@@ -57,7 +58,10 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     nvps2.add(new BasicNameValuePair("subject", subject));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
-    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body)
+    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
+      case Success(s) => logger.info(s)
+      case Failure(ex) => logger.info(ex.getMessage)
+    }
   }
 
   def setHeader(rh: RequestHeader): RequestHeader = {
@@ -71,13 +75,10 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     val monitorStatus = putStatus(fai.id, "ALARM") _
     try {
       val url: String = getUrlByPath(fai.coreFormatAlarm.path)
-      logger.info(url)
       val formatResultString: String = executeFormat(url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
       val formatAlarmResult: FormatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
       val mails = fai.coreFormatAlarm.notification.mail.map(mail => (mail, formatAlarmResult.mailResult))
       val phones = fai.coreFormatAlarm.notification.phone.map(phone => (phone, formatAlarmResult.phoneResult))
-
-      logger.info(formatResultString)
 
       genFormBody("test", fai.coreFormatAlarm.notification.mail, formatAlarmResult.mailResult)
     } catch {
