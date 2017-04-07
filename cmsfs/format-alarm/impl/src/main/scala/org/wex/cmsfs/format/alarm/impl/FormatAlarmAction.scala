@@ -31,8 +31,6 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  private val subscriber = topic.formatTopic.subscriber
-
   logger.info(s"${this.getClass.getName} start.")
 
   def genFormBody(contact: Seq[String], content: String): Unit = {
@@ -45,7 +43,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("content", content));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
-    es.pushNotificationItem.handleRequestHeader(a).invoke(body)
+    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body)
   }
 
   def genFormBody(subject: String, contact: Seq[String], content: String): Unit = {
@@ -59,20 +57,15 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     nvps2.add(new BasicNameValuePair("subject", subject));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
-    es.pushNotificationItem.handleRequestHeader(a).invoke(body)
+    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body)
   }
 
-  def a(rh: RequestHeader): RequestHeader = {
+  def setHeader(rh: RequestHeader): RequestHeader = {
     rh.withMethod(Method.POST)
       .withProtocol(MessageProtocol(Some("application/x-www-form-urlencoded"), None, None))
       .removeHeader("Accept")
       .addHeader("Accept", "*/*")
   }
-
-  subscriber
-    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
-    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    .runWith(Sink.ignore)
 
   def actionFormat(fai: FormatAlarmItem) = Future {
     val monitorStatus = putStatus(fai.id, "ALARM") _
@@ -89,6 +82,11 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
         throw new Exception(ex.getMessage)
     }
   }
+
+  topic.formatTopic.subscriber
+    .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
+    .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
+    .runWith(Sink.ignore)
 }
 
 case class FormatAlarmResult(mailResult: String, phoneResult: String)
