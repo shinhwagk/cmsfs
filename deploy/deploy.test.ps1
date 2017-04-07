@@ -26,12 +26,13 @@ function startService($serviceName) {
   $DOCKER_COMPOSE = "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml"
   Write-Host -ForegroundColor Red "start ${serviceName} service...";
 
-  sshExecute "rm -fr /opt/cmsfs/deploy/cmsfs/${serviceName}"
-  sshExecute "mkdir -p /opt/cmsfs/deploy/cmsfs/${serviceName}"
-  sshExecute "cp -r /opt/cmsfs/cmsfs/${serviceName}/impl/target/universal/stage/* /opt/cmsfs/deploy/cmsfs/${serviceName}"
-
   # sshExecute "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${serviceName} 1"
   sshExecute "docker run -t --rm -v /opt/cmsfs/cmsfs:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c 'cd /opt/cmsfs; sbt clean ${serviceName}-impl/stage'"
+
+  $serviceDeployPath = "/opt/cmsfs/deploy/cmsfs/${serviceName}"
+  sshExecute "rm -fr ${serviceDeployPath}; mkdir -p ${serviceDeployPath}"
+  sshExecute "cp -r /opt/cmsfs/cmsfs/${serviceName}/impl/target/universal/stage/* ${serviceDeployPath}"
+
   sshExecute "${DOCKER_COMPOSE} stop ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} rm -f ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} up -d ${serviceName}"
