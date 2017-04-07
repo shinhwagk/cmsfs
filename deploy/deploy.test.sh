@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 BASE="/opt/cmsfs"
@@ -16,7 +15,6 @@ if [[ ${SERVICE_IMPL} == 1 ]]; then
 else
   PROJECT_NAME="${SERVICE_NAME}"
 fi
-echo "remote: generate cmsfs project name & location: ${PROJECT_NAME} & ${PROJECT_PATH}"
 
 echo "remote: build ${SERVICE_NAME}..."
 docker run -t --rm -v ${CMSFS_HOME}:/opt/cmsfs -v /root/.ivy2:/root/.ivy2 sbt:0.13.13 sh -c "cd /opt/cmsfs; sbt clean ${PROJECT_NAME}/stage"
