@@ -1,11 +1,4 @@
-function scp_cmsfs() {
-  cd E:\github\cmsfs;
-  git add -A
-  git commit -m "test"
-  git push
-}
 
-scp_cmsfs
 
 # $SERVICE_NAME=$args[0]
 # $SERVICE_IMPL=$args[1]
@@ -21,6 +14,16 @@ Param(
   [string[]]$buildServices,
   [switch]$startBaseServices
 )
+
+function scp_cmsfs() {
+  cd E:\github\cmsfs;
+  git add -A
+  git commit -m "test"
+  git push
+}
+
+scp_cmsfs
+
 
 $baseServices = "consul", "db", "redis";
 
