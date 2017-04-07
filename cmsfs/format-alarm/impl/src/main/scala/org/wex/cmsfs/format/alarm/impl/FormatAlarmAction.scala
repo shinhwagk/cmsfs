@@ -77,10 +77,12 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
       val url: String = getUrlByPath(fai.coreFormatAlarm.path)
       val formatResultString: String = executeFormat(url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
       val formatAlarmResult: FormatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
-      val mails = fai.coreFormatAlarm.notification.mail.map(mail => (mail, formatAlarmResult.mailResult))
-      val phones = fai.coreFormatAlarm.notification.phone.map(phone => (phone, formatAlarmResult.phoneResult))
+      val mails = fai.coreFormatAlarm.notification.mails.map(mail => (mail, formatAlarmResult.mailResult))
+      val phones = fai.coreFormatAlarm.notification.mobiles.map(phone => (phone, formatAlarmResult.phoneResult))
 
-      genFormBody("test", fai.coreFormatAlarm.notification.mail, formatAlarmResult.mailResult)
+      logger.info(s"${fai.coreFormatAlarm.notification.mails} ${formatAlarmResult.mailResult}")
+
+      genFormBody("test", fai.coreFormatAlarm.notification.mails, formatAlarmResult.mailResult)
     } catch {
       case ex: Exception =>
         monitorStatus(false, ex.getMessage)

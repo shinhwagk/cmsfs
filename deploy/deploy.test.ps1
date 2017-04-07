@@ -1,7 +1,8 @@
 Param(
   [string[]]$startServices,
   [string[]]$buildServices,
-  [switch]$startBaseServices
+  [switch]$startBaseServices,
+  [switch]$startNotification
 )
 
 function sshExecute($command) {
@@ -60,3 +61,7 @@ if ($startBaseServices.IsPresent) {
     startBaseService $service;
   }
 }
+
+# if ($startNotification.IsPresent) {
+
+# }

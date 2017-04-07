@@ -2,7 +2,7 @@ package org.wex.cmsfs.common.`object`
 
 import play.api.libs.json.{Format, Json}
 
-case class CoreFormatAlarmNotification(mail: Seq[String], phone: Seq[String])
+case class CoreFormatAlarmNotification(mails: Seq[String], mobiles: Seq[String])
 
 object CoreFormatAlarmNotification {
   implicit val format: Format[CoreFormatAlarmNotification] = Json.format
