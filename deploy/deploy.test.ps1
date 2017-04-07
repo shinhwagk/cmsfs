@@ -22,6 +22,7 @@ function startBaseService($serviceName) {
 }
 
 function startService($serviceName) {
+  sshExecute "cd /opt/cmsfs; git pull"
   $DOCKER_COMPOSE = "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml"
   Write-Host -ForegroundColor Red "start ${serviceName} service...";
   # sshExecute "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${serviceName} 1"
