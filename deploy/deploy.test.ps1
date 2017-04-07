@@ -1,14 +1,3 @@
-
-
-# $SERVICE_NAME=$args[0]
-# $SERVICE_IMPL=$args[1]
-
-# echo "start execute deploy"
-# ssh root@10.65.103.63 "cd /opt/cmsfs; git pull; cd deploy; sh deploy.test.sh ${SERVICE_NAME} ${SERVICE_IMPL}"
-# ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml stop ${SERVICE_NAME}"
-# ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml rm -f ${SERVICE_NAME}"
-# ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml up -d ${SERVICE_NAME}"
-
 Param(
   [string[]]$startServices,
   [string[]]$buildServices,
@@ -24,7 +13,6 @@ function scp_cmsfs() {
 
 scp_cmsfs
 
-
 $baseServices = "consul", "db", "redis";
 
 function startBaseService($serviceName) {
@@ -37,6 +25,7 @@ function startService($serviceName) {
   ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml stop ${serviceName}"
   ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml rm -f ${serviceName}"
   ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml up -d ${serviceName}"
+  ssh root@10.65.103.63 "cd /opt/cmsfs/deploy; docker-compose -p cmsfs -f docker-compose.test.yml ps"
   Write-Host -ForegroundColor Red "end ${serviceName} service...";
 }
 
