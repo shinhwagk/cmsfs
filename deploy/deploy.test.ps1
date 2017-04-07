@@ -33,9 +33,10 @@ function startService($serviceName) {
   sshExecute "rm -fr ${serviceDeployPath}; mkdir -p ${serviceDeployPath}"
   sshExecute "cp -r /opt/cmsfs/cmsfs/${serviceName}/impl/target/universal/stage/* ${serviceDeployPath}"
 
+  sshExecute "${DOCKER_COMPOSE} build ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} stop ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} rm -f ${serviceName}"
-  sshExecute "${DOCKER_COMPOSE} up -d --build ${serviceName}"
+  sshExecute "${DOCKER_COMPOSE} up -d ${serviceName}"
   sshExecute "${DOCKER_COMPOSE} ps"
   Write-Host -ForegroundColor Red "end ${serviceName} service...";
 }

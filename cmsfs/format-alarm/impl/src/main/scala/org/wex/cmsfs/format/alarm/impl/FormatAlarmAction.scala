@@ -31,7 +31,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  logger.info(s"${this.getClass.getName} start.")
+  logger.info(s"${this.getClass.getName} start.2")
 
   def genFormBody(contact: Seq[String], content: String): Unit = {
     val nvps2 = new util.ArrayList[NameValuePair]();
@@ -71,6 +71,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     val monitorStatus = putStatus(fai.id, "ALARM") _
     try {
       val url: String = getUrlByPath(fai.coreFormatAlarm.path)
+      logger.info(url)
       val formatResultString: String = executeFormat(url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
       val formatAlarmResult: FormatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
       val mails = fai.coreFormatAlarm.notification.mail.map(mail => (mail, formatAlarmResult.mailResult))
