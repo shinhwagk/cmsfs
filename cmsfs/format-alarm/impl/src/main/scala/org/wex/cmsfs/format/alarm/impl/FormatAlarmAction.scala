@@ -69,11 +69,9 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
       .addHeader("Accept", "*/*")
   }
 
-
   subscriber
     .map(elem => loggerFlow(elem, s"start format alarm ${elem.id}"))
     .mapAsync(10)(actionFormat).withAttributes(supervisionStrategy((x) => x + " xxxx"))
-    //    .mapAsync(10) { case (_index, _type, row) => es.(_index, _type).invoke(row) }.withAttributes(supervisionStrategy((x) => x + " xxxx"))
     .runWith(Sink.ignore)
 
   def actionFormat(fai: FormatAlarmItem) = Future {
