@@ -49,7 +49,7 @@ trait FormatCore {
     writeData(data, workDirName)
     writeArgs(args, workDirName)
     val formatResult: String = executeScript(workDirName, mainFile)
-    executeFormatAfter(workDirName)
+//    executeFormatAfter(workDirName)
     formatResult
   }
 }
