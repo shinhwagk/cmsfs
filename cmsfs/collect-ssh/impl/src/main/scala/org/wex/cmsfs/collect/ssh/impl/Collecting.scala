@@ -30,6 +30,8 @@ class Collecting(ct: CollectTopic,
 
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
+  logger.info(s"${this.getClass.getName} start.")
+
   private implicit val executionContext = system.dispatcher
 
   private val flow = Flow[CoreMonitorDetailForSsh]
@@ -54,8 +56,9 @@ class Collecting(ct: CollectTopic,
 
           logger.info("alarms: " + cmdfs.alarms.toString())
 
+
           val c: Future[Seq[Done]] =
-            Future.sequence(cmdfs.alarms.map(a => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, a))))
+            Future.sequence(cmdfs.alarms.map(cfa => alarmService.pushFormatAlarm.invoke(FormatAlarmItem(cmdfs.id, collectResult, cfa))))
 
           for {
             done <- a

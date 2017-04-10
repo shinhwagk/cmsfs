@@ -23,11 +23,9 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: config
-        BOOTSTRAP_NAME: config-impl
+        SVC_PORT: 9000
     image: cmsfs/config
     container_name: cmsfs_config
-    environment: 
-      - SERVICE_PORT=9000
     volumes: 
       - /etc/localtime:/etc/localtime
     networks: 
@@ -47,11 +45,9 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: monitor
-        BOOTSTRAP_NAME: monitor-impl
+        SVC_PORT: 9000
     image: cmsfs/monitor
     container_name: cmsfs_monitor
-    environment: 
-      - SERVICE_PORT=9000
     volumes:
       - /etc/localtime:/etc/localtime
     networks: 
@@ -72,10 +68,8 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: collect-ssh
-        BOOTSTRAP_NAME: collect-ssh-impl
+        SVC_PORT: 9000
     image: cmsfs/collect-ssh
-    environment: 
-      - SERVICE_PORT=9000
     volumes:
       - /root/.ssh/id_rsa:/root/.ssh/id_rsa
       - /etc/localtime:/etc/localtime
@@ -95,10 +89,8 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: collect-jdbc
-        BOOTSTRAP_NAME: collect-jdbc-impl
+        SVC_PORT: 9000
     image: cmsfs/collect-jdbc
-    environment: 
-      - SERVICE_PORT=9000
     volumes:
       - /etc/localtime:/etc/localtime
     networks: 
@@ -115,10 +107,8 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: format-analyze
-        BOOTSTRAP_NAME: format-analyze-impl
+        SVC_PORT: 9000
     image: cmsfs/format-analyze
-    environment: 
-      - SERVICE_PORT=9000
     volumes: 
       - /etc/localtime:/etc/localtime
     networks: 
@@ -135,10 +125,8 @@ services:
       dockerfile: Dockerfile-lagom.test
       args:
         SVC_NAME: format-alarm
-        BOOTSTRAP_NAME: format-alarm-impl
+        SVC_PORT: 9000
     image: cmsfs/format-alarm
-    environment: 
-      - SERVICE_PORT=9000
     volumes: 
       - /etc/localtime:/etc/localtime
     networks: 
@@ -149,25 +137,25 @@ services:
         max-file: "3"
         max-size: "10m"
 
-  notification:
-    build:
-      context: ./
-      dockerfile: Dockerfile-lagom.test
-      args:
-        SVC_NAME: notification
-    image: cmsfs/notification
-    environment: 
-      - SERVICE_NAME=notification
-      - SERVICE_PORT=9000
-    volumes:
-      - /etc/localtime:/etc/localtime
-    networks: 
-      - cmsfs
-    logging: 
-      driver: "json-file"
-      options: 
-        max-file: "3"
-        max-size: "10m"
+  # notification:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile-lagom.test
+  #     args:
+  #       SVC_NAME: notification
+  #   image: cmsfs/notification
+  #   environment: 
+  #     - SERVICE_NAME=notification
+  #     - SERVICE_PORT=9000
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime
+  #   networks: 
+  #     - cmsfs
+  #   logging: 
+  #     driver: "json-file"
+  #     options: 
+  #       max-file: "3"
+  #       max-size: "10m"
 
   web-gateway:
     container_name: cmsfs_web-gateway

@@ -1,15 +1,17 @@
 FROM cmsfs/oraclejdk8
 
 ARG SVC_NAME
-ARG BOOTSTRAP_NAME
+ARG SVC_PORT
 
 ADD register.py register.py
 ADD entrypoint.sh /usr/local/bin/entrypoint.sh
 ADD logback.xml /opt/logback.xml
 
 ENV SERVICE_NAME ${SVC_NAME}
+ENV SERVICE_PORT ${SVC_PORT}
+ENV BOOTSTRAP_FILE ${SVC_NAME}-impl
 
-EXPOSE 9000
+EXPOSE ${SERVICE_PORT}
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
@@ -17,5 +19,4 @@ ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
 
-RUN ln -s /opt/cmsfs/bin/${BOOTSTRAP_NAME} /usr/local/bin/app.sh
-ADD cmsfs/${SVC_NAME} /opt/cmsfs
+ADD ${SVC_NAME}-impl-1.0-SNAPSHOT /opt/cmsfs

@@ -32,7 +32,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
 
   private implicit val executionContext = system.dispatcher
 
-  logger.info(s"${this.getClass.getName} start.3")
+  logger.info(s"${this.getClass.getName} start.1")
 
   def genFormBody(contact: Seq[String], content: String): Unit = {
     val nvps2 = new util.ArrayList[NameValuePair]();
@@ -44,7 +44,10 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("content", content));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
-    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body)
+    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
+      case Success(s) => logger.info(s)
+      case Failure(ex) => logger.info(ex.getMessage)
+    }
   }
 
   def genFormBody(subject: String, contact: Seq[String], content: String): Unit = {
@@ -83,6 +86,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
       logger.info(s"${fai.coreFormatAlarm.notification.mails} ${formatAlarmResult.mailResult}")
 
       genFormBody("test", fai.coreFormatAlarm.notification.mails, formatAlarmResult.mailResult)
+      genFormBody(fai.coreFormatAlarm.notification.mobiles, formatAlarmResult.phoneResult)
     } catch {
       case ex: Exception =>
         monitorStatus(false, ex.getMessage)

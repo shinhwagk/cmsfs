@@ -1,2 +1,2 @@
 #!/bin/bash
-python register.py && cd /opt/cmsfs/bin && sh app.sh $@
+python register.py && /opt/cmsfs/bin/${BOOTSTRAP_FILE} $@;

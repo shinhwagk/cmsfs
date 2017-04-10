@@ -24,6 +24,8 @@ class MonitorActionCollect(cs: ConfigService,
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
+  logger.info(s"${this.getClass.getName} start.")
+
   private implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   Future {
@@ -66,9 +68,17 @@ class MonitorActionCollect(cs: ConfigService,
     }
 
     val formatAlarmsFuture: Future[Seq[`object`.CoreFormatAlarm]] = {
-      Future.sequence(cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke()))
+      cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke())
+
+
+      val c = Future.sequence(cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke()))
         .map(_.map(apiAlarm =>
-          `object`.CoreFormatAlarm(apiAlarm.id.get, apiAlarm.path, apiAlarm.args, Json.parse(apiAlarm.notification).as[`object`.CoreFormatAlarmNotification])))
+          `object`.CoreFormatAlarm(apiAlarm.id.get, apiAlarm.path, apiAlarm.args, `object`.CoreFormatAlarmNotification(apiAlarm.notification.mails, apiAlarm.notification.mobiles))))
+
+      logger.info("aaa: " + cmd.formatAlarmIds)
+      c.foreach(p => logger.info("dddd:  " + p.toString))
+
+      c
     }
 
     formatAlarmsFuture.foreach(p => logger.info(s"future ${cmd.formatAlarmIds.toString()}, ${p.toString()}"))
@@ -119,12 +129,9 @@ class MonitorActionCollect(cs: ConfigService,
       case None => None
     }
 
-    val formatAlarms: Seq[`object`.CoreFormatAlarm] =
-      alarms.map(alarm => `object`.CoreFormatAlarm(alarm.id, alarm.path, alarm.args, alarm.notification))
+    logger.info(s"formatAlarms: ${alarms.toString()}")
 
-    logger.info(s"formatAlarms: ${formatAlarms.toString()}")
-
-    cJDBCs.pushCollectItem.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, formatAlarms))
+    cJDBCs.pushCollectItem.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, alarms))
   }
 
   def sendMonitorForSsh(id: Int, utcDate: String,
@@ -143,11 +150,8 @@ class MonitorActionCollect(cs: ConfigService,
       case None => None
     }
 
-    val formatAlarms: Seq[`object`.CoreFormatAlarm] =
-      alarms.map(alarm => `object`.CoreFormatAlarm(alarm.id, alarm.path, alarm.args, alarm.notification))
+    logger.info(s"formatAlarms: ${alarms.toString()}")
 
-    logger.info(s"formatAlarms: ${formatAlarms.toString()}")
-
-    cSSHs.pushCollectItem.invoke(`object`.CoreMonitorDetailForSsh(id, utcDate, ccj, cc, formatAnalyzeOpt, formatAlarms))
+    cSSHs.pushCollectItem.invoke(`object`.CoreMonitorDetailForSsh(id, utcDate, ccj, cc, formatAnalyzeOpt, alarms))
   }
 }
