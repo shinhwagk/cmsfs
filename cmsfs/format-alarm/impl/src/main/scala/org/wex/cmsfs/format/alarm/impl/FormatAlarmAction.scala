@@ -40,31 +40,32 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
     nvps2.add(new BasicNameValuePair("protocol", "S"));
     nvps2.add(new BasicNameValuePair("targetIdenty", contact.mkString(",")));
-    nvps2.add(new BasicNameValuePair("targetCount", "1"));
+    nvps2.add(new BasicNameValuePair("targetCount", contact.length.toString));
     nvps2.add(new BasicNameValuePair("content", content));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
-    val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
-    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
-      case Success(s) => logger.info(s)
-      case Failure(ex) => logger.info(ex.getMessage)
-    }
+    val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"));
+//    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
+//      case Success(s) => logger.info(s)
+//      case Failure(ex) => logger.info(ex.getMessage)
+//    }
   }
 
   def genFormBody(subject: String, contact: Seq[String], content: String): Unit = {
     val nvps2 = new util.ArrayList[NameValuePair]();
     nvps2.add(new BasicNameValuePair("appId", "TOC"));
     nvps2.add(new BasicNameValuePair("orderNo", System.currentTimeMillis().toString));
-    nvps2.add(new BasicNameValuePair("protocol", "m"));
+    nvps2.add(new BasicNameValuePair("protocol", "M"));
     nvps2.add(new BasicNameValuePair("targetIdenty", contact.mkString(",")));
-    nvps2.add(new BasicNameValuePair("targetCount", "1"));
+    nvps2.add(new BasicNameValuePair("targetCount", contact.length.toString));
     nvps2.add(new BasicNameValuePair("content", content));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     nvps2.add(new BasicNameValuePair("subject", subject));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
-    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
-      case Success(s) => logger.info(s)
-      case Failure(ex) => logger.info(ex.getMessage)
-    }
+    println(body)
+//    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
+//      case Success(s) => logger.info(s)
+//      case Failure(ex) => logger.info(ex.getMessage)
+//    }
   }
 
   def setHeader(rh: RequestHeader): RequestHeader = {

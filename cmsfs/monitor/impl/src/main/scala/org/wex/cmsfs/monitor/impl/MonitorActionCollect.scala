@@ -30,9 +30,9 @@ class MonitorActionCollect(cs: ConfigService,
 
   Future {
     while (true) {
-      logger.info(s"${System.currentTimeMillis()}")
-      schedulerMonitor
-      Thread.sleep(1000)
+      logger.info(s"${System.currentTimeMillis()}");
+      schedulerMonitor;
+      Thread.sleep(1000);
     }
   }
 
@@ -83,29 +83,29 @@ class MonitorActionCollect(cs: ConfigService,
 
     formatAlarmsFuture.foreach(p => logger.info(s"future ${cmd.formatAlarmIds.toString()}, ${p.toString()}"))
 
-    val p: Promise[Done] = Promise[Done]
-    val f: Future[Done] = p.future
+    val p: Promise[Seq[Done]] = Promise[Seq[Done]]
+    val f: Future[Seq[Done]] = p.future
 
     cmd.connectorMode.toUpperCase match {
       case "JDBC" =>
         p completeWith {
           for {
             collect <- coreCollectFuture
-            connectorJdbc <- cs.getCoreConnectorJdbcById(cmd.connectorId).invoke()
+            connectors <- Future.sequence(cmd.connectorIds.map(id => cs.getCoreConnectorJdbcById(id).invoke()))
             formatAnalyze <- formatAnalyzeFuture
             formatAlarms <- formatAlarmsFuture
-            done <- sendMonitorForJdbc(cmd.id.get, utcDate, collect, connectorJdbc, formatAnalyze, formatAlarms)
-          } yield done
+            dones <- sendMonitorForJdbc(cmd.id.get, utcDate, collect, connectors, formatAnalyze, formatAlarms)
+          } yield dones
         }
       case "SSH" =>
         p completeWith {
           for {
             collect <- coreCollectFuture
-            connectorSsh <- cs.getCoreConnectorSshById(cmd.connectorId).invoke()
+            connectors <- Future.sequence(cmd.connectorIds.map(id => cs.getCoreConnectorSshById(id).invoke()))
             formatAnalyze <- formatAnalyzeFuture
             formatAlarms <- formatAlarmsFuture
-            done <- sendMonitorForSsh(cmd.id.get, utcDate, collect, connectorSsh, formatAnalyze, formatAlarms)
-          } yield done
+            dones <- sendMonitorForSsh(cmd.id.get, utcDate, collect, connectors, formatAnalyze, formatAlarms)
+          } yield dones
         }
     }
 
@@ -115,43 +115,51 @@ class MonitorActionCollect(cs: ConfigService,
     }
   }
 
-  def sendMonitorForJdbc(id: Int, utcDate: String, collect: CoreCollect, connector: CoreConnectorJdbc,
+  def sendMonitorForJdbc(id: Int, utcDate: String,
+                         collect: CoreCollect,
+                         connectors: Seq[CoreConnectorJdbc],
                          analyze: Option[CoreFormatAnalyze],
-                         alarms: Seq[`object`.CoreFormatAlarm]): Future[Done] = {
-    val ccj = `object`.CoreConnectorJdbc(connector.id.get, connector.name, connector.url, connector.user, connector.password)
+                         alarms: Seq[`object`.CoreFormatAlarm]): Future[Seq[Done]] = {
     val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
 
-    val sendFormatAnalyzeOpt = analyze match {
-      case Some(a) => {
-        val es = `object`.CoreElasticsearch(a._index, connector.name)
-        Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, es))
-      }
-      case None => None
-    }
+    val ccjs = connectors.map(connector => `object`.CoreConnectorJdbc(connector.id.get, connector.name, connector.url, connector.user, connector.password))
 
     logger.info(s"formatAlarms: ${alarms.toString()}")
 
-    cJDBCs.pushCollectItem.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, alarms))
+    val dones = ccjs.map { ccj =>
+      val sendFormatAnalyzeOpt = analyze match {
+        case Some(a) =>
+          Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, `object`.CoreElasticsearch(a._index, ccj.name)))
+        case None => None
+      }
+
+      cJDBCs.pushCollectItem.invoke(CoreMonitorDetailForJdbc(id, utcDate, ccj, cc, sendFormatAnalyzeOpt, alarms))
+    }
+
+    Future.sequence(dones)
   }
 
   def sendMonitorForSsh(id: Int, utcDate: String,
                         collect: CoreCollect,
-                        connector: CoreConnectorSsh,
+                        connectors: Seq[CoreConnectorSsh],
                         analyze: Option[CoreFormatAnalyze],
-                        alarms: Seq[`object`.CoreFormatAlarm]): Future[Done] = {
-    val ccj = `object`.CoreConnectorSsh(connector.id.get, connector.name, connector.ip, connector.user, connector.password, connector.privateKey)
-    val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
+                        alarms: Seq[`object`.CoreFormatAlarm]): Future[Seq[Done]] = {
+    val ccjs = connectors.map(connector => `object`.CoreConnectorSsh(connector.id.get, connector.name, connector.ip, connector.user, connector.password, connector.privateKey))
 
-    val formatAnalyzeOpt = analyze match {
-      case Some(a) => {
-        val es = `object`.CoreElasticsearch(a._index, connector.name)
-        Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, es))
-      }
-      case None => None
-    }
+    val cc = `object`.CoreCollect(collect.id.get, collect.name, collect.path, collect.args)
 
     logger.info(s"formatAlarms: ${alarms.toString()}")
 
-    cSSHs.pushCollectItem.invoke(`object`.CoreMonitorDetailForSsh(id, utcDate, ccj, cc, formatAnalyzeOpt, alarms))
+    val dones = ccjs.map { ccj =>
+      val formatAnalyzeOpt = analyze match {
+        case Some(a) =>
+          Some(`object`.CoreFormatAnalyze(a.id.get, a.path, a.args, `object`.CoreElasticsearch(a._index, ccj.name)))
+        case None => None
+      }
+
+      cSSHs.pushCollectItem.invoke(`object`.CoreMonitorDetailForSsh(id, utcDate, ccj, cc, formatAnalyzeOpt, alarms))
+    }
+
+    Future.sequence(dones)
   }
 }

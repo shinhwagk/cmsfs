@@ -7,17 +7,19 @@ Param(
   [string[]]$startBaseServices
 )
 
-$BASE_DIR = $PSScriptRoot; Set-Location $BASE_DIR;
+$BASE_DIR = $PSScriptRoot;
+$DEPLOY_DIR = "${BASE_DIR}";
+$PROJECT_DIR = "${BASE_DIR}/../cmsfs";
+$BASH_BASH_DIR = "/mnt/e/github/cmsfs";
+$BASH_PROJECT_DIR = "${BASH_BASH_DIR}/cmsfs"
 
 $REMOTE_SERVICE_IP = "10.65.103.63";
 
-[hashtable]$lagomServices = @{}
-$lagomServices.Add("config", "..\cmsfs\config\impl\target\universal\config-impl-1.0-SNAPSHOT.zip")
-$lagomServices.Add("collect-jdbc", "..\cmsfs\collect-jdbc\impl\target\universal\collect-jdbc-impl-1.0-SNAPSHOT.zip")
-$lagomServices.Add("collect-ssh", "..\cmsfs\collect-ssh\impl\target\universal\collect-ssh-impl-1.0-SNAPSHOT.zip")
-$lagomServices.Add("format-analyze", "..\cmsfs\format-analyze\impl\target\universal\format-analyze-impl-1.0-SNAPSHOT.zip")
-$lagomServices.Add("format-alarm", "..\cmsfs\format-alarm\impl\target\universal\format-alarm-impl-1.0-SNAPSHOT.zip")
-$lagomServices.Add("monitor", "..\cmsfs\monitor\impl\target\universal\monitor-impl-1.0-SNAPSHOT.zip")
+function genLagomProjectPath($serviceName){
+  return "..\cmsfs\${serviceName}\impl\target\universal\${serviceName}-impl-1.0-SNAPSHOT.tgz";
+}
+
+$lagomServices = "config", "collect-jdbc","collect-ssh","format-analyze","format-alarm","monitor";
 
 $baseServices = "consul", "db", "redis", "elasticsearch", "notification";
 
@@ -43,6 +45,7 @@ function scpCommandForFile($source, $target = "root@${REMOTE_SERVICE_IP}:/opt/cm
 }
 
 function scpDeployFile() {
+  Set-Location $DEPLOY_DIR;
   scpCommandForFile docker-compose.test.yml
   scpCommandForFile Dockerfile-lagom.test 
   scpCommandForFile entrypoint.sh 
@@ -62,26 +65,28 @@ function stopLagomServices($serviceName) {
 }
 
 function buildLagomAllService() {
+  Set-Location $PROJECT_DIR;
   Write-Host -ForegroundColor Red "start all build lagom service: ${serviceName} ...";
-  Set-Location $BASE_DIR\..\cmsfs; sbt dist;
+  bashExecute "sbt universal:packageZipTarball";
   Write-Host -ForegroundColor Red "start all build lagom service: ${serviceName} ...";
 }
 
+function bashExecute($command) {
+  bash -c "source ~/.bash_profile; ${command}";
+}
+
 function buildLagomService($serviceName) {
+  Set-Location $PROJECT_DIR;
   Write-Host -ForegroundColor Red "start build lagom service: ${serviceName} ...";
-  $lagomServiceName = "${serviceName}-impl";
-  Set-Location $BASE_DIR\..\cmsfs; sbt ${lagomServiceName}/dist | out-null;
+  $lagomServiceImplName = "${serviceName}-impl";
+  bashExecute "cd ${BASH_PROJECT_DIR}; sbt ${lagomServiceImplName}/universal:packageZipTarball"
   Write-Host -ForegroundColor Red "end build lagom service: ${serviceName} ...";
   Write-Host -ForegroundColor Red "-------------------------------------------";
 }
 
 function startLagomService($serviceName) {
   Set-Location $BASE_DIR
-  $serviceFile = $lagomServices.Item($serviceName);
-  scpCommandForFile $serviceFile;
-  $serviceZipFile = $serviceFile.split("\")[-1];
-  $serviceProjectName = $serviceZipFile.Substring(0, $serviceZipFile.length - 4);
-  sshExecute "cd /opt/cmsfs/; rm -fr ./${serviceProjectName}; unzip ${serviceZipFile} -d ./";
+  scpCommandForFile (genLagomProjectPath $serviceName);
 
   sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} build ${serviceName}";
   sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} stop ${serviceName}";
@@ -91,6 +96,7 @@ function startLagomService($serviceName) {
 }
 
 function startBaseServiceCommand($service) {
+  Set-Location $DEPLOY_DIR;
   if($service.equals("notification")) {
     $RANDOM = Get-Random -minimum 1 -maximum 101
     $body="{""ID"":""${RANDOM}"",""Name"":""${service}"",""Tags"":[],""Address"":""10.65.209.12"",""Port"":8380}";
@@ -122,9 +128,8 @@ if ($startLagomServices.Length -ge 1) {
 }
 
 if ($startAllLagomServices.IsPresent) {
-  [string[]]$services = @($lagomServices.keys)
   buildLagomAllService;
-  foreach ($service in $services) {
+  foreach ($service in $lagomServices) {
     startLagomService $service;
   }
 }

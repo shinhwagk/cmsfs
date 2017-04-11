@@ -19,4 +19,4 @@ ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["-Dplay.crypto.secret=abcdefghijk", "-Dlogger.file=/opt/logback.xml"]
 
-ADD ${SVC_NAME}-impl-1.0-SNAPSHOT /opt/cmsfs
+ADD ${SVC_NAME}-impl-1.0-SNAPSHOT.tgz /opt/cmsfs

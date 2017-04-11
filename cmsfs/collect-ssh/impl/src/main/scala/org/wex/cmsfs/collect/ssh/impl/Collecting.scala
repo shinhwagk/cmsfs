@@ -106,7 +106,7 @@ class Collecting(ct: CollectTopic,
 
     val channelExec: ChannelExec = session.openChannel("exec").asInstanceOf[ChannelExec]
     val in = channelExec.getInputStream();
-    channelExec.setCommand(s"curl -s ${scriptUrl} | sh");
+    channelExec.setCommand(s"curl -sk ${scriptUrl} | sh");
     channelExec.connect();
 
     val reader = new BufferedReader(new InputStreamReader(in));

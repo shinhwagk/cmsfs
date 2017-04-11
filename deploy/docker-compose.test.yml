@@ -202,7 +202,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=123456aA+
     volumes:
-      # - /var/lib/mysql:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
       - /etc/localtime:/etc/localtime
     networks:
       cmsfs:
@@ -215,17 +215,17 @@ services:
       timeout: 2s
       retries: 10
 
-  db_data:
-    container_name: cmsfs_db_data
-    image: mysql
-    volumes:
-      - ./db/:/opt/
-    command: sh -c "/opt/load.sh"
-    networks: 
-      - cmsfs
-    depends_on:
-      db:
-        condition: service_healthy
+  # db_data:
+  #   container_name: cmsfs_db_data
+  #   image: mysql
+  #   volumes:
+  #     - ./db/:/opt/
+  #   command: sh -c "/opt/load.sh"
+  #   networks: 
+  #     - cmsfs
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
   # cadvisor:
   #   container_name: cmsfs_cadvisor
@@ -247,10 +247,12 @@ services:
      - cmsfs
     volumes: 
       - /etc/localtime:/etc/localtime
+      - ./grafana/data:/var/lib/grafana
+      # - ./grafana/config:/etc/grafana
     ports: 
       - "3000:3000"
     environment: 
-      - GF_SECURITY_ADMIN_PASSWORD=123456aA+ 
+      - GF_SECURITY_ADMIN_PASSWORD=123456aA+
     logging: 
       driver: "json-file"
       options: 
@@ -271,6 +273,7 @@ services:
     mem_limit: 1g
     volumes:
       - ./register.sh:/register.sh
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
       - /etc/localtime:/etc/localtime
     entrypoint: sh -c "sh /register.sh && /docker-entrypoint.sh elasticsearch"
     ports: 
