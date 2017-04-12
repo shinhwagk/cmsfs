@@ -2,26 +2,16 @@
 
 <div>
     <select [(ngModel)]="category">
-      <option value="pow1">Volvo</option>
-      <option value="pow2">Saab</option>
-      <option>Mercedes</option>
-      <option>Audi</option>
+      <option [value]="val" *ngFor ="let val of categorys">{{val}}</option>
+    </select>
+    <select [(ngModel)]="name">
+      <option [value]="val" *ngFor ="let val of names">{{val}}</option>
     </select>
     <select [(ngModel)]="metric">
-      <option value="pow1">Volvo</option>
-      <option value="pow2">Saab</option>
-      <option>Mercedes</option>
-      <option>Audi</option>
+      <option [value]="val" *ngFor ="let val of metrics">{{val}}</option>
     </select>
-    <select [(ngModel)]="metric">
-      <option value="pow1">Volvo</option>
-      <option value="pow2">Saab</option>
-      <option>Mercedes</option>
-      <option>Audi</option>
-    </select>
-    <button>query</button>
+    <button (click)="filter()">query</button>
 </div>
-
 
 <div class="container">
     <table class="table table-striped">
@@ -35,8 +25,8 @@
             <th>Alarm</th>
             <th>Chart</th>
         </tr>
-        <tr *ngFor="let status of data">
-            <td>{{status.id}}</td>
+        <tr *ngFor="let status of echoData; let i = index">
+            <td>{{i + 1}}</td>
             <td>{{status.category}}</td>
             <td>{{status.name}}</td>
             <td>{{status.metric}}</td>
@@ -59,7 +49,7 @@
                     </div>
                 </div>
             </td>
-            <td><a [href]="chartUrl(status.metric,status.name)" target="_blank">link</a></td>
+            <td><a [href]="chartUrl(status.metric, status.name)" target="_blank">link</a></td>
         </tr>
     </table>
 </div>

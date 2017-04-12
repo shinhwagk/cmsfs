@@ -15,7 +15,7 @@ class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_m
 
   def connectorMode = column[String]("CONNECTOR_MODE")
 
-  def connectorId = column[Int]("CONNECTOR_ID")
+  def connectorIds = column[Seq[Int]]("CONNECTOR_IDS")
 
   def collectId = column[Int]("COLLECT_ID")
 
@@ -27,5 +27,5 @@ class CoreMonitorDetails(tag: Tag) extends Table[CoreMonitorDetail](tag, "core_m
 
   def formatAlarmIds = column[Seq[Int]]("FORMAT_ALARM_IDS")
 
-  override def * = (id, cron, connectorMode, connectorId, collectId, collectArgs, formatAnalyzeId, formatAnalyzeArgs, formatAlarmIds) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
+  override def * = (id, cron, connectorMode, connectorIds, collectId, collectArgs, formatAnalyzeId, formatAnalyzeArgs, formatAlarmIds) <> (CoreMonitorDetail.tupled, CoreMonitorDetail.unapply)
 }

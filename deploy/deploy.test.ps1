@@ -15,11 +15,11 @@ $BASH_PROJECT_DIR = "${BASH_BASH_DIR}/cmsfs"
 
 $REMOTE_SERVICE_IP = "10.65.103.63";
 
-function genLagomProjectPath($serviceName){
+function genLagomProjectPath($serviceName) {
   return "..\cmsfs\${serviceName}\impl\target\universal\${serviceName}-impl-1.0-SNAPSHOT.tgz";
 }
 
-$lagomServices = "config", "collect-jdbc","collect-ssh","format-analyze","format-alarm","monitor";
+$lagomServices = "config", "collect-jdbc", "collect-ssh", "format-analyze", "format-alarm", "monitor";
 
 $baseServices = "consul", "db", "redis", "elasticsearch", "notification";
 
@@ -97,11 +97,12 @@ function startLagomService($serviceName) {
 
 function startBaseServiceCommand($service) {
   Set-Location $DEPLOY_DIR;
-  if($service.equals("notification")) {
+  if ($service.equals("notification")) {
     $RANDOM = Get-Random -minimum 1 -maximum 101
-    $body="{""ID"":""${RANDOM}"",""Name"":""${service}"",""Tags"":[],""Address"":""10.65.209.12"",""Port"":8380}";
+    $body = "{""ID"":""${RANDOM}"",""Name"":""${service}"",""Tags"":[],""Address"":""10.65.209.12"",""Port"":8380}";
     Invoke-WebRequest -Method POST -Body "${body}" -Uri http://${REMOTE_SERVICE_IP}:8500/v1/agent/service/register
-  } else {
+  }
+  else {
     startBaseService $service;
   }
 }
@@ -114,7 +115,7 @@ if ($startAllBaseServices.IsPresent) {
   }
 }
 
-if($startBaseServices.length -ge 1) {
+if ($startBaseServices.length -ge 1) {
   foreach ($service in [string[]]$startBaseServices) {
     startBaseServiceCommand $service
   }
