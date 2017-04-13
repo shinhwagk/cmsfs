@@ -13,45 +13,45 @@ export class AppComponent {
 
   constructor(private apiServicer: ApiService) {
     this.apiServicer.getMonitorStatuses().then(p => {
-      this.categorys = Array.from(new Set(this.data.map(p => p.category)))
-      this.metrics = Array.from(new Set(this.data.map(p => p.metric)))
-      this.names = Array.from(new Set(this.data.map(p => p.name)))
       this.data = p
-      this.echoData = p
+      this.categorys = Array.from(new Set(this.data.map(p => p.category)));
+      this.metrics = Array.from(new Set(this.data.map(p => p.metric)));
+      this.names = Array.from(new Set(this.data.map(p => p.name)));
+      this.echoData = p;
     });
     setInterval(() => this.apiServicer.getMonitorStatuses().then(p => {
-      this.categorys = Array.from(new Set(this.data.map(p => p.category)))
-      this.metrics = Array.from(new Set(this.data.map(p => p.metric)))
-      this.names = Array.from(new Set(this.data.map(p => p.name)))
-      this.data = p
+      this.categorys = Array.from(new Set(this.data.map(p => p.category)));
+      this.metrics = Array.from(new Set(this.data.map(p => p.metric)));
+      this.names = Array.from(new Set(this.data.map(p => p.name)));
+      this.data = p;
+      this.filter();
     }), 5000);
   }
 
   data: CoreMonitorStatus[] = [];
-  echoData: CoreMonitorStatus[] = []
+  echoData: CoreMonitorStatus[] = [];
 
   categorys: string[] = [];
   metrics: string[] = [];
   names: string[] = [];
 
-  category: string
-  metric: string
-  name: string
+  category = '';
+  metric = '';
+  name = '';
 
   filter() {
-    var filterData: CoreMonitorStatus[] = this.data
-
+    let filterData: CoreMonitorStatus[] = this.data;
     if (this.name) {
-      filterData = filterData.filter(j => j.name == this.name)
+      filterData = filterData.filter(j => j.name === this.name);
     }
     if (this.category) {
-      filterData = filterData.filter(j => j.category == this.category)
+      filterData = filterData.filter(j => j.category === this.category);
     }
     if (this.metric) {
-      filterData = filterData.filter(j => j.metric == this.metric)
+      filterData = filterData.filter(j => j.metric === this.metric);
     }
 
-    this.echoData = filterData
+    this.echoData = filterData;
   }
 
   setCurrentClasses(state) {
@@ -62,7 +62,7 @@ export class AppComponent {
   }
 
   chartUrl(metric, name) {
-    console.info(metric)
+    console.info(metric);
     return `http://10.65.103.63:3000/dashboard/db/${metric}?var-name=${name}`;
   }
 

@@ -44,10 +44,10 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("content", content));
     nvps2.add(new BasicNameValuePair("isRealTime", "true"));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"));
-//    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
-//      case Success(s) => logger.info(s)
-//      case Failure(ex) => logger.info(ex.getMessage)
-//    }
+    //    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
+    //      case Success(s) => logger.info(s)
+    //      case Failure(ex) => logger.info(ex.getMessage)
+    //    }
   }
 
   def genFormBody(subject: String, contact: Seq[String], content: String): Unit = {
@@ -62,10 +62,10 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     nvps2.add(new BasicNameValuePair("subject", subject));
     val body = EntityUtils.toString(new UrlEncodedFormEntity(nvps2, "UTF-8"))
     println(body)
-//    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
-//      case Success(s) => logger.info(s)
-//      case Failure(ex) => logger.info(ex.getMessage)
-//    }
+    //    es.pushNotificationItem.handleRequestHeader(setHeader).invoke(body).onComplete {
+    //      case Success(s) => logger.info(s)
+    //      case Failure(ex) => logger.info(ex.getMessage)
+    //    }
   }
 
   def setHeader(rh: RequestHeader): RequestHeader = {
@@ -79,7 +79,7 @@ class FormatAlarmAction(topic: FormatAlarmTopic,
     val monitorStatus = putStatus(fai.id, "ALARM") _
     try {
       val url: String = getUrlByPath(fai.coreFormatAlarm.path)
-      val formatResultString: String = executeFormat(url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
+      val formatResultString: String = executeFormat(fai.id, url, "alarm.py", fai.collectResult, fai.coreFormatAlarm.args)
       val formatAlarmResult: FormatAlarmResult = Json.parse(formatResultString).as[FormatAlarmResult]
       val mails = fai.coreFormatAlarm.notification.mails.map(mail => (mail, formatAlarmResult.mailResult))
       val phones = fai.coreFormatAlarm.notification.mobiles.map(phone => (phone, formatAlarmResult.phoneResult))

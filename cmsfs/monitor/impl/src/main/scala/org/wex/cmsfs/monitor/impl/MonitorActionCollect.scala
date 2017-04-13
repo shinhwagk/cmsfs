@@ -50,7 +50,9 @@ class MonitorActionCollect(cs: ConfigService,
   }
 
   def filterMonitorDetails(cDate: Date)(monitorDetails: Seq[CoreMonitorDetail]): Seq[CoreMonitorDetail] = {
-    monitorDetails.filter(cmd => filterCron(cmd.cron, cDate))
+    val view = monitorDetails.filter(cmd => filterCron(cmd.cron, cDate))
+    logger.info(s"filter monitor detail ${view.map(_.id).toString()} ${cDate.toString} - ${view.map(_.collectId).toString()}")
+    view
   }
 
   def filterCron(cron: String, cDate: Date): Boolean = {
@@ -70,15 +72,9 @@ class MonitorActionCollect(cs: ConfigService,
     val formatAlarmsFuture: Future[Seq[`object`.CoreFormatAlarm]] = {
       cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke())
 
-
-      val c = Future.sequence(cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke()))
+      Future.sequence(cmd.formatAlarmIds.map(id => cs.getCoreFormatAlarmsById(id).invoke()))
         .map(_.map(apiAlarm =>
           `object`.CoreFormatAlarm(apiAlarm.id.get, apiAlarm.path, apiAlarm.args, `object`.CoreFormatAlarmNotification(apiAlarm.notification.mails, apiAlarm.notification.mobiles))))
-
-      logger.info("aaa: " + cmd.formatAlarmIds)
-      c.foreach(p => logger.info("dddd:  " + p.toString))
-
-      c
     }
 
     formatAlarmsFuture.foreach(p => logger.info(s"future ${cmd.formatAlarmIds.toString()}, ${p.toString()}"))

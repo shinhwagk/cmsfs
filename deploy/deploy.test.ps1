@@ -21,7 +21,7 @@ function genLagomProjectPath($serviceName) {
 
 $lagomServices = "config", "collect-jdbc", "collect-ssh", "format-analyze", "format-alarm", "monitor";
 
-$baseServices = "consul", "db", "redis", "elasticsearch", "notification";
+$baseServices = "consul", "db", "redis", "elasticsearch", "notification", "grafana";
 
 $DOCKER_COMPOSE = "docker-compose -p cmsfs -f docker-compose.test.yml"
 
@@ -88,11 +88,21 @@ function startLagomService($serviceName) {
   Set-Location $BASE_DIR
   scpCommandForFile (genLagomProjectPath $serviceName);
 
-  sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} build ${serviceName}";
   sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} stop ${serviceName}";
   sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} rm -f ${serviceName}";
-  sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} up -d ${serviceName}";
+  sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} up -d --build ${serviceName}";
   sshExecute "cd /opt/cmsfs/; ${DOCKER_COMPOSE} ps"
+}
+
+function consulDeregister($serviceName) {
+  $url = "http://${REMOTE_SERVICE_IP}:8500/v1/catalog/service/${serviceName}"
+  $services = (Invoke-WebRequest -Method GET -Uri $url).Content.Trim() | ConvertFrom-Json ;
+  foreach ($service in $services) {
+    $serviceId = $service.ServiceID
+    $re = "http://${REMOTE_SERVICE_IP}:8500/v1/agent/service/deregister/${serviceId}"
+    echo " $serviceId $node $body"
+    Invoke-WebRequest -Method Put -Uri $re
+  }
 }
 
 function startBaseServiceCommand($service) {
@@ -123,7 +133,8 @@ if ($startBaseServices.length -ge 1) {
 
 if ($startLagomServices.Length -ge 1) {
   foreach ($service in [string[]]$startLagomServices) {
-    buildLagomService $service;
+    # buildLagomService $service;
+    consulDeregister $service;
     startLagomService $service;
   }
 }

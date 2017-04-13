@@ -1,13 +1,15 @@
 <h4>{{title}}</h4>
-
 <div>
     <select [(ngModel)]="category">
+      <option [value]="''">All</option>
       <option [value]="val" *ngFor ="let val of categorys">{{val}}</option>
     </select>
     <select [(ngModel)]="name">
+      <option [value]="''">All</option>
       <option [value]="val" *ngFor ="let val of names">{{val}}</option>
     </select>
     <select [(ngModel)]="metric">
+      <option [value]="''">All</option>
       <option [value]="val" *ngFor ="let val of metrics">{{val}}</option>
     </select>
     <button (click)="filter()">query</button>
