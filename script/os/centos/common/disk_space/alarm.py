@@ -1,5 +1,5 @@
 import json
 
-a = {"mailResult": "xx", "phoneResult" :"f"}
+a = {"mailResult": "xx", "mobileResult" :"f"}
 
 print(json.dumps(a))
