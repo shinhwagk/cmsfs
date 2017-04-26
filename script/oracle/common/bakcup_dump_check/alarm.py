@@ -8,8 +8,7 @@ def readFileData(file):
   return x
 
 collectData = readFileData(sys.argv[1])
-notificationData = json.loads(readFileData(sys.argv[2]))
 
-n = [[notificationData[0],notificationData[1],collectData]]
+rs = [{"mail": notificationData}]
 
-print(json.dumps(n))
+print(json.dumps(rs))
