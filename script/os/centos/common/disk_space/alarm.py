@@ -21,7 +21,7 @@ def split_str(y):
 
 g = list(map(split_str, j))
 
-xr = filter(lambda x: x['Ued%'] >= int(11), g)
+xr = filter(lambda x: x['Ued%'] >= int(x2), g)
 
 rs = map(lambda y: {"mail": ("%s - %s%s") %
                     (y["Filesystem"], y["Ued%"], "%"), "mobile": ("%s - %s%s") %
