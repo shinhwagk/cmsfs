@@ -9,6 +9,6 @@ def readFileData(file):
 
 collectData = readFileData(sys.argv[1])
 
-rs = [{"mail": notificationData}]
+rs = [{"mail": collectData}]
 
 print(json.dumps(rs))
