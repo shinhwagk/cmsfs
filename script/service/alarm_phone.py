@@ -9,5 +9,5 @@ f = open(sys.argv[2], "r")
 phones = json.loads(f.read())
 f.close
 
-for content in contents:
-  sendPhone(phones, content)
+# for content in contents:
+#   sendPhone(phones, content)
