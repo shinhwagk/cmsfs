@@ -3,12 +3,12 @@ import os
 import json
 
 es_timestamp = os.getenv("utc-data")
-es_point = os.getenv("collect-name")
+es_metric = os.getenv("collect-name")
 
 datas = format_data()
 
 for data in datas:
   data['@timestamp'] = es_timestamp
-  data['point'] = es_point
+  data['@metric'] = es_metric
   
 print(json.dumps(datas))
