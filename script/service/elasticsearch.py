@@ -1,7 +1,7 @@
 import sys
 import json
 import re
-import http
+import http.client
 
 f = open(sys.argv[1], "r")
 datas = json.loads(f.read())
