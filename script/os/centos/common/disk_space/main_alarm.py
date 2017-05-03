@@ -1,5 +1,4 @@
 from format_common import format_data
-from notify_email import mail_send
 import sys
 
 data = format_data()
