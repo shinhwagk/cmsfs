@@ -11,4 +11,4 @@ for data in datas:
   data['@timestamp'] = es_timestamp
   data['point'] = es_point
   
-return json.dumps(datas)
+print(json.dumps(datas))
