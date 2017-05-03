@@ -2,14 +2,13 @@ import sys
 import json
 import re
 import http.client
+import os
 
 f = open(sys.argv[1], "r")
 datas = json.loads(f.read())
 f.close
 
-f = open(sys.argv[2], "r")
-args = json.loads(f.read())
-f.close
+hostname = os.getenv("conn-name")
 
 
 def sendElasticsearch(_index, _type, contents):
@@ -21,4 +20,4 @@ def sendElasticsearch(_index, _type, contents):
         response = conn.getresponse()
         print(response.status, response.reason)
 
-sendElasticsearch(args["_index"], args["_type"], datas)
+sendElasticsearch("monitor", hostname, datas)
