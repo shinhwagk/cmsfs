@@ -13,7 +13,6 @@ host = os.getenv("conn-ip")
 
 filterData = filter(lambda x: x['Ued%'] >= args["threshold"], data)
 
-for d in filterData:
-    content = "%s(%s) | %s - %s%s" % (hostname,host,d["Filesystem"], d["Ued%"], "%")
+contents = map(lambda x: "%s(%s) | %s - %s%s" % (hostname,host,d["Filesystem"], d["Ued%"], "%"), filterData)
     
 print(content)
