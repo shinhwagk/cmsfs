@@ -8,7 +8,7 @@ f = open(sys.argv[1], "r")
 datas = json.loads(f.read())
 f.close
 
-hostname = os.getenv("connect-name")
+hostname = os.getenv("conn-name")
 
 
 def sendElasticsearch(_index, _type, contents):
