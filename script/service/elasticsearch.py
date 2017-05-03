@@ -6,5 +6,7 @@ f = open(sys.argv[1], "r")
 datas = json.loads(f.read())
 f.close
 
-for data in datas:
-  print(data)
+f = open(sys.argv[2], "r")
+args = json.loads(f.read())
+f.close
+
