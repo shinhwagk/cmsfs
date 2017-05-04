@@ -8,9 +8,6 @@ f = open(sys.argv[1], "r")
 datas = json.loads(f.read())
 f.close
 
-hostname = os.getenv("conn-name")
-
-
 def sendElasticsearch(_index, _type, contents):
     for content in contents:
         headers = {"Content-type": "application/json; charset=utf-8"}
@@ -20,4 +17,4 @@ def sendElasticsearch(_index, _type, contents):
         response = conn.getresponse()
         print(response.status, response.reason)
 
-sendElasticsearch("monitor", hostname, datas)
+sendElasticsearch("monitor", "oracle", datas)
