@@ -20,4 +20,4 @@ def sendElasticsearch(_index, _type, contents):
         response = conn.getresponse()
         print(response.status, response.reason)
 
-sendElasticsearch("monitor", hostname, datas)
+sendElasticsearch("monitor", "os", datas)
