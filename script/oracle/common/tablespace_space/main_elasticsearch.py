@@ -2,7 +2,7 @@ from format_common import get_data
 import os
 import json
 
-es_timestamp = os.getenv("utc-data")
+es_timestamp = os.getenv("utc-date")
 es_metric = os.getenv("collect-name")
 service_name = os.getenv("conn-service")
 
