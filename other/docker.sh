@@ -18,7 +18,7 @@ delete_image() {
 }
 
 
-# delete images node
+# delete images none
 docker images | grep 'none' | awk '{print $3}' | while read image
 do
   docker ps -a | grep $image | awk '{print $1}' | while read container
