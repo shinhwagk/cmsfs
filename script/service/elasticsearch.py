@@ -14,7 +14,7 @@ hostname = os.getenv("conn-name")
 def sendElasticsearch(_index, _type, contents):
     for content in contents:
         headers = {"Content-type": "application/json; charset=utf-8"}
-        conn = http.client.HTTPConnection("10.65.103.63", 9200)
+        conn = http.client.HTTPConnection("10.65.103.75", 9200)
         url = "/%s/%s" % (_index, _type)
         conn.request("POST", url, json.dumps(content), headers)
         response = conn.getresponse()
